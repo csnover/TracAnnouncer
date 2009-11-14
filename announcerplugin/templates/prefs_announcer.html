@@ -1,0 +1,27 @@
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:py="http://genshi.edgewall.org/"
+      xmlns:xi="http://www.w3.org/2001/XInclude">
+  <xi:include href="prefs.html" />
+  <head>
+    <title>Announcements</title>
+  </head>
+  <body>
+    <p>
+      Announcements serve as a method for Trac to communicate events to you; 
+      the creation of a ticket, the change of a Wiki page, and so on. Under
+      the Announcement system, you will only receive notifications to those
+      topics that you subscribe to.
+    </p>
+   <div py:for="(title, box) in boxes" align="center">
+     <div class="announcer_preference_box">
+       <div class="announcer_preference_title">${title}</div>
+       <div class="announcer_preference_options">${box}</div>
+     </div>
+   </div>
+  </body>
+</html>
+
+

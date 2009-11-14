@@ -1,0 +1,22 @@
+<span xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:py="http://genshi.edgewall.org/"
+     xmlns:xi="http://www.w3.org/2001/XInclude" id="announcer_rules">
+  <p>
+    The rule-based subscription module is for advanced users, and allows you to use filters to specify which events you are interested in hearing about.
+  </p>
+  <p>
+    Every rule is in the form of: 
+      <div class="syntax"><span class="realm">realm</span>, <span class="category">category</span>: <span class="rule">query rule</span></div>
+  </p>
+  <div py:for="rulenum, rule in enumerate(rules)" style="padding: 0.5 em">
+      <input type="hidden" name="rule_${rulenum}_id" value="${rule['id']}" />
+      <input type="checkbox" name="rule_${rulenum}_enabled" checked="${rule['enabled']}" value="1" />
+      <select name="rule_${rulenum}_category">
+        <optgroup label="${realm.capitalize()}" py:for="realm in categories">
+          <option value="${realm}:${category}" py:for="category in categories[realm]" selected="${rule['category'] == category or None}">${realm.capitalize()}, ${category.capitalize()}</option>
+        </optgroup>
+      </select>
+      <input type="text" name="rule_${rulenum}_rule" value="${rule['value']}" style="width:99%" />
+  </div>
+
+</span>

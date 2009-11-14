@@ -1,0 +1,20 @@
+div.announcer_preference_box {
+    background-color: #f0f6fe; 
+    width: 95%; 
+    border: thin outset #d4d1ff; 
+    padding: 0.5em;
+    text-align: left;
+    margin: 1em;
+}
+
+div.announcer_preference_title {
+    background-color: #213da4; 
+    color: #fff; 
+    padding: 5px; 
+    font-family: "Lucida Grande", Lucida, Verdana, sans-serif;
+}
+
+div.announcer_preference_options {
+    padding: 2px;
+}
+

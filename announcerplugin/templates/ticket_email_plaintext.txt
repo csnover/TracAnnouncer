@@ -1,0 +1,50 @@
+#${ticket.id}: ${ticket['summary']}
+${ticket['status']} ${ticket['type']}
+---------------------------------------------------------------------
+{% for field in header %}\
+{% choose %}\
+{% when ticket[field] %}\
+${field.capitalize()}: ${ticket[field]}
+{% end %}\
+{% otherwise %}\
+${field.capitalize()}: (None)
+{% end %}\
+{% end %}\
+{% end %}\
+{% if category == 'created' %}\
+---------------------------------------------------------------------
+${ticket['description']}
+{% end %}\
+{% if has_changes or attachment %}\
+---------------------------------------------------------------------
+Changes (by ${author}): 
+{% for change in short_changes %}
+ * ${change} from '${short_changes[change][0]}' to \
+{% choose %}\
+{% when short_changes[change][1] %}\
+'${short_changes[change][1]}'{% end %}\
+{% otherwise %}\
+(deleted){% end %}\
+{% end %}\
+{% end %}\
+{% for change in long_changes %}\
+
+ * ${change}:
+${long_changes[change]}
+{% end %}\
+{% end %}\
+{% if attachment %}\
+Attachment:
+ * File '${attachment.filename}' added{% if attachment.description %}: ${attachment.description} {% end %}
+{% end %}\
+{% if comment %}\
+---------------------------------------------------------------------
+Comment{% if not has_changes %} (by ${author}){% end %}:
+
+${comment}\
+{% end %}\
+
+--
+Ticket URL: <URL:${ticket_link}>
+${project_name} <URL:${project_link}>
+${project_desc}
