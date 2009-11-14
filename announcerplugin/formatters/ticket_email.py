@@ -109,7 +109,7 @@ class TicketEmailFormatter(Component):
             ticket = ticket,
             author = event.author,
             comment = event.comment,
-            header = self._header_fields(ticket),
+            fields = self._header_fields(ticket),
             category = event.category,
             ticket_link = self.env.abs_href('ticket', ticket.id),
             project_name = self.env.project_name,
@@ -136,7 +136,7 @@ class TicketEmailFormatter(Component):
         headers = self.ticket_email_header_fields
         if len(headers) and headers[0].strip() == '*':
             tsystem = TicketSystem(self.env)
-            headers = map(lambda x: x['name'], tsystem.get_ticket_fields())
+            headers = tsystem.get_ticket_fields()
         return headers 
         
     def _format_html(self, event):
@@ -167,7 +167,7 @@ class TicketEmailFormatter(Component):
         data = dict(
             ticket = ticket,
             author = event.author,
-            header = self._header_fields(ticket),
+            fields = self._header_fields(ticket),
             comment = event.comment,
             category = event.category,
             ticket_link = self.env.abs_href('ticket', ticket.id),

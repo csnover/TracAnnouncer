@@ -1,13 +1,13 @@
 #${ticket.id}: ${ticket['summary']}
 ${ticket['status']} ${ticket['type']}
 ---------------------------------------------------------------------
-{% for field in header %}\
+{% for field in fields %}\
 {% choose %}\
-{% when ticket[field] %}\
-${field.capitalize()}: ${ticket[field]}
+{% when ticket[field['name']] %}\
+${field['label']}: ${ticket[field['name']]}
 {% end %}\
 {% otherwise %}\
-${field.capitalize()}: (None)
+${field['label']}: (None)
 {% end %}\
 {% end %}\
 {% end %}\

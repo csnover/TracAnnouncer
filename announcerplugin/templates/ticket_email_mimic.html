@@ -117,9 +117,9 @@
     <div class="ticketbox" style="background-color: #fefcd3; width: 90%; padding: .5em 1em; border-style: outset; border-width: 1px; margin: 2px;">
       <div class="title" style="font-weight: bold; border-bottom: 1pt inset #dfdfdf; padding-bottom: .5em;">${ticket['summary']}</div>
       <table class="header" width="100%">
-        <tr py:for="field in header">
-          <td class="label" width="30%" style="font-size: x-small; color: #7e7e7e; border-bottom: 1pt inset #dfdfdf; padding-bottom: .5em; width:  30%;">${field.capitalize()}:</td>
-          <td class="value" width="70%" style="border-bottom: 1pt inset #dfdfdf; padding-bottom: .5em; font-size: small;">${ticket[field] or 'None'}</td>
+        <tr py:for="field in fields">
+          <td class="label" width="30%" style="font-size: x-small; color: #7e7e7e; border-bottom: 1pt inset #dfdfdf; padding-bottom: .5em; width:  30%;">${field['label']}:</td>
+          <td class="value" width="70%" style="border-bottom: 1pt inset #dfdfdf; padding-bottom: .5em; font-size: small;">${ticket[field['name']] or 'None'}</td>
         </tr>
       </table>
       <py:if test="category == 'created'">
