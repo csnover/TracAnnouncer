@@ -58,7 +58,7 @@ class WikiEmailFormatter(Component):
                 yield "text/plain"
         
     def get_format_alternative(self, transport, realm, style):
-        return None
+        return "text/plain"
         
     def format_headers(self, transport, realm, style, event):
         return {}
