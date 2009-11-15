@@ -9,6 +9,7 @@ from trac.ticket.api import TicketSystem
 from trac.versioncontrol.diff import diff_blocks
 from trac.web.chrome import Chrome
 from trac.web.href import Href
+from trac.wiki.formatter import wiki_to_html
 import difflib
 
 def diff_cleanup(gen):
@@ -164,11 +165,16 @@ class TicketEmailFormatter(Component):
 
             else:
                 short_changes[field.capitalize()] = (old_value, new_value)
+
+        try:
+            temp = wiki_to_html(event.comment, self.env, None)
+        except:
+            temp = 'Comment in plain text: %s'%event.comment
         data = dict(
             ticket = ticket,
             author = event.author,
             fields = self._header_fields(ticket),
-            comment = event.comment,
+            comment = temp,
             category = event.category,
             ticket_link = self.env.abs_href('ticket', ticket.id),
             project_name = self.env.project_name,
@@ -177,7 +183,8 @@ class TicketEmailFormatter(Component):
             has_changes = short_changes or long_changes,
             long_changes = long_changes,
             short_changes = short_changes,
-            attachment= event.attachment
+            attachment = event.attachment,
+            attachment_link = self.env.abs_href('attachment/ticket',ticket.id)
         )
         chrome = Chrome(self.env)
         dirs = []
