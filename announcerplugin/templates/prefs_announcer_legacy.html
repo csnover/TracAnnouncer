@@ -2,20 +2,20 @@
      xmlns:py="http://genshi.edgewall.org/"
      xmlns:xi="http://www.w3.org/2001/XInclude">
   <ul>
-    <li py:if="always_notify_component_owner">
-      <input type="checkbox" name="legacy_notify_component_owner" checked="${legacy_notify_component_owner}" value="1" />
+    <li>
+      <input type="checkbox" name="legacy_notify_component_owner" checked="${data.component or None}"/>
       Notify me of changes to tickets that belong to components that I own.
     </li>        
-    <li py:if="always_notify_owner">
-      <input type="checkbox" name="legacy_notify_owner" checked="${legacy_notify_owner}" value="1" />
+    <li>
+      <input type="checkbox" name="legacy_notify_owner" checked="${data.owner or None}"/>
       Notify me of changes to tickets that I own.
     </li>        
-    <li py:if="always_notify_reporter">
-      <input type="checkbox" name="legacy_notify_reporter" checked="${legacy_notify_reporter}" value="1" />
+    <li>
+      <input type="checkbox" name="legacy_notify_reporter" checked="${data.reporter or None}"/>
       Notify me of changes to tickets that I reported.
     </li>        
-    <li py:if="always_notify_updater">
-      <input type="checkbox" name="legacy_notify_updater" checked="${legacy_notify_updater}" value="1" />
+    <li>
+      <input type="checkbox" name="legacy_notify_updater" checked="${data.updater or None}"/>
       Notify me when I update a ticket.
     </li>        
   </ul>

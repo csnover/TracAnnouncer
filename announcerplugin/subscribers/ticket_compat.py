@@ -77,24 +77,45 @@ class LegacyTicketSubscriber(Component):
     def render_announcement_preference_box(self, req, panel):
         if req.method == "POST":
             for attr in ('component_owner', 'owner', 'reporter', 'updater'):
-                if self.__getattribute__('always_notify_%s'%attr):
-                    val = req.args.get('legacy_notify_%s'%attr, '0')
-                    req.session['announcer_legacy_notify_%s'%attr] = val
-        data = dict(
-            always_notify_component_owner = self.always_notify_component_owner,
-            always_notify_owner = self.always_notify_owner,
-            always_notify_reporter = self.always_notify_reporter,
-            always_notify_updater = self.always_notify_updater,
-            legacy_notify_component_owner = req.session.get(
-                'announcer_legacy_notify_component_owner', '0') == '1' or None,
-            legacy_notify_owner = req.session.get(
-                'announcer_legacy_notify_owner', '0') == '1' or None,
-            legacy_notify_reporter = req.session.get(
-                'announcer_legacy_notify_reporter', '0') == '1' or None,
-            legacy_notify_updater = req.session.get(
-                'announcer_legacy_notify_updater', '0') == '1' or None,
+                val = req.args.get('legacy_notify_%s'%attr) == 'on'
+                req.session['announcer_legacy_notify_%s'%attr] = val
+
+        # component
+        component = req.session.get('announcer_legacy_notify_component_owner')
+        if component is None:
+            component = self.always_notify_component_owner
+        else:
+            component = component == u'True'
+
+        # owner
+        owner = req.session.get('announcer_legacy_notify_owner')
+        if owner is None:
+            owner = self.always_notify_owner
+        else:
+            owner = owner == u'True'
+
+        # reporter
+        reporter = req.session.get('announcer_legacy_notify_reporter')
+        if reporter is None:
+            reporter = self.always_notify_reporter
+        else:
+            reporter = reporter == u'True'
+
+        # updater
+        updater = req.session.get('announcer_legacy_notify_updater')
+        if updater is None:
+            updater = self.always_notify_updater
+        else:
+            updater = updater == u'True'
+
+        return "prefs_announcer_legacy.html", dict(
+            data=dict(
+                component=component,
+                owner=owner,
+                reporter=reporter,
+                updater=updater
+            )    
         )
-        return "prefs_announcer_legacy.html", data
 
     def get_subscription_realms(self):
         return ('ticket',)
@@ -117,48 +138,59 @@ class LegacyTicketSubscriber(Component):
                 ))
                 for s in subs:
                     yield s
-
     def _always_notify_component_owner(self, ticket):
         try:
             component = model.Component(self.env, ticket['component'])
+            if component.owner:
+                notify = self._check_user_setting('notify_component_owner', 
+                        component.owner)
+                if notify is None:
+                    notify = self.always_notify_component_owner
+                if notify:
+                    self._log_sub(component.owner, True, 
+                            'always_notify_component_owner')
+                    return ('email', component.owner, True, None)
         except ResourceNotFound, message:
             self.log.warn(_("LegacyTicketSubscriber couldn't add " \
                     "component owner because component was not found, " \
                     "message: '%s'"%(message,)))
-            return
-        if self.always_notify_component_owner and component.owner and not \
-                self._check_opt_out('notify_component_owner', component.owner):
-            self._log_sub(component.owner, True, 
-                    'always_notify_component_owner')
-            return ('email', component.owner, True, None)
 
     def _always_notify_ticket_owner(self, ticket):
-        if self.always_notify_owner and ticket['owner'] and not \
-            self._check_opt_out('notify_owner', ticket['owner']):                   
-            owner = ticket['owner']
-            if '@' in owner:
-                name, authenticated, address = None, False, owner
-            else:
-                name, authenticated, address = owner, True, None
-            self._log_sub(owner, authenticated, 'always_notify_owner')
-            return ('email', name, authenticated, address)
+        if ticket['owner']:
+            notify = self._check_user_setting('notify_owner', ticket['owner'])
+            if notify is None:
+                notify = self.always_notify_ticket_owner
+            if notify: 
+                owner = ticket['owner']
+                if '@' in owner:
+                    name, authenticated, address = None, False, owner
+                else:
+                    name, authenticated, address = owner, True, None
+                self._log_sub(owner, authenticated, 'always_notify_owner')
+                return ('email', name, authenticated, address)
         
     def _always_notify_ticket_reporter(self, ticket):
-        if self.always_notify_reporter and ticket['reporter'] and not \
-            self._check_opt_out('notify_reporter', ticket['reporter']):
-            reporter = ticket['reporter']
-            if '@' in reporter:
-                name, authenticated, address = None, False, reporter
-            else:
-                name, authenticated, address = reporter, True, None
-            self._log_sub(reporter, authenticated, 'always_notify_reporter')
-            return ('email', name, authenticated, address)
+        if ticket['reporter']:
+            notify = self._check_opt_out('notify_reporter', ticket['reporter'])
+            if notify is None:
+                notify = self.always_notify_ticket_reporter
+            if notify:
+                reporter = ticket['reporter']
+                if '@' in reporter:
+                    name, authenticated, address = None, False, reporter
+                else:
+                    name, authenticated, address = reporter, True, None
+                self._log_sub(reporter, authenticated, 'always_notify_reporter')
+                return ('email', name, authenticated, address)
 
     def _always_notify_ticket_updater(self, event, ticket):
-        if self.always_notify_updater and event.author and not \
-            self._check_opt_out('notify_updater', event.author):
-            self._log_sub(event.author, True, 'always_notify_updater')
-            return ('email', event.author, True, None)
+        if event.author:
+            notify = self._check_opt_out('notify_updater', event.author)
+            if notify is None:
+                notify = self.always_notify_ticket_updater
+            if notify:
+                self._log_sub(event.author, True, 'always_notify_updater')
+                return ('email', event.author, True, None)
     
     def _log_sub(self, author, authenticated, rule):
         "Log subscriptions"
@@ -166,8 +198,9 @@ class LegacyTicketSubscriber(Component):
         self.log.debug(_("LegacyTicketSubscriber added '%s " \
             "(%s)' because of rule: %s"%(author, auth, rule)))
         
-    def _check_opt_out(self, preference, sid):
-        "Check if user has opted out of notification"
+    def _check_user_setting(self, preference, sid):
+        """Check the user's selection.  None means 
+        they haven't selected anything."""
         db = self.env.get_db_cnx()
         cursor = db.cursor()
         cursor.execute("""
@@ -179,12 +212,8 @@ class LegacyTicketSubscriber(Component):
         """, (sid, 'announcer_legacy_' + preference))
         result = cursor.fetchone()
         if result:
-            optout = (result[0] == '0')
-            if optout:
-                self.log.debug(_("LegacyTicketSubscriber excluded '%s' " \
-                        "because of opt-out rule: %s"%(sid,preference)))
-                return True
-        return False
+            return result[0]
+        return None
 
 class CarbonCopySubscriber(Component):
     implements(IAnnouncementSubscriber)
