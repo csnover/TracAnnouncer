@@ -159,7 +159,7 @@ class LegacyTicketSubscriber(Component):
         if ticket['owner']:
             notify = self._check_user_setting('notify_owner', ticket['owner'])
             if notify is None:
-                notify = self.always_notify_ticket_owner
+                notify = self.always_notify_owner
             if notify: 
                 owner = ticket['owner']
                 if '@' in owner:
