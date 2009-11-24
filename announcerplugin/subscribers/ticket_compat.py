@@ -171,7 +171,7 @@ class LegacyTicketSubscriber(Component):
         
     def _always_notify_ticket_reporter(self, ticket):
         if ticket['reporter']:
-            notify = self._check_opt_out('notify_reporter', ticket['reporter'])
+            notify = self._check_user_setting('notify_reporter', ticket['reporter'])
             if notify is None:
                 notify = self.always_notify_ticket_reporter
             if notify:
@@ -185,7 +185,7 @@ class LegacyTicketSubscriber(Component):
 
     def _always_notify_ticket_updater(self, event, ticket):
         if event.author:
-            notify = self._check_opt_out('notify_updater', event.author)
+            notify = self._check_user_setting('notify_updater', event.author)
             if notify is None:
                 notify = self.always_notify_ticket_updater
             if notify:
