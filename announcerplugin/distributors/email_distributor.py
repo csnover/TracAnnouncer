@@ -200,6 +200,7 @@ class EmailDistributor(Component):
                     "for format %s"%k
                 )
                 continue
+            rslvr = None
             if name and not addr:
                 # figure out what the addr should be if it's not defined
                 for rslvr in self.resolvers:
