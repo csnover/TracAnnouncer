@@ -38,6 +38,7 @@ Attachment:
  * File '${attachment.filename}' added{% if attachment.description %}: ${attachment.description} {% end %}
 {% end %}\
 {% if comment %}\
+
 ---------------------------------------------------------------------
 Comment{% if not has_changes %} (by ${author}){% end %}:
 
