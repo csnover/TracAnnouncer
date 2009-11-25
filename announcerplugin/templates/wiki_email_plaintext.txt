@@ -2,8 +2,8 @@
 {% when action == "created" %} * The user '${author}' has created the page: ${page.name}. {% end %}\
 {% when action == "changed" %} * The user '${author}' has changed the page: ${page.name}.
  * Diff link: <URL:${diff_link}> 
-${diff}
 {% end %}\
+${diff}
 {% when action == "attachment added" %} * The user '${author}' has added the attachment '${event.attachment.name}' to the page: ${page.name}. {% end %}\
 {% when action == "version deleted" %} * The page '${page.name}' has been reverted to its previous version. {% end %}\
 {% when action == "deleted" %} * The '${page.name}' has been deleted. {% end %}\

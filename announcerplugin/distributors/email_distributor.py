@@ -1,7 +1,8 @@
 from trac.core import Component, implements, ExtensionPoint
 from trac.util.compat import set, sorted
 from trac.config import Option, BoolOption, IntOption, OrderedExtensionsOption
-from trac.util import get_pkginfo
+from trac.util import get_pkginfo, md5
+from trac.util.datefmt import to_timestamp
 from trac.util.text import to_unicode
 from trac.util.translation import _
 
@@ -272,6 +273,25 @@ class EmailDistributor(Component):
         else:
             raise TracError(_('Invalid email encoding setting: %s'%pref))
 
+    def _message_id(self, realm, id, modtime=None):
+        """Generate a predictable, but sufficiently unique message ID."""
+        s = '%s.%s.%d.%s' % (self.env.project_url, 
+                               id, to_timestamp(modtime),
+                               realm.encode('ascii', 'ignore'))
+        dig = md5(s).hexdigest()
+        host = self.smtp_from[self.smtp_from.find('@') + 1:]
+        msgid = '<%03d.%s@%s>' % (len(s), dig, host)
+        return msgid
+
+    def _event_id(self, event):
+        "Hacked bullshit"
+        if hasattr(event.target, 'id'):
+            return "%08d"%event.target.id
+        elif hasattr(event.target, 'name'):
+            return event.target.name
+        else:
+            return str(event.target)
+
     def _do_send(self, transport, event, format, recipients, formatter):
         output = formatter.format(transport, event.realm, format, event)
         subject = formatter.format_subject(transport, event.realm, format, 
@@ -293,6 +313,13 @@ class EmailDistributor(Component):
         rootMessage['X-Trac-Version'] = trac_version
         rootMessage['X-Announcer-Version'] = announcer_version
         rootMessage['X-Trac-Project'] = proj_name
+        rootMessage['X-Trac-Announcement-Realm'] = event.realm
+        rootMessage['X-Trac-Announcement-ID'] = self._event_id(event)
+        msgid = self._message_id(event.realm, self._event_id(event))
+        rootMessage['Message-ID'] = msgid
+        if event.category is not 'created':
+            rootMessage['In-Reply-To'] = msgid
+            rootMessage['References'] = msgid
         rootMessage['Precedence'] = 'bulk'
         rootMessage['Auto-Submitted'] = 'auto-generated'
         provided_headers = formatter.format_headers(transport, event.realm, 
@@ -310,10 +337,12 @@ class EmailDistributor(Component):
                                   "Please change encoding setting"))
 
         prefix = self.smtp_subject_prefix
+        if prefix == '__default__': 
+            prefix = '[%s]' % self.env.project_name
+        if event.category is not 'created':
+            prefix = 'Re: %s'%prefix
         if prefix:
-            if prefix == '__default__': 
-                prefix = '[%s]' % self.env.project_name
-            subject = "%s%s"%(prefix, subject)
+            subject = "%s %s"%(prefix, subject)
         rootMessage['Subject'] = Header(subject, self._charset) 
         from_header = '"%s" <%s>'%(
             Header(self.smtp_from_name or proj_name, self._charset),
