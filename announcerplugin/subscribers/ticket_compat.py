@@ -173,7 +173,7 @@ class LegacyTicketSubscriber(Component):
         if ticket['reporter']:
             notify = self._check_user_setting('notify_reporter', ticket['reporter'])
             if notify is None:
-                notify = self.always_notify_ticket_reporter
+                notify = self.always_notify_reporter
             if notify:
                 reporter = ticket['reporter']
                 if '@' in reporter:
@@ -187,7 +187,7 @@ class LegacyTicketSubscriber(Component):
         if event.author:
             notify = self._check_user_setting('notify_updater', event.author)
             if notify is None:
-                notify = self.always_notify_ticket_updater
+                notify = self.always_notify_updater
             if notify:
                 self._log_sub(event.author, True, 'always_notify_updater')
                 return ('email', event.author, True, None)
