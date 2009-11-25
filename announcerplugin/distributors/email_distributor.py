@@ -309,6 +309,11 @@ class EmailDistributor(Component):
                 raise TracError(_("Ticket contains non-ASCII chars. " \
                                   "Please change encoding setting"))
 
+        prefix = self.smtp_subject_prefix
+        if prefix:
+            if prefix == '__default__': 
+                prefix = '[%s]' % self.env.project_name
+            subject = "%s%s"%(prefix, subject)
         rootMessage['Subject'] = Header(subject, self._charset) 
         from_header = '"%s" <%s>'%(
             Header(self.smtp_from_name or proj_name, self._charset),
