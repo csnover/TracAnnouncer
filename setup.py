@@ -65,6 +65,7 @@ setup(
             'announcerplugin.subscribers.ticket_custom = announcerplugin.subscribers.ticket_custom',
             'announcerplugin.subscribers.ticket_groups = announcerplugin.subscribers.ticket_groups',
             'announcerplugin.subscribers.watchers = announcerplugin.subscribers.watchers',
+            'announcerplugin.subscribers.watch_users = announcerplugin.subscribers.watch_users',
             'announcerplugin.subscribers.wiki = announcerplugin.subscribers.wiki',
         ]    
     },
