@@ -1,10 +1,7 @@
 <span xmlns="http://www.w3.org/1999/xhtml"
      xmlns:py="http://genshi.edgewall.org/"
      xmlns:xi="http://www.w3.org/2001/XInclude">
-  The following groups have been defined by the Trac administrators. These are all 'opt-in', meaning that you will not
-  receive any email for them unless you choose to. They are general topics that may be added onto the CC list of tickets
-  (by prepending their name with @), which can be used to bring specific attention to those people who are concerned
-  with the topic. Case does matter.
+  The following groups have been defined by the Trac administrators. They are general topics that may be added onto the CC list of tickets (by prepending their name with @).  Case does matter.
   <ul py:for="group in joinable_groups">
     <li>
       <input type="checkbox" name="joinable_group_${group}" checked="${joinable_groups[group]}" value="1" /> ${group}

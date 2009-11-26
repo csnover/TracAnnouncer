@@ -72,7 +72,7 @@ class LegacyTicketSubscriber(Component):
             component.""")
         
     def get_announcement_preference_boxes(self, req):
-        yield "legacy", "Ticket Notifications"
+        yield "legacy", "Ticket Subscriptions"
 
     def render_announcement_preference_box(self, req, panel):
         if req.method == "POST":
