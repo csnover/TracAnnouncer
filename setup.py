@@ -1,4 +1,5 @@
 # Copyright (c) 2008, Stephen Hansen
+# Copyright (c) 2009, Robert Corsaro
 # 
 # All rights reserved.
 # 
@@ -33,12 +34,12 @@ from setuptools import find_packages, setup
 
 setup(
     name = 'AnnouncerPlugin', 
-    version = '0.2',
-    author = 'Stephen Hansen',
-    author_email = 'shansen@advpubtech.com',
+    version = '1.0-a1',
+    author = 'Robert Corsaro',
+    author_email = 'doki_pen@doki-pen.org',
     description = 'Customizable notification system',
     license = \
-    """Copyright (c) 2008, Stephen Hansen. All rights reserved. Released under the 3-clause BSD license. """,
+    """Copyright (c) 2008, Stephen Hansen. Copyright (c) 2009, Robert Corsaro.  All rights reserved. Released under the 3-clause BSD license. """,
     url = "http://www.trac-hacks.org/wiki/AnnouncerPlugin",
     packages = find_packages(exclude=['*.tests*']),
     package_data = {'announcerplugin': ['templates/*.html', 'templates/*.txt', 'htdocs/*.*', 'htdocs/css/*.*']},
