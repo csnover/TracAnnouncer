@@ -1,2 +1,0 @@
-import ticket_email
-import wiki_email
