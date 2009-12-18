@@ -332,7 +332,7 @@ class EmailDistributor(Component):
         # sanity check
         if not self._charset.body_encoding:
             try:
-                dummy = body.encode('ascii')
+                dummy = output.encode('ascii')
             except UnicodeDecodeError:
                 raise TracError(_("Ticket contains non-ASCII chars. " \
                                   "Please change encoding setting"))
