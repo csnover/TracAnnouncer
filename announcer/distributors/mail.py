@@ -46,7 +46,7 @@ except:
 
 import trac
 from trac import core
-from trac.core import Component, implements, ExtensionPoint, Interface
+from trac.core import *
 from trac.util.compat import set, sorted
 from trac.config import Option, BoolOption, IntOption, OrderedExtensionsOption
 from trac.util import get_pkginfo, md5
