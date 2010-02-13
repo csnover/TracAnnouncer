@@ -1,4 +1,4 @@
-from trac.core import Component, implements, ExtensionPoint
+from trac.core import Component, implements, ExtensionPoint, Interface
 from trac.util.compat import set, sorted
 from trac.config import Option, BoolOption, IntOption, OrderedExtensionsOption
 from trac.util import get_pkginfo, md5
@@ -33,12 +33,21 @@ class DeliveryThread(threading.Thread):
         while 1:
             sendfrom, recipients, message = self._queue.get()
             self._sender(sendfrom, recipients, message)
+
+class IAnnouncementEmailDecorator(Interface):
+    def decorate_message(event, message, decorators):
+        """
+        Manipulate the message before it is sent on it's way.  The callee
+        should call the next decorator by by popping decorators and calling
+        the popped decorator.  If decorators is empty, don't worry about it.
+        """
             
 class EmailDistributor(Component):
     
     implements(IAnnouncementDistributor, IAnnouncementPreferenceProvider)
 
     formatters = ExtensionPoint(IAnnouncementFormatter)
+    decorators = ExtensionPoint(IAnnouncementEmailDecorator)
     resolvers = OrderedExtensionsOption('announcer', 'email_address_resolvers',
         IAnnouncementAddressResolver, 'SpecifiedEmailResolver, '\
         'SessionEmailResolver, DefaultDomainEmailResolver', 
@@ -63,6 +72,9 @@ class EmailDistributor(Component):
 
     smtp_from = Option('announcer', 'smtp_from', 'trac@localhost',
         """Sender address to use in notification emails.""")
+
+    smtp_debuglevel = Option('announcer', 'smtp_debuglevel', 
+        doc="""Set to 1 for useful smtp debugging on stdout.""")
         
     smtp_from_name = Option('announcer', 'smtp_from_name', '',
         """Sender name to use in notification emails.""")
@@ -274,24 +286,15 @@ class EmailDistributor(Component):
         else:
             raise TracError(_('Invalid email encoding setting: %s'%pref))
 
-    def _message_id(self, realm, id, modtime=None):
+    def _message_id(self, realm, modtime=None):
         """Generate a predictable, but sufficiently unique message ID."""
-        s = '%s.%s.%d.%s' % (self.env.project_url, 
-                               id, to_timestamp(modtime),
+        s = '%s.%d.%s' % (self.env.project_url, 
+                               to_timestamp(modtime),
                                realm.encode('ascii', 'ignore'))
         dig = md5(s).hexdigest()
         host = self.smtp_from[self.smtp_from.find('@') + 1:]
         msgid = '<%03d.%s@%s>' % (len(s), dig, host)
         return msgid
-
-    def _event_id(self, event):
-        "Hacked bullshit"
-        if hasattr(event.target, 'id'):
-            return "%08d"%event.target.id
-        elif hasattr(event.target, 'name'):
-            return event.target.name
-        else:
-            return str(event.target)
 
     def _do_send(self, transport, event, format, recipients, formatter):
         output = formatter.format(transport, event.realm, format, event)
@@ -307,6 +310,7 @@ class EmailDistributor(Component):
         rootMessage = MIMEMultipart("related")
         proj_name = self.env.project_name
         trac_version = get_pkginfo(trac.core).get('version', trac.__version__)
+        msgid = self._message_id(event.realm)
         announcer_version = get_pkginfo(announcerplugin).get('version', 
                 'Undefined')
         rootMessage['X-Mailer'] = 'AnnouncerPlugin v%s on Trac ' \
@@ -315,12 +319,7 @@ class EmailDistributor(Component):
         rootMessage['X-Announcer-Version'] = announcer_version
         rootMessage['X-Trac-Project'] = proj_name
         rootMessage['X-Trac-Announcement-Realm'] = event.realm
-        rootMessage['X-Trac-Announcement-ID'] = self._event_id(event)
-        msgid = self._message_id(event.realm, self._event_id(event))
         rootMessage['Message-ID'] = msgid
-        if event.category is not 'created':
-            rootMessage['In-Reply-To'] = msgid
-            rootMessage['References'] = msgid
         rootMessage['Precedence'] = 'bulk'
         rootMessage['Auto-Submitted'] = 'auto-generated'
         provided_headers = formatter.format_headers(transport, event.realm, 
@@ -373,6 +372,10 @@ class EmailDistributor(Component):
         msgText.set_charset(self._charset)
         parentMessage.attach(msgText)
         start = time.time()
+        decorators = self._get_decorators()
+        if len(decorators) > 0:
+            decorator = decorators.pop()
+            decorator.decorate_message(event, rootMessage, decorators)
         package = (from_header, [x[2] for x in recipients if x], 
                 rootMessage.as_string())
         if self.use_threaded_delivery:
@@ -383,12 +386,17 @@ class EmailDistributor(Component):
         self.log.debug("EmailDistributor took %s seconds to send."\
                 %(round(stop-start,2)))
 
+    def _get_decorators(self):
+        return self.decorators[:]
+
     def _transmit(self, smtpfrom, addresses, message):
         # use defaults to make sure connect() is called in the constructor
         smtp = smtplib.SMTP(
             self.smtp_server or 'localhost', 
             self.smtp_port or 25
         )
+        if self.smtp_debuglevel:
+            smtp.set_debuglevel(self.smtp_debuglevel)
         if self.use_tls:
             smtp.ehlo()
             if not smtp.esmtp_features.has_key('starttls'):
