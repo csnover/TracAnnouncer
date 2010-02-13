@@ -36,7 +36,7 @@ from setuptools import find_packages, setup
 
 setup(
     name = 'AnnouncerPlugin', 
-    version = '0.11',
+    version = '0.12',
     author = 'Robert Corsaro',
     author_email = 'doki_pen@doki-pen.org',
     description = 'Customizable notification system',
