@@ -35,7 +35,7 @@ import announcer
 from announcer.distributors.mail import IAnnouncementEmailDecorator 
 from announcer.util.mail import set_header, msgid, next_decorator, uid_encode
 
-class ReplyToEmailDecorator(Component): 
+class ThreadingEmailDecorator(Component): 
     """ 
     Add Message-ID, In-Reply-To and References message headers for resources. 
     All message ids are derived from the properties of the ticket so that they 
