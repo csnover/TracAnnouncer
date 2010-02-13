@@ -60,6 +60,8 @@ class TicketComponentSubscriber(Component):
                     yield subscriber
 
     def _get_membership(self, component):
+        if not component:
+            return
         db = self.env.get_db_cnx()
         cursor = db.cursor()
         cursor.execute("""
