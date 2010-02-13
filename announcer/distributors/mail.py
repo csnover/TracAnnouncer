@@ -395,13 +395,13 @@ class EmailDistributor(Component):
         del msgText['Content-Transfer-Encoding']
         msgText.set_charset(self._charset)
         parentMessage.attach(msgText)
-        start = time.time()
         decorators = self._get_decorators()
         if len(decorators) > 0:
             decorator = decorators.pop()
             decorator.decorate_message(event, rootMessage, decorators)
         package = (from_header, [x[2] for x in recipients if x], 
                 rootMessage.as_string())
+        start = time.time()
         if self.use_threaded_delivery:
             self.get_delivery_queue().put(package)
         else:
