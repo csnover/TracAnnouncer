@@ -27,9 +27,11 @@
 import re
 from email.utils import parseaddr 
  
+import trac
 from trac.core import * 
 from trac.config import ListOption 
 
+import announcer
 from announcer.distributors.mail import IAnnouncementEmailDecorator 
 from announcer.util.mail import set_header, msgid, next_decorator, uid_encode
 
@@ -78,3 +80,26 @@ class ReplyToEmailDecorator(Component):
                 set_header(message, 'References', mymsgid) 
 
         return next_decorator(event, message, decorates) 
+
+class AnnouncerEmailDecorator(Component):
+    """
+    Add some boring headers that should be set.
+    """
+
+    implements(IAnnouncementEmailDecorator)
+
+    def decorate_message(self, event, message, decorators):
+        mailer = 'AnnouncerPlugin v%s on Trac v%s'%(
+            announcer.__version__, 
+            trac.__version__
+        )
+        set_header(message, 'Auto-Submitted', 'auto-generated')
+        set_header(message, 'Precedence', 'bulk')
+        set_header(message, 'X-Announcer-Version', announcer.__version__)
+        set_header(message, 'X-Mailer', mailer)
+        set_header(message, 'X-Trac-Announcement-Realm', event.realm)
+        set_header(message, 'X-Trac-Project', self.env.project_name)
+        set_header(message, 'X-Trac-Version', trac.__version__)
+
+        return next_decorator(event, message, decorators)
+

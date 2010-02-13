@@ -44,8 +44,6 @@ try:
 except:
     from email.Header import Header
 
-import trac
-from trac import core
 from trac.core import *
 from trac.util.compat import set, sorted
 from trac.config import Option, BoolOption, IntOption, OrderedExtensionsOption
@@ -54,7 +52,6 @@ from trac.util.datefmt import to_timestamp
 from trac.util.text import to_unicode
 from trac.util.translation import _
 
-import announcer
 from announcer.api import AnnouncementSystem
 from announcer.api import IAnnouncementAddressResolver
 from announcer.api import IAnnouncementDistributor
@@ -345,21 +342,10 @@ class EmailDistributor(Component):
         else:
             alternate_output = None
         rootMessage = MIMEMultipart("related")
-        proj_name = self.env.project_name
-        trac_version = get_pkginfo(core).get('version', trac.__version__)
         msgid = self._message_id(event.realm)
-        announcer_version = get_pkginfo(announcer).get('version', 
-                'Undefined')
-        rootMessage['X-Mailer'] = 'AnnouncerPlugin v%s on Trac ' \
-                'v%s'%(announcer_version, trac_version)
-        rootMessage['X-Trac-Version'] = trac_version
-        rootMessage['X-Announcer-Version'] = announcer_version
-        rootMessage['X-Trac-Project'] = proj_name
-        rootMessage['X-Trac-Announcement-Realm'] = event.realm
         rootMessage['Message-ID'] = msgid
-        rootMessage['Precedence'] = 'bulk'
-        rootMessage['Auto-Submitted'] = 'auto-generated'
         rootMessage['Date'] = formatdate()
+
         # sanity check
         if not self._charset.body_encoding:
             try:
