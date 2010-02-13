@@ -30,13 +30,6 @@ def lineup(gen):
 class TicketEmailFormatter(Component):
     implements(IAnnouncementFormatter)
         
-    ticket_email_subject = Option('announcer', 'ticket_email_subject', 
-        "Ticket #${ticket.id}: ${ticket['summary']} " \
-                "{% if action %}[${action}]{% end %}",
-            """Format string for ticket email subject.  This is 
-               a mini genshi template that is passed the ticket
-               event and action objects.""")
-    
     ticket_email_header_fields = ListOption('announcer', 
             'ticket_email_header_fields', 
             'owner, reporter, milestone, priority, severity',
@@ -65,24 +58,12 @@ class TicketEmailFormatter(Component):
         return None
         
     def format_headers(self, transport, realm, style, event):
-        ticket = event.target
-        return dict(
-            realm=realm,
-            ticket=ticket.id,
-            priority=ticket['priority'],
-            severity=ticket['severity']            
-        )
-        
+        # TODO: remove
+        return []
+
     def format_subject(self, transport, realm, style, event):
-        action = None
-        if transport == "email":
-            if realm == "ticket":
-                if event.changes:
-                    if 'status' in event.changes:
-                        action = 'Status -> %s' % (event.target['status'])
-                template = NewTextTemplate(self.ticket_email_subject)
-                return template.generate(ticket=event.target, event=event, 
-                        action=action).render()
+        # TODO: remove
+        return ''
                 
     def format(self, transport, realm, style, event):
         if transport == "email":

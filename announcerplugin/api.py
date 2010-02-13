@@ -17,6 +17,9 @@ class IAnnouncementSubscriber(Interface):
     in receiving a particular notice. Again, how it makes that decision is
     entirely up to a particular implementation."""
 
+    # TODO: do we really need anything except the last method?  What's the 
+    # point of making 4 calls?
+
     def get_subscription_realms():
         """Returns an iterable that lists all the realms that this subscriber
         is capable of handling subscriptions for.
@@ -26,12 +29,14 @@ class IAnnouncementSubscriber(Interface):
         producer, subscriber and formatter could result in messages about all
         kinds of things not directly relatable to Trac resources.
         
+        TODO: why?  
         If a single realm is handled, use 'yield' instead of 'return'."""
         
     def get_subscription_categories(realm):
         """Returns an iterable that lists all the categories that this
         subscriber can handle for the specified realm.
         
+        TODO: why?  
         If a single realm is handled, use 'yield' instead of 'return'."""
         
     def get_subscriptions_for_event(event):
@@ -68,6 +73,8 @@ class IAnnouncementFormatter(Interface):
     combinations. This means there may be a proliferation of formatters as
     options expand.
     """
+
+    # TODO: can we carve out some of these methods?
     
     def get_format_transport():
         """Returns an iterable of the transports this formatter is capable of
@@ -96,7 +103,7 @@ class IAnnouncementFormatter(Interface):
         If a single item is to be returned, use yield instead of return."""
         
     def get_format_alternative(transport, realm, style):
-        """..."""
+        """TODO: ..."""
         
     def format(transport, realm, style, event):
         """Converts the event into the specified style. If the transport or
@@ -108,12 +115,6 @@ class IAnnouncementFormatter(Interface):
         expects.
         """
         
-    def format_subject(transport, realm, style, event):
-        """Returns a suitable subject line for the specified event."""
-        
-    def format_headers(transport, realm, style, event):
-        """..."""
-
 class IAnnouncementDistributor(Interface):
     """The Distributor is responsible for actually delivering an event to the
     desired subscriptions.

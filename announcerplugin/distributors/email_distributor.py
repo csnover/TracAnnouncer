@@ -41,6 +41,18 @@ class IAnnouncementEmailDecorator(Interface):
         should call the next decorator by by popping decorators and calling
         the popped decorator.  If decorators is empty, don't worry about it.
         """
+
+def next_decorator(event, message, decorates):
+    if decorates and len(decorates) > 0:
+        next = decorates.pop()
+        return next.decorate_message(event, message, decorates)
+
+def set_header(message, key, value):
+    if message.has_key(key):
+        message.replace_header(key, value)
+    else:
+        message[key] = value
+    return message
             
 class EmailDistributor(Component):
     
@@ -298,8 +310,6 @@ class EmailDistributor(Component):
 
     def _do_send(self, transport, event, format, recipients, formatter):
         output = formatter.format(transport, event.realm, format, event)
-        subject = formatter.format_subject(transport, event.realm, format, 
-                event)
         alternate_format = formatter.get_format_alternative(transport, 
                 event.realm, format)
         if alternate_format:
@@ -322,11 +332,6 @@ class EmailDistributor(Component):
         rootMessage['Message-ID'] = msgid
         rootMessage['Precedence'] = 'bulk'
         rootMessage['Auto-Submitted'] = 'auto-generated'
-        provided_headers = formatter.format_headers(transport, event.realm, 
-                format, event)
-        for key in provided_headers:
-            rootMessage['X-Announcement-%s'%key.capitalize()] = \
-                    to_unicode(provided_headers[key])
         rootMessage['Date'] = formatdate()
         # sanity check
         if not self._charset.body_encoding:
@@ -336,14 +341,6 @@ class EmailDistributor(Component):
                 raise TracError(_("Ticket contains non-ASCII chars. " \
                                   "Please change encoding setting"))
 
-        prefix = self.smtp_subject_prefix
-        if prefix == '__default__': 
-            prefix = '[%s]' % self.env.project_name
-        if event.category is not 'created':
-            prefix = 'Re: %s'%prefix
-        if prefix:
-            subject = "%s %s"%(prefix, subject)
-        rootMessage['Subject'] = Header(subject, self._charset) 
         from_header = '"%s" <%s>'%(
             Header(self.smtp_from_name or proj_name, self._charset),
             self.smtp_from
