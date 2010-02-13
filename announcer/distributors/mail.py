@@ -58,6 +58,7 @@ from announcer.api import IAnnouncementDistributor
 from announcer.api import IAnnouncementFormatter
 from announcer.api import IAnnouncementPreferenceProvider
 from announcer.api import IAnnouncementProducer
+from announcer.util.mail import set_header
 
 class IAnnouncementEmailDecorator(Interface):
     def decorate_message(event, message, decorators):
@@ -341,10 +342,6 @@ class EmailDistributor(Component):
             )
         else:
             alternate_output = None
-        rootMessage = MIMEMultipart("related")
-        msgid = self._message_id(event.realm)
-        rootMessage['Message-ID'] = msgid
-        rootMessage['Date'] = formatdate()
 
         # sanity check
         if not self._charset.body_encoding:
@@ -354,18 +351,26 @@ class EmailDistributor(Component):
                 raise TracError(_("Ticket contains non-ASCII chars. " \
                                   "Please change encoding setting"))
 
+        rootMessage = MIMEMultipart("related")
+
+        headers = dict()
+        headers['Message-ID'] = self._message_id(event.realm)
+        headers['Date'] = formatdate()
         from_header = formataddr((
-            self.smtp_from,
-            Header(self.smtp_from_name or proj_name, self._charset)
+            self.smtp_from_name or self.env.project_name,
+            self.smtp_from
         ))
-        rootMessage['From'] = from_header
+        headers['From'] = from_header
         if self.smtp_always_bcc:
-            rootMessage['Bcc'] = self.smtp_always_bcc
+            headers['Bcc'] = self.smtp_always_bcc
         if self.smtp_to:
-            rootMessage['To'] = '"%s"'%(self.smtp_to)
+            headers['To'] = '"%s"'%(self.smtp_to)
         if self.use_public_cc:
-            rootMessage['Cc'] = ', '.join([x[2] for x in recipients if x])
-        rootMessage['Reply-To'] = self.smtp_replyto
+            headers['Cc'] = ', '.join([x[2] for x in recipients if x])
+        headers['Reply-To'] = self.smtp_replyto
+        for k, v in headers.iteritems():
+            set_header(rootMessage, k, v)
+
         rootMessage.preamble = 'This is a multi-part message in MIME format.'
         if alternate_output:
             parentMessage = MIMEMultipart('alternative')
