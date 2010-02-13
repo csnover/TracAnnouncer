@@ -435,10 +435,10 @@ class EmailDistributor(Component):
                 for distributor in self.distributors:
                     for transport in distributor.transports():
                         for fmtr in self.formatters:
-                            for style in fmtr.styles(realm, transport):
+                            for style in fmtr.styles(transport, realm):
                                 if realm not in supported_realms:
                                     supported_realms[realm] = set()
-                                supported_realms[realm].append(style)
+                                supported_realms[realm].add(style)
             
         if req.method == "POST":
             for realm in supported_realms:
