@@ -66,6 +66,7 @@ setup(
             'announcer.email_decorators.ticket = announcer.email_decorators.ticket',
             'announcer.email_decorators.wiki = announcer.email_decorators.wiki',
             'announcer.filters.ticket_owner = announcer.filters.ticket_owner',
+            'announcer.filters.unsubscribe = announcer.filters.unsubscribe',
             'announcer.formatters.ticket = announcer.formatters.ticket',
             'announcer.formatters.wiki = announcer.formatters.wiki',
             'announcer.pref = announcer.pref',
