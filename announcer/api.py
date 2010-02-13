@@ -57,8 +57,8 @@ class IAnnouncementSubscriber(Interface):
     in receiving a particular notice. Again, how it makes that decision is
     entirely up to a particular implementation."""
 
-    # TODO: do we really need anything except the last method?  What's the 
-    # point of making 4 calls?
+    # TODO: do we really need anything except the last 2 method?  What's the 
+    # point of making all these calls?
 
     def get_subscription_realms():
         """Returns an iterable that lists all the realms that this subscriber
@@ -94,6 +94,18 @@ class IAnnouncementSubscriber(Interface):
         doesn't have to return both. In many cases returning both is
         actually undesirable-- in such a case resolvers will be bypassed
         entirely.
+        """
+
+class IAnnouncementSubscriptionFilter(Interface):
+    """IAnnouncementSubscriptionFilter provides an interface where a component 
+    can filter subscribers from the final distribution list. 
+    """
+
+    def filter_subscriptions(event, subscriptions):
+        """Returns a filtered iterator of subscriptions.  This method is called
+        after all get_subscriptions_for_event calls are made to allow 
+        components to remove addresses from the distribution list.  This can
+        be used for things like "never notify updater" functionality.
         """
         
 class IAnnouncementFormatter(Interface):
@@ -296,6 +308,7 @@ class AnnouncementSystem(Component):
     implements(IEnvironmentSetupParticipant)
         
     subscribers = ExtensionPoint(IAnnouncementSubscriber)
+    subscription_filters = ExtensionPoint(IAnnouncementSubscriptionFilter)
     distributors = ExtensionPoint(IAnnouncementDistributor)
 
     # IEnvironmentSetupParticipant implementation
@@ -378,6 +391,11 @@ class AnnouncementSystem(Component):
                 subscriptions.update(
                     x for x in sp.get_subscriptions_for_event(evt) if x
                 )
+            for sf in self.subscription_filters:
+                subscriptions = set(
+                    sf.filter_subscriptions(evt, subscriptions)
+                )
+
             self.log.debug(
                 "AnnouncementSystem has found the following subscriptions: " \
                         "%s"%(', '.join(['[%s(%s) via %s]' % ((s[1] or s[3]),\

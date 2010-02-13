@@ -65,7 +65,7 @@ class RuleBasedTicketSubscriber(Component):
                 print True
             else:
                 print False
-        
+
     def _get_basic_terms(self, event):
         terms = [event.realm, event.category]
         try:
