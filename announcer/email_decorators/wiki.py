@@ -35,7 +35,7 @@ from genshi.template import NewTextTemplate
 from announcer.distributors.mail import IAnnouncementEmailDecorator
 from announcer.util.mail import next_decorator, set_header
 
-class SubjectWikiEmailDecorator(Component):
+class WikiSubjectEmailDecorator(Component):
 
     implements(IAnnouncementEmailDecorator)
 
