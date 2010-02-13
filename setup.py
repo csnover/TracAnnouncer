@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+#
 # Copyright (c) 2008, Stephen Hansen
 # Copyright (c) 2009, Robert Corsaro
 # 
@@ -38,36 +40,49 @@ setup(
     author = 'Robert Corsaro',
     author_email = 'doki_pen@doki-pen.org',
     description = 'Customizable notification system',
-    license = \
-    """Copyright (c) 2008, Stephen Hansen. Copyright (c) 2009, Robert Corsaro.  All rights reserved. Released under the 3-clause BSD license. """,
+    license = """
+    Copyright (c) 2008, Stephen Hansen. 
+    Copyright (c) 2009, Robert Corsaro.  
+    All rights reserved. Released under the 3-clause BSD license. 
+    """,
     url = "http://www.trac-hacks.org/wiki/AnnouncerPlugin",
     packages = find_packages(exclude=['*.tests*']),
-    package_data = {'announcerplugin': ['templates/*.html', 'templates/*.txt', 'htdocs/*.*', 'htdocs/css/*.*']},
+    package_data = {
+        'announcer': [
+            'templates/*.html', 
+            'templates/*.txt', 
+            'htdocs/*.*', 
+            'htdocs/css/*.*'
+        ]
+    },
     install_requires = [
-        #'trac>=0.11',
+        'trac>=0.11',
     ],
     entry_points = {
         'trac.plugins': [
-            'announcerplugin.api = announcerplugin.api',
-            'announcerplugin.distributors.email_distributor = announcerplugin.distributors.email_distributor',
-            'announcerplugin.formatters.ticket_email = announcerplugin.formatters.ticket_email',
-            'announcerplugin.formatters.wiki_email = announcerplugin.formatters.wiki_email',
-            'announcerplugin.pref = announcerplugin.pref',
-            'announcerplugin.producers.attachment = announcerplugin.producers.attachment',
-            'announcerplugin.producers.ticket = announcerplugin.producers.ticket',
-            'announcerplugin.producers.wiki = announcerplugin.producers.wiki',
-            'announcerplugin.resolvers.defaultdomain = announcerplugin.resolvers.defaultdomain',
-            'announcerplugin.resolvers.sessionemail = announcerplugin.resolvers.sessionemail',
-            'announcerplugin.resolvers.specified = announcerplugin.resolvers.specified',
-    #        'announcerplugin.subscribers.rulefilters = announcerplugin.subscribers.rulefilters',
-            'announcerplugin.subscribers.ticket_compat = announcerplugin.subscribers.ticket_compat',
-            'announcerplugin.subscribers.ticket_components = announcerplugin.subscribers.ticket_components',
-            'announcerplugin.subscribers.ticket_custom = announcerplugin.subscribers.ticket_custom',
-            'announcerplugin.subscribers.ticket_groups = announcerplugin.subscribers.ticket_groups',
-            'announcerplugin.subscribers.watchers = announcerplugin.subscribers.watchers',
-            'announcerplugin.subscribers.watch_users = announcerplugin.subscribers.watch_users',
-            'announcerplugin.subscribers.wiki = announcerplugin.subscribers.wiki',
+            'announcer.api = announcer.api',
+            'announcer.distributors.email = announcer.distributors.email',
+            'announcer.email_decorators.ticket = announcer.email_decorators.ticket',
+            'announcer.email_decorators.wiki = announcer.email_decorators.wiki',
+            'announcer.formatters.ticket = announcer.formatters.ticket',
+            'announcer.formatters.wiki = announcer.formatters.wiki',
+            'announcer.pref = announcer.pref',
+            'announcer.producers.attachment = announcer.producers.attachment',
+            'announcer.producers.ticket = announcer.producers.ticket',
+            'announcer.producers.wiki = announcer.producers.wiki',
+            'announcer.resolvers.defaultdomain = announcer.resolvers.defaultdomain',
+            'announcer.resolvers.sessionemail = announcer.resolvers.sessionemail',
+            'announcer.resolvers.specified = announcer.resolvers.specified',
+    #        'announcer.subscribers.rulefilters = announcer.subscribers.rulefilters',
+            'announcer.subscribers.ticket_compat = announcer.subscribers.ticket_compat',
+            'announcer.subscribers.ticket_components = announcer.subscribers.ticket_components',
+            'announcer.subscribers.ticket_custom = announcer.subscribers.ticket_custom',
+            'announcer.subscribers.ticket_groups = announcer.subscribers.ticket_groups',
+            'announcer.subscribers.watchers = announcer.subscribers.watchers',
+            'announcer.subscribers.watch_users = announcer.subscribers.watch_users',
+            'announcer.subscribers.wiki = announcer.subscribers.wiki',
+            'announcer.util.email = announcer.util.email',
         ]    
     },
-    test_suite = 'announcerplugin.tests',
+    test_suite = 'announcer.tests',
 )
