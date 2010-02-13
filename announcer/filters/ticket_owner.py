@@ -31,17 +31,59 @@
 
 from trac.core import *
 from announcer.api import IAnnouncementSubscriptionFilter
+from announcer.api import IAnnouncementPreferenceProvider
 import re
 
 class ChangeAuthorFilter(Component):
     implements(IAnnouncementSubscriptionFilter)
+    implements(IAnnouncementPreferenceProvider)
     
     def filter_subscriptions(self, event, subscriptions):
         for subscription in subscriptions:
             if event.realm == 'ticket' and "email" == subscription[0]:
-                if event.author == subscription[1]:
+                if event.author == subscription[1] and \
+                        self._author_filter(event.author):
+                    self.log.debug(
+                        "Filtering %s because of rule: ChangeAuthorFilter"\
+                        %event.author
+                    )
                     pass
                 else:
                     yield subscription
             else:
                 yield subscription
+
+    def _author_filter(self, sid):
+        db = self.env.get_db_cnx()
+        cursor = db.cursor()
+        cursor.execute("""
+            SELECT value
+              FROM session_attribute
+             WHERE sid=%s
+               AND name='announcer_author_filter'
+        """, (sid,))
+        value = cursor.fetchone()
+        if value == '0':
+            return False
+        else:
+            # default to true
+            return True
+
+    def get_announcement_preference_boxes(self, req):
+        if req.authname == 'anonymous' and 'email' not in req.session:
+            return
+        yield 'author_filter', 'Author Filter'
+
+    def render_announcement_preference_box(self, req, panel):
+        if req.method == "POST":
+            opt = req.args.get('author_filter')
+            if opt:
+                req.session["announcer_author_filter"] = '1'
+            else:
+                req.session["announcer_author_filter"] = '0'
+        # default on
+        attr = req.session.get('announcer_author_filter', '1')
+        opt = attr == '1' 
+        return 'prefs_announcer_author_filter.html', \
+                dict(data=dict(author_filter=opt))
+
