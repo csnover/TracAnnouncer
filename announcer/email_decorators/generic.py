@@ -61,17 +61,12 @@ class ThreadingEmailDecorator(Component):
 
         References, In-Reply-To and Message-ID are just so email clients can 
         make sense of the threads. 
-
-        This algorithm seems pretty generic, so maybe we can make the realm 
-        configurable.  Any resource with and id and version should work.  The  
-        Reply-To header only makes sense for things that can be appended to 
-        through email.  Two examples are tickets and blog comments. 
         """ 
         if event.realm in self.supported_realms: 
+            uid = uid_encode(self.env.abs_href(), event.realm, event.target) 
             smtp_from = self.config.get('announcer', 'smtp_from', 'localhost') 
             _, smtp_addr = parseaddr(smtp_from) 
             host = re.sub('^.+@', '', smtp_addr) 
-            uid = uid_encode(self.env.abs_href(), event.realm, event.target) 
             mymsgid = msgid(uid, host) 
             if event.category == 'created': 
                 set_header(message, 'Message-ID', mymsgid) 
