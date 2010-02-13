@@ -28,61 +28,12 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # ----------------------------------------------------------------------------
-import re
-from email.utils import parseaddr
-
 from trac.core import *
 from trac.config import Option
 from genshi.template import NewTextTemplate
 
-from announcer.distributors.email import IAnnouncementEmailDecorator
-from announcer.util.email import ResourceUIDs, next_decorator, set_header
-
-class ReplyToWikiEmailDecorator(Component):
-    """
-    Addd Message-ID, In-Reply-To and References message headers for wiki.
-    All message ids are derived from the properties of the wiki so that they
-    can be regenerated later.
-    """
-
-    implements(IAnnouncementEmailDecorator)
-
-    def decorate_message(self, event, message, decorates=None):
-        """
-        Added headers to the outgoing email to track it's relationship
-        with a ticket. 
-
-        References, In-Reply-To and Message-ID are just so email clients can
-        make sense of the threads.
-
-        This algorithm seems pretty generic, so maybe we can make the realm
-        configurable.  Any resource with and id and version should work.  The 
-        Reply-To header only makes sense for things that can be appended to
-        through email.  Two examples are tickets and blog comments.
-        """
-        if event.realm == 'wiki':
-            uids = ResourceUIDs(
-                self.env, 
-                event, 
-                message, 
-                len(list(event.target.get_history()))
-            )
-            smtp_from = self.config.get('announcer', 'smtp_from', 'localhost')
-            _, smtp_addr = parseaddr(smtp_from)
-            host = re.sub('^.@', '', smtp_addr)
-            set_header(message, 'Message-ID', uids.msgid('cur', host))
-            if event.category != 'created':
-                set_header(message, 'In-Reply-To', uids.msgid('prev', host))
-                set_header(
-                    message,
-                    'References', 
-                    "%s, %s"%(
-                        uids.msgid('first', host),
-                        uids.msgid('prev', host)
-                    )
-                )
-
-        return next_decorator(event, message, decorates)
+from announcer.distributors.mail import IAnnouncementEmailDecorator
+from announcer.util.mail import next_decorator, set_header
 
 class SubjectWikiEmailDecorator(Component):
 
@@ -105,7 +56,7 @@ class SubjectWikiEmailDecorator(Component):
 
             prefix = self.config.get('announcer', 'smtp_subject_prefix')
             if prefix == '__default__': 
-                prefix = '[%s]' % self.env.project_name
+                prefix = '[%s] ' % self.env.project_name
             if prefix:
                 subject = "%s%s"%(prefix, subject)
             if event.category != 'created':

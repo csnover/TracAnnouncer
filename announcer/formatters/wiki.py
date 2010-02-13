@@ -87,6 +87,7 @@ class WikiFormatter(Component):
         page = event.target
         data = dict(
             action = event.category,
+            attachment = event.attachment,
             page = page,
             author = event.author,
             comment = event.comment,

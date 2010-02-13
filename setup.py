@@ -61,7 +61,8 @@ setup(
     entry_points = {
         'trac.plugins': [
             'announcer.api = announcer.api',
-            'announcer.distributors.email = announcer.distributors.email',
+            'announcer.distributors.mail = announcer.distributors.mail',
+            'announcer.email_decorators.generic = announcer.email_decorators.generic',
             'announcer.email_decorators.ticket = announcer.email_decorators.ticket',
             'announcer.email_decorators.wiki = announcer.email_decorators.wiki',
             'announcer.formatters.ticket = announcer.formatters.ticket',
@@ -81,7 +82,7 @@ setup(
             'announcer.subscribers.watchers = announcer.subscribers.watchers',
             'announcer.subscribers.watch_users = announcer.subscribers.watch_users',
             'announcer.subscribers.wiki = announcer.subscribers.wiki',
-            'announcer.util.email = announcer.util.email',
+            'announcer.util.mail = announcer.util.mail',
         ]    
     },
     test_suite = 'announcer.tests',

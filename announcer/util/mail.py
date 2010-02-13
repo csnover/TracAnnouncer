@@ -28,20 +28,19 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # ----------------------------------------------------------------------------
-
 from base64 import b32encode, b32decode
-# TODO: this sucks, change it!
-import __builtin__
-pyemail = __builtin__.__import__('email')
 try:
-    Header = pyemail.header.Header
+    from email.header import Header
 except:
-    Header = pyemail.Header.Header
-# end suckage
+    from email.Header import Header
 
 MAXHEADERLEN = 76
 
 def next_decorator(event, message, decorates):
+    """
+    Helper method for IAnnouncerEmailDecorators.  Call the next decorator
+    or return.
+    """
     if decorates and len(decorates) > 0:
         next = decorates.pop()
         return next.decorate_message(event, message, decorates)
@@ -54,7 +53,7 @@ def set_header(message, key, value, charset='ascii'):
         message[key] = value
     return message
 
-def uid_encode(projurl, realm, target, change_num='0'):
+def uid_encode(projurl, realm, target):
     """
     Unique identifier used to track resources in relation to emails.
     projurl included to avoid Message-ID collisions.  Returns a base32 encode 
@@ -68,8 +67,7 @@ def uid_encode(projurl, realm, target, change_num='0'):
         id = target.name
     else:
         id = str(target)
-    change_num = str(change_num)
-    uid = ','.join((projurl, realm, id, change_num))
+    uid = ','.join((projurl, realm, id))
     return b32encode(uid)
 
 def uid_decode(encoded_uid):
@@ -79,48 +77,10 @@ def uid_decode(encoded_uid):
     uid = b32decode(encoded_uid)
     return uid.split(',')
 
-class ResourceUIDs(object):
+def msgid(uid, host='localhost'):
     """
-    Repeatable generation of resource announcement message-ids used for 
-    References, Message-ID and In-Reply-To headers.  Can also be used
-    for incoming email replies that modify their target.
+    Formatted id for email headers.
+    ie. <UIDUIDUIDUIDUID@localhost>
     """
-    def __init__(self, env, event, message, change_num=0):
-        self.event = event
-        self.message = message
-        self.env = env
-        prev_change_num = change_num > 0 and change_num - 1 or change_num
-        self.uids = dict(
-            cur = uid_encode(
-                self.env.abs_href(), 
-                event.realm, 
-                event.target, 
-                change_num
-            ),
-            prev = uid_encode(
-                self.env.abs_href(), 
-                event.realm, 
-                event.target, 
-                change_num - 1 
-            ), 
-            first = uid_encode(
-                self.env.abs_href(), 
-                event.realm, 
-                event.target, 
-                0
-            ), 
-        )
-
-    def msgid(self, key, host='localhost'):
-        """
-        cur, prev or first.  Formatted id for email headers.
-        ie. <UIDUIDUIDUIDUID@localhost>
-        """
-        return "<%s@%s>"%(self.uids[key], host)
-
-    def __getitem__(self, key):
-        """
-        Raw UID without message-id formatting.
-        """
-        return self.uids[key]
+    return "<%s@%s>"%(uid, host)
 

@@ -29,11 +29,20 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # ----------------------------------------------------------------------------
-
 import Queue
+import random
 import smtplib
+import sys
 import threading
 import time
+from email.MIMEMultipart import MIMEMultipart
+from email.MIMEText import MIMEText
+from email.Utils import formatdate, formataddr
+from email.Charset import Charset, QP, BASE64
+try:
+    from email.header import Header
+except:
+    from email.Header import Header
 
 import trac
 from trac import core
@@ -52,22 +61,6 @@ from announcer.api import IAnnouncementDistributor
 from announcer.api import IAnnouncementFormatter
 from announcer.api import IAnnouncementPreferenceProvider
 from announcer.api import IAnnouncementProducer
-
-# TOD: this sucks, change it!
-import __builtin__
-pyemail = __builtin__.__import__('email')
-MIMEMultipart = pyemail.MIMEMultipart.MIMEMultipart
-MIMEText = pyemail.MIMEText.MIMEText
-formatdate = pyemail.Utils.formatdate
-formataddr = pyemail.Utils.formataddr
-Charset = pyemail.Charset.Charset
-QP = pyemail.Charset.QP
-BASE64 = pyemail.Charset.BASE64
-try:
-    Header = pyemail.header.Header
-except:
-    Header = pyemail.Header.Header
-# end suckage
 
 class IAnnouncementEmailDecorator(Interface):
     def decorate_message(event, message, decorators):
@@ -323,11 +316,13 @@ class EmailDistributor(Component):
         else:
             raise TracError(_('Invalid email encoding setting: %s'%pref))
 
-    def _message_id(self, realm, modtime=None):
+    def _message_id(self, realm):
         """Generate a predictable, but sufficiently unique message ID."""
-        s = '%s.%d.%s' % (self.env.project_url, 
-                               to_timestamp(modtime),
-                               realm.encode('ascii', 'ignore'))
+        modtime = time.time()
+        rand = random.randint(0,32000)
+        s = '%s.%d.%d.%s' % (self.env.project_url, 
+                          modtime, rand,
+                          realm.encode('ascii', 'ignore'))
         dig = md5(s).hexdigest()
         host = self.smtp_from[self.smtp_from.find('@') + 1:]
         msgid = '<%03d.%s@%s>' % (len(s), dig, host)
