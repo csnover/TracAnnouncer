@@ -42,13 +42,12 @@ class TicketFormatTestCase(unittest.TestCase):
         self.out = TicketFormatter(self.env)
 
     def test_styles(self):
-        self.assertTrue('text/html' in self.out.format_styles('email', 'ticket'))
-        self.assertTrue('text/plain' in self.out.format_styles('email', 'ticket'))
-        self.assertFalse('text/plain' in self.out.format_styles('email', 'wiki'))
-        self.assertEqual('text/plain', self.out.alternative_style('email', 'ticket', 'text/blah'))
-        self.assertEqual('text/plain', self.out.alternative_style('email', 'ticket', 'text/html'))
-        self.assertEqual(None, self.out.alternative_style('email', 'ticket', 'text/plain'))
-        self.assertEqual(0, len([i for i in self.out.format_styles('email', 'wiki')]))
+        self.assertTrue('text/html' in self.out.styles('email', 'ticket'))
+        self.assertTrue('text/plain' in self.out.styles('email', 'ticket'))
+        self.assertFalse('text/plain' in self.out.styles('email', 'wiki'))
+        self.assertEqual('text/plain', self.out.alternative_style_for('email', 'ticket', 'text/blah'))
+        self.assertEqual('text/plain', self.out.alternative_style_for('email', 'ticket', 'text/html'))
+        self.assertEqual(None, self.out.alternative_style_for('email', 'ticket', 'text/plain'))
 
 def suite():
     suite = unittest.TestSuite()
