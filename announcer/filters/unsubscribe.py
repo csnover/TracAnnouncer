@@ -39,9 +39,7 @@ class UnsubscribeFilter(Component):
     
     def filter_subscriptions(self, event, subscriptions):
         unsubscribed = list(self._unsubscribed())
-        self.log.error('unsubscribed: %s'%unsubscribed)
         for subscription in subscriptions:
-            self.log.error('checking: %s'%subscription[1])
             if subscription[1] in unsubscribed:
                 self.log.debug(
                     "Filtering %s because of rule: UnsubscribeFilter"\
@@ -74,8 +72,8 @@ class UnsubscribeFilter(Component):
             if opt:
                 req.session['announcer_unsubscribe_all'] = '1'
             else:
-                if "announcer_unsubscribe_all" in req.session:
-                    del req.session['announcer_unsubscribe_all']
-        opt = req.session.get('announcer_unsubscribe_all')
+                req.session['announcer_unsubscribe_all'] = '0'
+        attr = req.session.get('announcer_unsubscribe_all') 
+        opt = attr == '1' and True or None
         return "prefs_announcer_unsubscribe_all.html", \
             dict(data=dict(unsubscribe_all = opt))

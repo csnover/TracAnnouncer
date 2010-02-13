@@ -41,13 +41,7 @@ class RuleBasedTicketSubscriber(Component):
     implements(IAnnouncementSubscriber, IAnnouncementPreferenceProvider)
     
     # IAnnouncementSubscriber
-    def get_subscription_realms(self):
-        return ('*', )
-        
-    def get_subscription_categories(self, realm):
-        return ('*', )
-        
-    def get_subscriptions_for_event(self, event):
+    def subscriptions(self, event):
         terms = self._get_basic_terms(event)
         db = self.env.get_db_ctx()
         cursor = db.cursor()

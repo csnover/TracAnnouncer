@@ -48,16 +48,7 @@ class JoinableGroupSubscriber(Component):
         the sec group) to the CC field of a ticket, everyone in that group
         will receive an announcement when that ticket is changed.""")
     
-    def get_subscription_realms(self):
-        return ('ticket',)
-    
-    def get_subscription_categories(self, realm):
-        if realm == "ticket":
-            return('changed', 'created', 'attachment added')
-        else:
-            ()
-    
-    def get_subscriptions_for_event(self, event):
+    def subscriptions(self, event):
         if event.realm == 'ticket':
             if event.category in ('changed', 'created', 'attachment added'):
                 cc = event.target['cc'] or ''
@@ -103,7 +94,7 @@ class JoinableGroupSubscriber(Component):
         sess = req.session
         if req.method == "POST":
             for group in self.joinable_groups:
-                group_opt = 'joinable_group_%s' % group
+                group_opt = 'joinable_group_%s' % group[1:]
                 result = req.args.get(group_opt, None)
                 if result:
                     sess["announcer_" + group_opt] = '1'

@@ -41,19 +41,10 @@ import re, urllib
 class GeneralWikiSubscriber(Component):
     implements(IAnnouncementSubscriber, IAnnouncementPreferenceProvider)
         
-    def get_subscription_realms(self):
-        return ('wiki',)
-        
-    def get_subscription_categories(self, realm):
-        if realm == "wiki":
-            return ('changed', 'created', 'attachment added', 'deleted', 
-                    'version deleted')
-        else:
-            return tuple()
-            
-    def get_subscriptions_for_event(self, event):
+    def subscriptions(self, event):
         if event.realm == 'wiki':
-            if event.category in self.get_subscription_categories(event.realm):
+            if event.category in ('changed', 'created', 'attachment added', 
+                    'deleted', 'version deleted'):
                 page = event.target
                 for name, authenticated in self._get_membership(page.name):
                     yield ('email', name, authenticated, None)

@@ -57,29 +57,7 @@ class IAnnouncementSubscriber(Interface):
     in receiving a particular notice. Again, how it makes that decision is
     entirely up to a particular implementation."""
 
-    # TODO: do we really need anything except the last 2 method?  What's the 
-    # point of making all these calls?
-
-    def get_subscription_realms():
-        """Returns an iterable that lists all the realms that this subscriber
-        is capable of handling subscriptions for.
-        
-        Although these usually correspond to realms within Trac, there is no
-        actual requirement for that. Conspiracy between a specialied 
-        producer, subscriber and formatter could result in messages about all
-        kinds of things not directly relatable to Trac resources.
-        
-        TODO: why?  
-        If a single realm is handled, use 'yield' instead of 'return'."""
-        
-    def get_subscription_categories(realm):
-        """Returns an iterable that lists all the categories that this
-        subscriber can handle for the specified realm.
-        
-        TODO: why?  
-        If a single realm is handled, use 'yield' instead of 'return'."""
-        
-    def get_subscriptions_for_event(event):
+    def subscriptions(event):
         """Returns a list of subscriptions that are interested in the 
         specified event.
         
@@ -374,22 +352,10 @@ class AnnouncementSystem(Component):
         the debug logs.
         """
         try:
-            supported_subscribers = []
-            for sp in self.subscribers:
-                categories = sp.get_subscription_categories(evt.realm)
-                if categories:
-                    if ('*' in categories) or (evt.category in categories):
-                        supported_subscribers.append(sp)
-            self.log.debug(
-                "AnnouncementSystem found the following subscribers capable of"
-                " handling '%s, %s': %s" % (evt.realm, evt.category, 
-                ', '.join([ss.__class__.__name__ for ss in \
-                        supported_subscribers]))
-            )
             subscriptions = set()
-            for sp in supported_subscribers:
+            for sp in self.subscribers:
                 subscriptions.update(
-                    x for x in sp.get_subscriptions_for_event(evt) if x
+                    x for x in sp.subscriptions(evt) if x
                 )
             for sf in self.subscription_filters:
                 subscriptions = set(

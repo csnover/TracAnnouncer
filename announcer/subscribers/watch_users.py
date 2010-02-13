@@ -42,16 +42,11 @@ class UserChangeSubscriber(Component):
     modifies a ticket or wiki page."""
     implements(IAnnouncementSubscriber, IAnnouncementPreferenceProvider)
 
-    def get_subscription_realms(self):
-        return ('wiki', 'ticket')
-    
-    def get_subscription_categories(self, realm):
-        return('changed', 'created', 'attachment added')
-    
-    def get_subscriptions_for_event(self, event):
-        if event.category in ('changed', 'created', 'attachment added'):
-            for sub in self._get_membership(event.author):
-                yield sub
+    def subscriptions(self, event):
+        if event.realm in ('wiki', 'ticket'):
+            if event.category in ('changed', 'created', 'attachment added'):
+                for sub in self._get_membership(event.author):
+                    yield sub
 
     def _get_membership(self, author):
         """Check the user's selection.  None means 

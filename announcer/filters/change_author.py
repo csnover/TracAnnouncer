@@ -40,16 +40,13 @@ class ChangeAuthorFilter(Component):
     
     def filter_subscriptions(self, event, subscriptions):
         for subscription in subscriptions:
-            if event.realm == 'ticket' and "email" == subscription[0]:
-                if event.author == subscription[1] and \
-                        self._author_filter(event.author):
-                    self.log.debug(
-                        "Filtering %s because of rule: ChangeAuthorFilter"\
-                        %event.author
-                    )
-                    pass
-                else:
-                    yield subscription
+            if event.author == subscription[1] and \
+                    self._author_filter(event.author):
+                self.log.debug(
+                    "Filtering %s because of rule: ChangeAuthorFilter"\
+                    %event.author
+                )
+                pass
             else:
                 yield subscription
 
@@ -77,13 +74,15 @@ class ChangeAuthorFilter(Component):
     def render_announcement_preference_box(self, req, panel):
         if req.method == "POST":
             opt = req.args.get('author_filter')
-            if opt:
+            self.log.error(req.args)
+            if opt == '1':
                 req.session["announcer_author_filter"] = '1'
             else:
                 req.session["announcer_author_filter"] = '0'
         # default on
         attr = req.session.get('announcer_author_filter', '1')
-        opt = attr == '1' 
+        opt = attr != '0' and True or None
         return 'prefs_announcer_author_filter.html', \
                 dict(data=dict(author_filter=opt))
+
 

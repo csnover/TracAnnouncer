@@ -40,16 +40,7 @@ import re
 class TicketComponentSubscriber(Component):
     implements(IAnnouncementSubscriber, IAnnouncementPreferenceProvider)
     
-    def get_subscription_realms(self):
-        return ('ticket',)
-    
-    def get_subscription_categories(self, realm):
-        if realm == "ticket":
-            return('changed', 'created', 'attachment added')
-        else:
-            ()
-    
-    def get_subscriptions_for_event(self, event):
+    def subscriptions(self, event):
         if event.realm == 'ticket':
             ticket = event.target
             if event.category in ('changed', 'created', 'attachment added'):

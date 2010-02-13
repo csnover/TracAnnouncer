@@ -246,33 +246,26 @@ class WatchSubscriber(Component):
         db.commit()
     
     # IAnnouncementSubscriber    
-    def get_subscription_realms(self):
-        return ('wiki', 'ticket')
+    def subscriptions(self, event):
+        if event.realm in ('wiki', 'ticket'):
+            db = self.env.get_db_cnx()
+            cursor = db.cursor()
+            cursor.execute("""
+                SELECT transport, sid, authenticated
+                  FROM subscriptions
+                 WHERE enabled=1 AND managed=%s
+                   AND realm=%s
+                   AND category=%s
+                   AND rule=%s
+            """, ('watcher', event.realm, '*', 
+                to_unicode(self._get_target_identifier(event.realm, 
+                event.target))))
         
-    def get_subscription_categories(self, realm):
-        return ('created', 'changed', 'attachment added')
-        
-    def get_subscriptions_for_event(self, event):
-        if event.realm in self.get_subscription_realms():
-            if event.category in self.get_subscription_categories(event.realm):
-                db = self.env.get_db_cnx()
-                cursor = db.cursor()
-                cursor.execute("""
-                    SELECT transport, sid, authenticated
-                      FROM subscriptions
-                     WHERE enabled=1 AND managed=%s
-                       AND realm=%s
-                       AND category=%s
-                       AND rule=%s
-                """, ('watcher', event.realm, '*', 
-                    to_unicode(self._get_target_identifier(event.realm, 
-                    event.target))))
-            
-                for transport, sid, authenticated in cursor.fetchall():
-                    self.log.debug("WatchSubscriber added '%s (%s)' because " \
-                        "of rule: watched"%(sid,authenticated and \
-                        'authenticated' or 'not authenticated'))
-                    yield (transport, sid, authenticated, None)
+            for transport, sid, authenticated in cursor.fetchall():
+                self.log.debug("WatchSubscriber added '%s (%s)' because " \
+                    "of rule: watched"%(sid,authenticated and \
+                    'authenticated' or 'not authenticated'))
+                yield (transport, sid, authenticated, None)
                     
     def _get_target_identifier(self, realm, target):
         if realm == "wiki":

@@ -4,7 +4,7 @@
   The following groups have been defined by the Trac administrators. They are general topics that may be added onto the CC list of tickets (by prepending their name with @).  Case does matter.
   <ul py:for="group in joinable_groups">
     <li>
-      <input type="checkbox" name="joinable_group_${group}" checked="${joinable_groups[group]}" value="1" /> ${group}
+      <input type="checkbox" name="joinable_group_${group[1:]}" checked="${joinable_groups[group]}" value="1" /> ${group}
     </li>
   </ul>
 </span>

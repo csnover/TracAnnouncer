@@ -60,15 +60,7 @@ class StaticTicketSubscriber(Component):
                bcc is unneccesary since users can't see
                each others email addresses.""")
     
-    def get_subscription_realms(self):
-        return (self.smtp_always_bcc or self.smtp_always_cc) and \
-                ('*',) or tuple()
-        
-    def get_subscription_categories(self, realm):
-        return (self.smtp_always_bcc or self.smtp_always_cc) and \
-                ('*',) or tuple()
-        
-    def get_subscriptions_for_event(self, event):
+    def subscriptions(self, event):
         if self.smtp_always_cc:
             for s in self.smtp_always_cc.split(','):
                 self.log.debug(_("StaticTicketSubscriber added '%s' " \
@@ -109,7 +101,8 @@ class LegacyTicketSubscriber(Component):
     def render_announcement_preference_box(self, req, panel):
         if req.method == "POST":
             for attr in ('component_owner', 'owner', 'reporter', 'updater'):
-                val = req.args.get('legacy_notify_%s'%attr) == 'on'
+                val = req.args.get('legacy_notify_%s'%attr) == 'on' 
+                val = val and '1' or '0'
                 req.session['announcer_legacy_notify_%s'%attr] = val
 
         # component
@@ -117,28 +110,28 @@ class LegacyTicketSubscriber(Component):
         if component is None:
             component = self.always_notify_component_owner
         else:
-            component = component == u'True'
+            component = component == u'1'
 
         # owner
         owner = req.session.get('announcer_legacy_notify_owner')
         if owner is None:
             owner = self.always_notify_owner
         else:
-            owner = owner == u'True'
+            owner = owner == u'1'
 
         # reporter
         reporter = req.session.get('announcer_legacy_notify_reporter')
         if reporter is None:
             reporter = self.always_notify_reporter
         else:
-            reporter = reporter == u'True'
+            reporter = reporter == u'1'
 
         # updater
         updater = req.session.get('announcer_legacy_notify_updater')
         if updater is None:
             updater = self.always_notify_updater
         else:
-            updater = updater == u'True'
+            updater = updater == u'1'
 
         return "prefs_announcer_legacy.html", dict(
             data=dict(
@@ -149,16 +142,7 @@ class LegacyTicketSubscriber(Component):
             )    
         )
 
-    def get_subscription_realms(self):
-        return ('ticket',)
-        
-    def get_subscription_categories(self, realm):
-        if realm == 'ticket':
-            return ('created', 'changed', 'attachment added')
-        else:
-            return tuple()
-
-    def get_subscriptions_for_event(self, event):
+    def subscriptions(self, event):
         if event.realm == "ticket":
             if event.category in ('created', 'changed', 'attachment added'):
                 ticket = event.target
@@ -244,22 +228,13 @@ class LegacyTicketSubscriber(Component):
         """, (sid, 'announcer_legacy_' + preference))
         result = cursor.fetchone()
         if result:
-            return result[0]
+            return result[0] == '1'
         return None
 
 class CarbonCopySubscriber(Component):
     implements(IAnnouncementSubscriber)
     
-    def get_subscription_realms(self):
-        return ('ticket',)
-        
-    def get_subscription_categories(self, realm):
-        if realm == 'ticket':
-            return ('created', 'changed', 'attachment added')
-        else:
-            return tuple()
-        
-    def get_subscriptions_for_event(self, event):
+    def subscriptions(self, event):
         if event.realm == 'ticket':
             if event.category in ('created', 'changed', 'attachment added'):
                 cc = event.target['cc'] or ''
