@@ -106,7 +106,7 @@ class EmailDistributor(Component):
     smtp_from = Option('announcer', 'smtp_from', 'trac@localhost',
         """Sender address to use in notification emails.""")
 
-    smtp_debuglevel = Option('announcer', 'smtp_debuglevel', 
+    smtp_debuglevel = IntOption('announcer', 'smtp_debuglevel', 0,
         doc="""Set to 1 for useful smtp debugging on stdout.""")
         
     smtp_from_name = Option('announcer', 'smtp_from_name', '',
