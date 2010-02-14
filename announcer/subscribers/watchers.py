@@ -68,7 +68,7 @@ class WatchSubscriber(Component):
     def process_request(self, req):
         match = self.path_match.match(req.path_info)
         resource = self.normalise_resource(match.groups()[0])
-        realm, _ = resource.split('/', 1)
+        realm = resource.split('/', 1)[0]
         req.perm.require('%s_VIEW' % realm.upper())
         self.toggle_watched(req.session.sid, (not req.authname == \
                 'anonymous') and 1 or 0, resource, req)
@@ -167,7 +167,7 @@ class WatchSubscriber(Component):
             for pattern in self.watchable_paths:
                 path = self.normalise_resource(req.path_info)
                 if re.match(pattern, path):
-                    realm, _ = path.split('/', 1)
+                    realm = path.split('/', 1)[0]
                     if '%s_VIEW'%realm.upper() not in req.perm:
                         return (template, data, content_type)
                     self.render_watcher(req)
@@ -179,7 +179,10 @@ class WatchSubscriber(Component):
         if not self.ctxtnav_names:
           return
         resource = self.normalise_resource(req.path_info)
-        realm, resource = resource.split('/', 1)
+        parts = resource.split('/', 1)
+        if len(parts) < 2:
+            return
+        realm, resource = parts
         if self.is_watching(req.session.sid, not req.authname == 'anonymous', 
                 realm, resource):
             action_name = len(self.ctxtnav_names) >= 2 and \
