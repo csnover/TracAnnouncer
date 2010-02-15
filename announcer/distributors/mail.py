@@ -231,7 +231,7 @@ class EmailDistributor(Component):
                 self._get_preferred_format(event.realm, name, authed) or \
                 self._get_default_format()
             if fmt not in fmtdict:
-                self.log.debug(("EmailDistributer format %s not available" +
+                self.log.debug(("EmailDistributer format %s not available " +
                     "for %s %s, looking for an alternative")%(
                         fmt, transport, event.realm))
                 # If the fmt is not available for this realm, then try to find
@@ -239,7 +239,7 @@ class EmailDistributor(Component):
                 oldfmt = fmt
                 fmt = None
                 for f in fmtdict.values():
-                    fmt = f.get_format_alternative(
+                    fmt = f.alternative_style_for(
                             transport, event.realm, oldfmt)
                     if fmt: break
             if not fmt:
