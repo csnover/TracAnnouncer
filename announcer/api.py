@@ -240,10 +240,11 @@ class AnnouncementEvent(object):
     is all that matters and there's no possible data you could conceivably
     get beyond just the message.
     """
-    def __init__(self, realm, category, target):
+    def __init__(self, realm, category, target, author=""):
         self.realm = realm
         self.category = category
         self.target = target
+        self.author = author
          
     def get_basic_terms(self):
         return (self.realm, self.category)

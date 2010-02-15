@@ -31,17 +31,22 @@
 # ----------------------------------------------------------------------------
 
 from announcer.api import IAnnouncementFormatter
+
 from genshi import HTML
 from genshi.template import NewTextTemplate, MarkupTemplate
 from genshi.template import TemplateLoader
+
 from trac.config import Option, IntOption, ListOption
-from trac.core import Component, implements
-from trac.util.text import wrap, to_unicode
+from trac.core import *
+from trac.mimeview import Context
+from trac.test import Mock, MockPerm
 from trac.ticket.api import TicketSystem
+from trac.util.text import wrap, to_unicode, exception_to_unicode
 from trac.versioncontrol.diff import diff_blocks
 from trac.web.chrome import Chrome
 from trac.web.href import Href
-from trac.wiki.formatter import wiki_to_html
+from trac.wiki.formatter import HtmlFormatter
+
 import difflib
 
 def diff_cleanup(gen):
@@ -159,8 +164,18 @@ class TicketFormatter(Component):
                 short_changes[field.capitalize()] = (old_value, new_value)
 
         try:
-            temp = wiki_to_html(event.comment, self.env, None)
-        except:
+            req = Mock(
+                href=Href(self.env.abs_href()),
+                abs_href=self.env.abs_href(),
+                authname=event.author, 
+                perm=MockPerm(),
+                args={}
+            )
+            context = Context.from_request(req, event.realm, event.target.id)
+            formatter = HtmlFormatter(self.env, context, event.comment)
+            temp = formatter.generate(True)
+        except Exception, e:
+            self.log.error(exception_to_unicode(e, traceback=True))
             temp = 'Comment in plain text: %s'%event.comment
         data = dict(
             ticket = ticket,
