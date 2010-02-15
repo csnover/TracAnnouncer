@@ -117,7 +117,7 @@ class IAnnouncementFormatter(Interface):
         need to.
         """
         
-    def alternative_style(transport, realm, style):
+    def alternative_style_for(transport, realm, style):
         """Returns an alternative style for the given style if one is 
         available.
         """
