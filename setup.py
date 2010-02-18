@@ -59,6 +59,7 @@ setup(
         'trac>=0.11',
     ],
     extras_require={
+        'acct_mgr': 'TracAccountManager',
         'bitten': 'Bitten',
         'fullblog': 'TracFullBlogPlugin',
     },
@@ -89,6 +90,7 @@ setup(
             'announcer.subscribers.watch_users = announcer.subscribers.watch_users',
             'announcer.subscribers.wiki = announcer.subscribers.wiki',
             'announcer.util.mail = announcer.util.mail',
+            'announcer.opt.acct_mgr.announce = announcer.opt.acct_mgr.announce[acct_mgr]',
             'announcer.opt.bitten.announce = announcer.opt.bitten.announce[bitten]',
             'announcer.opt.fullblog.announce = announcer.opt.fullblog.announce[fullblog]',
         ]    
