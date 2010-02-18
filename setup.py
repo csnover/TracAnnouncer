@@ -59,6 +59,7 @@ setup(
         'trac>=0.11',
     ],
     extras_require={
+        'bitten': 'Bitten',
         'fullblog': 'TracFullBlogPlugin',
     },
     entry_points = {
@@ -88,6 +89,7 @@ setup(
             'announcer.subscribers.watch_users = announcer.subscribers.watch_users',
             'announcer.subscribers.wiki = announcer.subscribers.wiki',
             'announcer.util.mail = announcer.util.mail',
+            'announcer.opt.bitten.announce = announcer.opt.bitten.announce[bitten]',
             'announcer.opt.fullblog.announce = announcer.opt.fullblog.announce[fullblog]',
         ]    
     },
