@@ -139,14 +139,13 @@ class EmailDistributor(Component):
         Valid options are 'base64' for Base64 encoding, 'qp' for
         Quoted-Printable, and 'none' for no encoding. Note that the no encoding
         means that non-ASCII characters in text are going to cause problems
-        with notifications (''since 0.10'').
+        with notifications.
         """)
 
     use_public_cc = BoolOption('announcer', 'use_public_cc', 'false',
         """Recipients can see email addresses of other CC'ed recipients.
         
         If this option is disabled (the default), recipients are put on BCC
-        (''since 0.10'').
         """)
 
     use_short_addr = BoolOption('announcer', 'use_short_addr', 'false',
@@ -161,7 +160,7 @@ class EmailDistributor(Component):
         
         If the setting is not defined, then the [$project_name] prefix.
         If no prefix is desired, then specifying an empty option 
-        will disable it.(''since 0.10.1'').
+        will disable it.
         """)
 
     smtp_to = Option('announcer', 'smtp_to', None, 'Default To: field')
