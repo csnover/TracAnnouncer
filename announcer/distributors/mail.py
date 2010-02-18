@@ -439,7 +439,16 @@ class EmailDistributor(Component):
                 self.smtp_password.encode('utf-8')
             )
         smtp.sendmail(smtpfrom, addresses, message)
-        smtp.quit()
+        if self.use_tls or self.smtp_ssl:
+            # avoid false failure detection when the server closes
+            # the SMTP connection with TLS/SSL enabled
+            import socket
+            try:
+                smtp.quit()
+            except socket.sslerror:
+                pass
+        else:
+            smtp.quit()
         
     # IAnnouncementDistributor
     def get_announcement_preference_boxes(self, req):
