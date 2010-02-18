@@ -49,6 +49,7 @@ except:
 from trac.core import *
 from trac.util.compat import set, sorted
 from trac.config import Option, BoolOption, IntOption, OrderedExtensionsOption
+from trac.config import ExtensionOption
 from trac.util import get_pkginfo, md5
 from trac.util.datefmt import to_timestamp
 from trac.util.text import to_unicode, CRLF
@@ -97,30 +98,18 @@ class EmailDistributor(Component):
     smtp_enabled = BoolOption('announcer', 'smtp_enabled', 'false',
         """Enable SMTP (email) notification.""")
 
-    smtp_server = Option('announcer', 'smtp_server', 'localhost',
-        """SMTP server hostname to use for email notifications.""")
+    email_sender = ExtensionOption('announcer', 'email_sender',
+        IEmailSender, 'SmtpEmailSender', 
+        """Name of the component implementing `IEmailSender`.
 
-    smtp_port = IntOption('announcer', 'smtp_port', 25,
-        """SMTP server port to use for email notification.""")
+        This component is used by the announcer system to send emails.
+        Currently, `SmtpEmailSender` is provided.
+        """)
 
-    smtp_timeout = IntOption('announcer', 'smtp_timeout', 10,
-        """SMTP server connection timeout.""")
-
-    smtp_user = Option('announcer', 'smtp_user', '',
-        """Username for SMTP server. (''since 0.9'').""")
-
-    smtp_password = Option('announcer', 'smtp_password', '',
-        """Password for SMTP server. (''since 0.9'').""")
 
     smtp_from = Option('announcer', 'smtp_from', 'trac@localhost',
         """Sender address to use in notification emails.""")
 
-    smtp_debuglevel = IntOption('announcer', 'smtp_debuglevel', 0,
-        doc="""Set to 1 for useful smtp debugging on stdout.""")
-        
-    smtp_ssl = BoolOption('announcer', 'smtp_ssl', 'false',
-        doc="""Use ssl for smtp connection.""")
-        
     smtp_from_name = Option('announcer', 'smtp_from_name', '',
         """Sender name to use in notification emails.""")
 
@@ -163,9 +152,6 @@ class EmailDistributor(Component):
         The SMTP server should accept those addresses, and either append
         a FQDN or use local delivery (''since 0.10'').""")
         
-    use_tls = BoolOption('announcer', 'use_tls', 'false',
-        """Use SSL/TLS to send notifications (''since 0.10'').""")
-    
     smtp_subject_prefix = Option('announcer', 'smtp_subject_prefix',
                                  '__default__', 
         """Text to prepend to subject line of notification emails. 
@@ -197,7 +183,7 @@ class EmailDistributor(Component):
     def get_delivery_queue(self):
         if not self.delivery_queue:
             self.delivery_queue = Queue.Queue()
-            thread = DeliveryThread(self.delivery_queue, self._transmit)
+            thread = DeliveryThread(self.delivery_queue, self.send)
             thread.start()
         return self.delivery_queue
     
@@ -412,52 +398,20 @@ class EmailDistributor(Component):
         if self.use_threaded_delivery:
             self.get_delivery_queue().put(package)
         else:
-            self._transmit(*package)
+            self.send(*package)
         stop = time.time()
         self.log.debug("EmailDistributor took %s seconds to send."\
                 %(round(stop-start,2)))
 
+    def send(self, from_addr, recipients, message):
+        """Send message to recipients via e-mail."""
+        # Ensure the message complies with RFC2822: use CRLF line endings
+        message = CRLF.join(re.split("\r?\n", message))
+        self.email_sender.send(from_addr, recipients, message)
+
     def _get_decorators(self):
         return self.decorators[:]
 
-    def _transmit(self, smtpfrom, addresses, message):
-        # Ensure the message complies with RFC2822: use CRLF line endings
-        message = CRLF.join(re.split("\r?\n", message))
-
-        # use defaults to make sure connect() is called in the constructor
-        smtpclass = smtplib.SMTP
-        if self.smtp_ssl:
-            smtpclass = smtplib.SMTP_SSL
-        smtp = smtpclass(
-            host=self.smtp_server,
-            port=self.smtp_port,
-            timeout=self.smtp_timeout
-        )
-        smtp.set_debuglevel(self.smtp_debuglevel)
-        if self.use_tls:
-            smtp.ehlo()
-            if not smtp.esmtp_features.has_key('starttls'):
-                raise TracError(_("TLS enabled but server does not support " \
-                        "TLS"))
-            smtp.starttls()
-            smtp.ehlo()
-        if self.smtp_user:
-            smtp.login(
-                self.smtp_user.encode('utf-8'), 
-                self.smtp_password.encode('utf-8')
-            )
-        smtp.sendmail(smtpfrom, addresses, message)
-        if self.use_tls or self.smtp_ssl:
-            # avoid false failure detection when the server closes
-            # the SMTP connection with TLS/SSL enabled
-            import socket
-            try:
-                smtp.quit()
-            except socket.sslerror:
-                pass
-        else:
-            smtp.quit()
-        
     # IAnnouncementDistributor
     def get_announcement_preference_boxes(self, req):
         yield "email", "E-Mail Format"
@@ -487,6 +441,72 @@ class EmailDistributor(Component):
             preferences = prefs,
         )
         return "prefs_announcer_email.html", data    
+    
+    
+class SmtpEmailSender(Component):
+    """E-mail sender connecting to an SMTP server."""
+    
+    implements(IEmailSender)
+    
+    server = Option('smtp', 'server', 'localhost',
+        """SMTP server hostname to use for email notifications.""")
+
+    timeout = IntOption('smtp', 'timeout', 10,
+        """SMTP server connection timeout.""")
+
+    port = IntOption('smtp', 'port', 25,
+        """SMTP server port to use for email notification.""")
+
+    user = Option('smtp', 'user', '',
+        """Username for SMTP server.""")
+
+    password = Option('smtp', 'password', '',
+        """Password for SMTP server.""")
+
+    use_tls = BoolOption('smtp', 'use_tls', 'false',
+        """Use SSL/TLS to send notifications over SMTP.""")
+
+    use_ssl = BoolOption('smtp', 'use_ssl', 'false',
+        """Use ssl for smtp connection.""")
+        
+    debuglevel = IntOption('smtp', 'debuglevel', 0,
+        """Set to 1 for useful smtp debugging on stdout.""")
+        
+
+    def send(self, from_addr, recipients, message):
+        # use defaults to make sure connect() is called in the constructor
+        smtpclass = smtplib.SMTP
+        if self.use_ssl:
+            smtpclass = smtplib.SMTP_SSL
+        smtp = smtpclass(
+            host=self.server,
+            port=self.port,
+            timeout=self.timeout
+        )
+        smtp.set_debuglevel(self.debuglevel)
+        if self.use_tls:
+            smtp.ehlo()
+            if not smtp.esmtp_features.has_key('starttls'):
+                raise TracError(_("TLS enabled but server does not support " \
+                        "TLS"))
+            smtp.starttls()
+            smtp.ehlo()
+        if self.user:
+            smtp.login(
+                self.user.encode('utf-8'), 
+                self.password.encode('utf-8')
+            )
+        smtp.sendmail(from_addr, recipients, message)
+        if self.use_tls or self.use_ssl:
+            # avoid false failure detection when the server closes
+            # the SMTP connection with TLS/SSL enabled
+            import socket
+            try:
+                smtp.quit()
+            except socket.sslerror:
+                pass
+        else:
+            smtp.quit()
 
 class DeliveryThread(threading.Thread):
     def __init__(self, queue, sender):
