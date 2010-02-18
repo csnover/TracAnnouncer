@@ -141,7 +141,7 @@ class EmailDistributor(Component):
         will disable it.
         """)
 
-    to = Option('announcer', 'email_to', None, 'Default To: field')
+    to = Option('announcer', 'email_to', 'undisclosed-recipients: ;', 'Default To: field')
     
     use_threaded_delivery = BoolOption('announcer', 'use_threaded_delivery', 
             'false', 
@@ -347,8 +347,7 @@ class EmailDistributor(Component):
             self.email_from
         ))
         headers['From'] = from_header
-        if self.to:
-            headers['To'] = '"%s"'%(self.to)
+        headers['To'] = '"%s"'%(self.to)
         if self.use_public_cc:
             headers['Cc'] = ', '.join([x[2] for x in recipients if x])
         headers['Reply-To'] = self.replyto
