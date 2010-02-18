@@ -45,31 +45,31 @@ from announcer.api import IAnnouncementPreferenceProvider
 
 class StaticTicketSubscriber(Component):
     """The static ticket subscriber implements a policy to -always- send an 
-    email to a certain address. Controlled via the smtp_always_bcc option in 
+    email to a certain address. Controlled via the always_bcc option in 
     the announcer section of the trac.ini"""
     
     implements(IAnnouncementSubscriber)
 
-    smtp_always_cc = Option("announcer", "smtp_always_cc", 
+    always_cc = Option("announcer", "email_always_cc", 
         doc="""Email addresses specified here will always
                be cc'd on all notifications.""")
 
-    smtp_always_bcc = Option("announcer", "smtp_always_bcc", 
+    always_bcc = Option("announcer", "email_always_bcc", 
         doc="""Email addresses specified here will always
                be cc'd on all notifications.  With announce,
                bcc is unneccesary since users can't see
                each others email addresses.""")
     
     def subscriptions(self, event):
-        if self.smtp_always_cc:
-            for s in self.smtp_always_cc.split(','):
+        if self.always_cc:
+            for s in self.always_cc.split(','):
                 self.log.debug(_("StaticTicketSubscriber added '%s' " \
-                        "because of rule: smtp_always_cc"%s))
+                        "because of rule: always_cc"%s))
                 yield ('email', None, False, s.strip())
-        if self.smtp_always_bcc:
-            for s in self.smtp_always_bcc.split(','):
+        if self.always_bcc:
+            for s in self.always_bcc.split(','):
                 self.log.debug(_("StaticTicketSubscriber added '%s' " \
-                        "because of rule: smtp_always_bcc"%s))
+                        "because of rule: always_bcc"%s))
                 yield ('email', None, False, s.strip())
 
 class LegacyTicketSubscriber(Component):

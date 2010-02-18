@@ -96,9 +96,6 @@ class EmailDistributor(Component):
         resolvers will no be called.
         """)
 
-    smtp_enabled = BoolOption('announcer', 'smtp_enabled', 'false',
-        """Enable SMTP (email) notification.""")
-
     email_sender = ExtensionOption('announcer', 'email_sender',
         IEmailSender, 'SmtpEmailSender', 
         """Name of the component implementing `IEmailSender`.
@@ -107,14 +104,16 @@ class EmailDistributor(Component):
         Currently, `SmtpEmailSender` is provided.
         """)
 
+    enabled = BoolOption('announcer', 'email_enabled', 'false',
+        """Enable SMTP (email) notification.""")
 
-    smtp_from = Option('announcer', 'smtp_from', 'trac@localhost',
+    email_from = Option('announcer', 'email_from', 'trac@localhost',
         """Sender address to use in notification emails.""")
 
-    smtp_from_name = Option('announcer', 'smtp_from_name', '',
+    from_name = Option('announcer', 'email_from_name', '',
         """Sender name to use in notification emails.""")
 
-    smtp_replyto = Option('announcer', 'smtp_replyto', 'trac@localhost',
+    replyto = Option('announcer', 'email_replyto', 'trac@localhost',
         """Reply-To address to use in notification emails.""")
 
     smtp_always_cc = Option('announcer', 'smtp_always_cc', '',
@@ -154,7 +153,8 @@ class EmailDistributor(Component):
         The SMTP server should accept those addresses, and either append
         a FQDN or use local delivery (''since 0.10'').""")
         
-    smtp_subject_prefix = Option('announcer', 'smtp_subject_prefix',
+    # used in email decorators, but not here
+    subject_prefix = Option('announcer', 'email_subject_prefix',
                                  '__default__', 
         """Text to prepend to subject line of notification emails. 
         
@@ -163,7 +163,7 @@ class EmailDistributor(Component):
         will disable it.
         """)
 
-    smtp_to = Option('announcer', 'smtp_to', None, 'Default To: field')
+    to = Option('announcer', 'email_to', None, 'Default To: field')
     
     use_threaded_delivery = BoolOption('announcer', 'use_threaded_delivery', 
             'false', 
@@ -217,8 +217,8 @@ class EmailDistributor(Component):
         for supported_transport in self.transports():
             if supported_transport == transport:
                 found = True
-        if not self.smtp_enabled or not found:
-            self.log.debug("EmailDistributer smtp_enabled set to false")
+        if not self.enabled or not found:
+            self.log.debug("EmailDistributer email_enabled set to false")
             return
         fmtdict = self.formats(transport, event.realm)
         if not fmtdict:
@@ -330,7 +330,7 @@ class EmailDistributor(Component):
                           modtime, rand,
                           realm.encode('ascii', 'ignore'))
         dig = md5(s).hexdigest()
-        host = self.smtp_from[self.smtp_from.find('@') + 1:]
+        host = self.email_from[self.email_from.find('@') + 1:]
         msgid = '<%03d.%s@%s>' % (len(s), dig, host)
         return msgid
 
@@ -365,17 +365,17 @@ class EmailDistributor(Component):
         headers['Message-ID'] = self._message_id(event.realm)
         headers['Date'] = formatdate()
         from_header = formataddr((
-            self.smtp_from_name or self.env.project_name,
-            self.smtp_from
+            self.from_name or self.env.project_name,
+            self.email_from
         ))
         headers['From'] = from_header
         if self.smtp_always_bcc:
             headers['Bcc'] = self.smtp_always_bcc
-        if self.smtp_to:
-            headers['To'] = '"%s"'%(self.smtp_to)
+        if self.to:
+            headers['To'] = '"%s"'%(self.to)
         if self.use_public_cc:
             headers['Cc'] = ', '.join([x[2] for x in recipients if x])
-        headers['Reply-To'] = self.smtp_replyto
+        headers['Reply-To'] = self.replyto
         for k, v in headers.iteritems():
             set_header(rootMessage, k, v)
 

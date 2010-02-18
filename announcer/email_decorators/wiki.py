@@ -54,7 +54,7 @@ class WikiSubjectEmailDecorator(Component):
                 action=event.category
             ).render()
 
-            prefix = self.config.get('announcer', 'smtp_subject_prefix')
+            prefix = self.config.get('announcer', 'email_subject_prefix')
             if prefix == '__default__': 
                 prefix = '[%s] ' % self.env.project_name
             if prefix:

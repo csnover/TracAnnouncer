@@ -64,9 +64,9 @@ class ThreadingEmailDecorator(Component):
         """ 
         if event.realm in self.supported_realms: 
             uid = uid_encode(self.env.abs_href(), event.realm, event.target) 
-            smtp_from = self.config.get('announcer', 'smtp_from', 'localhost') 
-            _, smtp_addr = parseaddr(smtp_from) 
-            host = re.sub('^.+@', '', smtp_addr) 
+            email_from = self.config.get('announcer', 'email_from', 'localhost') 
+            _, email_addr = parseaddr(email_from) 
+            host = re.sub('^.+@', '', email_addr) 
             mymsgid = msgid(uid, host) 
             if event.category == 'created': 
                 set_header(message, 'Message-ID', mymsgid) 
