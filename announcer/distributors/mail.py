@@ -417,18 +417,14 @@ class EmailDistributor(Component):
         message = CRLF.join(re.split("\r?\n", message))
 
         # use defaults to make sure connect() is called in the constructor
+        smtpclass = smtplib.SMTP
         if self.smtp_ssl:
-            smtp = smtplib.SMTP_SSL(
-                host=self.smtp_server,
-                port=self.smtp_port,
-                timeout=self.smtp_timeout
-            )
-        else:
-            smtp = smtplib.SMTP(
-                host=self.smtp_server,
-                port=self.smtp_port,
-                timeout=self.smtp_timeout
-            )
+            smtpclass = smtplib.SMTP_SSL
+        smtp = smtpclass(
+            host=self.smtp_server,
+            port=self.smtp_port,
+            timeout=self.smtp_timeout
+        )
         if self.smtp_debuglevel:
             smtp.set_debuglevel(self.smtp_debuglevel)
         if self.use_tls:
