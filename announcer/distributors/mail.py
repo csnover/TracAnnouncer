@@ -31,6 +31,7 @@
 # ----------------------------------------------------------------------------
 import Queue
 import random
+import re
 import smtplib
 import sys
 import threading
@@ -50,7 +51,7 @@ from trac.util.compat import set, sorted
 from trac.config import Option, BoolOption, IntOption, OrderedExtensionsOption
 from trac.util import get_pkginfo, md5
 from trac.util.datefmt import to_timestamp
-from trac.util.text import to_unicode
+from trac.util.text import to_unicode, CRLF
 from trac.util.translation import _
 
 from announcer.api import AnnouncementSystem
@@ -412,6 +413,9 @@ class EmailDistributor(Component):
         return self.decorators[:]
 
     def _transmit(self, smtpfrom, addresses, message):
+        # Ensure the message complies with RFC2822: use CRLF line endings
+        message = CRLF.join(re.split("\r?\n", message))
+
         # use defaults to make sure connect() is called in the constructor
         if self.smtp_ssl:
             smtp = smtplib.SMTP_SSL(
