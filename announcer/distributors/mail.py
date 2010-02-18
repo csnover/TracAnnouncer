@@ -434,7 +434,10 @@ class EmailDistributor(Component):
             smtp.starttls()
             smtp.ehlo()
         if self.smtp_user:
-            smtp.login(self.smtp_user, self.smtp_password)
+            smtp.login(
+                self.smtp_user.encode('utf-8'), 
+                self.smtp_password.encode('utf-8')
+            )
         smtp.sendmail(smtpfrom, addresses, message)
         smtp.quit()
         
