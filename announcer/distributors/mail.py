@@ -73,10 +73,9 @@ class IEmailSender(Interface):
 
 class IAnnouncementEmailDecorator(Interface):
     def decorate_message(event, message, decorators):
-        """
-        Manipulate the message before it is sent on it's way.  The callee
-        should call the next decorator by by popping decorators and calling
-        the popped decorator.  If decorators is empty, don't worry about it.
+        """Manipulate the message before it is sent on it's way.  The callee
+        should call the next decorator by by popping decorators and calling the
+        popped decorator.  If decorators is empty, don't worry about it.
         """
 
 class EmailDistributor(Component):
@@ -88,12 +87,14 @@ class EmailDistributor(Component):
     distributors = ExtensionPoint(IAnnouncementDistributor)
     # Make ordered
     decorators = ExtensionPoint(IAnnouncementEmailDecorator)
+
     resolvers = OrderedExtensionsOption('announcer', 'email_address_resolvers',
         IAnnouncementAddressResolver, 'SpecifiedEmailResolver, '\
         'SessionEmailResolver, DefaultDomainEmailResolver', 
-        doc="""Comma seperated list of email resolver components in the order 
+        """Comma seperated list of email resolver components in the order 
         they will be called.  If an email address is resolved, the remaining 
-        resolvers will no be called.""")
+        resolvers will no be called.
+        """)
 
     smtp_enabled = BoolOption('announcer', 'smtp_enabled', 'false',
         """Enable SMTP (email) notification.""")
@@ -138,13 +139,15 @@ class EmailDistributor(Component):
         Valid options are 'base64' for Base64 encoding, 'qp' for
         Quoted-Printable, and 'none' for no encoding. Note that the no encoding
         means that non-ASCII characters in text are going to cause problems
-        with notifications (''since 0.10'').""")
+        with notifications (''since 0.10'').
+        """)
 
     use_public_cc = BoolOption('announcer', 'use_public_cc', 'false',
         """Recipients can see email addresses of other CC'ed recipients.
         
         If this option is disabled (the default), recipients are put on BCC
-        (''since 0.10'').""")
+        (''since 0.10'').
+        """)
 
     use_short_addr = BoolOption('announcer', 'use_short_addr', 'false',
         """Permit email address without a host/domain (i.e. username only)
@@ -158,23 +161,27 @@ class EmailDistributor(Component):
         
         If the setting is not defined, then the [$project_name] prefix.
         If no prefix is desired, then specifying an empty option 
-        will disable it.(''since 0.10.1'').""")
+        will disable it.(''since 0.10.1'').
+        """)
 
     smtp_to = Option('announcer', 'smtp_to', None, 'Default To: field')
     
     use_threaded_delivery = BoolOption('announcer', 'use_threaded_delivery', 
-            'false', """If true, the actual delivery of the message will occur 
+            'false', 
+            """If true, the actual delivery of the message will occur 
             in a separate thread.  Enabling this will improve responsiveness 
             for requests that end up with an announcement being sent over 
             email. It requires building Python with threading support 
             enabled-- which is usually the case. To test, start Python and 
-            type 'import threading' to see if it raises an error.""")
+            type 'import threading' to see if it raises an error.
+            """)
     
     default_email_format = Option('announcer', 'default_email_format', 
             'text/plain',
-            doc="""The default mime type of the email notifications.  This
+            """The default mime type of the email notifications.  This
             can be overriden on a per user basis through the announcer
-            preferences panel.""")
+            preferences panel.
+            """)
 
     def __init__(self):
         self.delivery_queue = None
