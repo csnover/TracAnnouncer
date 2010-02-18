@@ -375,8 +375,15 @@ class EmailDistributor(Component):
         if len(decorators) > 0:
             decorator = decorators.pop()
             decorator.decorate_message(event, rootMessage, decorators)
-        package = (from_header, [x[2] for x in recipients if x], 
-                rootMessage.as_string())
+
+        recip_adds = [x[2] for x in recipients if x]
+        # Append any to, cc or bccs added to the recipient list
+        for field in ('To', 'Cc', 'Bcc'):
+            if rootMessage[field] and \
+                    len(str(rootMessage[field]).split(',')) > 0:
+                for addy in str(rootMessage[field]).split(','):
+                    self._add_recipient(recip_adds, addy)
+        package = (from_header, recip_adds, rootMessage.as_string())
         start = time.time()
         if self.use_threaded_delivery:
             self.get_delivery_queue().put(package)
@@ -394,6 +401,10 @@ class EmailDistributor(Component):
 
     def _get_decorators(self):
         return self.decorators[:]
+
+    def _add_recipient(self, recipients, addy):
+        if addy.strip() != '"undisclosed-recipients: ;"':
+            recipients.append(addy)
 
     # IAnnouncementDistributor
     def get_announcement_preference_boxes(self, req):
