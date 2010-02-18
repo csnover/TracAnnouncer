@@ -58,6 +58,9 @@ setup(
     install_requires = [
         'trac>=0.11',
     ],
+    extras_require={
+        'fullblog': 'TracFullBlogPlugin',
+    },
     entry_points = {
         'trac.plugins': [
             'announcer.api = announcer.api',
@@ -85,6 +88,7 @@ setup(
             'announcer.subscribers.watch_users = announcer.subscribers.watch_users',
             'announcer.subscribers.wiki = announcer.subscribers.wiki',
             'announcer.util.mail = announcer.util.mail',
+            'announcer.opt.fullblog.announce = announcer.opt.fullblog.announce[fullblog]',
         ]    
     },
     test_suite = 'announcer.tests',

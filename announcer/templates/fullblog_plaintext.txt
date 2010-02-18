@@ -1,0 +1,41 @@
+#${name}: ${title}
+{% if category == 'post created' or category == 'post updated' %}
+{% if category == 'post created' %}
+Added post "${name}" by ${author} at ${time}
+{% end %}\
+{% if category == 'post updated' %}\
+Changed post "${name}" by ${author} at ${time}. 
+Revision: ${version} 
+{% end %}\
+Page URL: ${link}
+
+Content:
+
+Title: ${title}
+
+${body}
+
+
+
+{% if comment %}\
+Comment: ${comment}
+{% end %}\
+{% end %}\
+
+{% if category == 'post deleted' %}\
+Deleted post "${name}" by ${author} at ${time}
+{% end %}\
+{% if category == 'post deleted' %}\
+Page URL: ${link}
+Deleted version "${version}" of post "${name}" by ${author} at ${time}
+{% end %}\
+
+{% if category == 'comment created' %}\
+Comment added to post "${name}" by ${author} at ${time}
+Page URL: ${link}
+
+Content:
+
+${comment}
+
+{% end %}
