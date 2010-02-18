@@ -116,22 +116,6 @@ class EmailDistributor(Component):
     replyto = Option('announcer', 'email_replyto', 'trac@localhost',
         """Reply-To address to use in notification emails.""")
 
-    smtp_always_cc = Option('announcer', 'smtp_always_cc', '',
-        """Email address(es) to always send notifications to,
-           addresses can be see by all recipients (Cc:).""")
-
-    smtp_always_bcc = Option('announcer', 'smtp_always_bcc', '',
-        """Email address(es) to always send notifications to,
-           addresses do not appear publicly (Bcc:). (''since 0.10'').""")
-                   
-    ignore_domains = Option('announcer', 'ignore_domains', '',
-        """Comma-separated list of domains that should not be considered
-           part of email addresses (for usernames with Kerberos domains)""")
-           
-    admit_domains = Option('announcer', 'admit_domains', '',
-        """Comma-separated list of domains that should be considered as
-        valid for email addresses (such as localdomain)""")
-           
     mime_encoding = Option('announcer', 'mime_encoding', 'base64',
         """Specifies the MIME encoding scheme for emails.
         
@@ -147,12 +131,6 @@ class EmailDistributor(Component):
         If this option is disabled (the default), recipients are put on BCC
         """)
 
-    use_short_addr = BoolOption('announcer', 'use_short_addr', 'false',
-        """Permit email address without a host/domain (i.e. username only)
-        
-        The SMTP server should accept those addresses, and either append
-        a FQDN or use local delivery (''since 0.10'').""")
-        
     # used in email decorators, but not here
     subject_prefix = Option('announcer', 'email_subject_prefix',
                                  '__default__', 
@@ -369,8 +347,6 @@ class EmailDistributor(Component):
             self.email_from
         ))
         headers['From'] = from_header
-        if self.smtp_always_bcc:
-            headers['Bcc'] = self.smtp_always_bcc
         if self.to:
             headers['To'] = '"%s"'%(self.to)
         if self.use_public_cc:
