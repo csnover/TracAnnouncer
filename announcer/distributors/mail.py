@@ -37,6 +37,8 @@ import sys
 import threading
 import time
 
+from subprocess import Popen, PIPE
+
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEText import MIMEText
 from email.Utils import formatdate, formataddr
@@ -101,7 +103,7 @@ class EmailDistributor(Component):
         """Name of the component implementing `IEmailSender`.
 
         This component is used by the announcer system to send emails.
-        Currently, `SmtpEmailSender` is provided.
+        Currently, `SmtpEmailSender` and `SendmailEmailSender` are provided.
         """)
 
     enabled = BoolOption('announcer', 'email_enabled', 'false',
@@ -488,6 +490,32 @@ class SmtpEmailSender(Component):
                 pass
         else:
             smtp.quit()
+        
+
+class SendmailEmailSender(Component):
+    """E-mail sender using a locally-installed sendmail program."""
+    
+    implements(IEmailSender)
+    
+    sendmail_path = Option('sendmail', 'sendmail_path', 'sendmail',
+        """Path to the sendmail executable.
+        
+        The sendmail program must accept the `-i` and `-f` options.
+        """)
+
+    def send(self, from_addr, recipients, message):
+        self.log.info("Sending notification through sendmail at %s to %s"
+                      % (self.sendmail_path, recipients))
+        cmdline = [self.sendmail_path, "-i", "-f", from_addr]
+        cmdline.extend(recipients)
+        self.log.debug("Sendmail command line: %s" % ' '.join(cmdline))
+        child = Popen(cmdline, bufsize=-1, stdin=PIPE, stdout=PIPE,
+                      stderr=PIPE)
+        (out, err) = child.communicate(message)
+        if child.returncode or err:
+            raise Exception("Sendmail failed with (%s, %s), command: '%s'"
+                            % (child.returncode, err.strip(), cmdline))
+
 
 class DeliveryThread(threading.Thread):
     def __init__(self, queue, sender):
