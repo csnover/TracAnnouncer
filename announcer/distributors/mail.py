@@ -62,6 +62,14 @@ from announcer.api import IAnnouncementPreferenceProvider
 from announcer.api import IAnnouncementProducer
 from announcer.util.mail import set_header
 
+
+class IEmailSender(Interface):
+    """Extension point interface for components that allow sending e-mail."""
+    
+    def send(self, from_addr, recipients, message):
+        """Send message to recipients."""
+
+
 class IAnnouncementEmailDecorator(Interface):
     def decorate_message(event, message, decorators):
         """
