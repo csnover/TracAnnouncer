@@ -36,8 +36,7 @@ from announcer.distributors.mail import IAnnouncementEmailDecorator
 from announcer.util.mail import set_header, msgid, next_decorator, uid_encode
 
 class ThreadingEmailDecorator(Component): 
-    """ 
-    Add Message-ID, In-Reply-To and References message headers for resources. 
+    """Add Message-ID, In-Reply-To and References message headers for resources. 
     All message ids are derived from the properties of the ticket so that they 
     can be regenerated later. 
     """ 
@@ -46,8 +45,7 @@ class ThreadingEmailDecorator(Component):
  
     supported_realms = ListOption('announcer', 'email_threaded_realms',  
         ['ticket', 'wiki'],  
-        doc=""" 
-        These are realms with announcements that should be threaded 
+        """These are realms with announcements that should be threaded 
         emails.  In order for email threads to work, the announcer 
         system needs to give the email recreatable Message-IDs based 
         on the resources in the realm.  The resources must have a unique 
@@ -77,9 +75,7 @@ class ThreadingEmailDecorator(Component):
         return next_decorator(event, message, decorates) 
 
 class AnnouncerEmailDecorator(Component):
-    """
-    Add some boring headers that should be set.
-    """
+    """Add some boring headers that should be set."""
 
     implements(IAnnouncementEmailDecorator)
 
