@@ -425,8 +425,7 @@ class EmailDistributor(Component):
             port=self.smtp_port,
             timeout=self.smtp_timeout
         )
-        if self.smtp_debuglevel:
-            smtp.set_debuglevel(self.smtp_debuglevel)
+        smtp.set_debuglevel(self.smtp_debuglevel)
         if self.use_tls:
             smtp.ehlo()
             if not smtp.esmtp_features.has_key('starttls'):
