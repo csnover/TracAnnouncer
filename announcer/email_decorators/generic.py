@@ -29,7 +29,7 @@ from email.utils import parseaddr
  
 import trac
 from trac.core import * 
-from trac.config import ListOption 
+from trac.config import ListOption, Option 
 
 import announcer
 from announcer.distributors.mail import IAnnouncementEmailDecorator 
@@ -73,6 +73,37 @@ class ThreadingEmailDecorator(Component):
                 set_header(message, 'References', mymsgid) 
 
         return next_decorator(event, message, decorates) 
+
+
+class StaticEmailDecorator(Component):
+    """The static ticket subscriber implements a policy to -always- send an 
+    email to a certain address. Controlled via the always_bcc option in 
+    the announcer section of the trac.ini"""
+    
+    implements(IAnnouncementEmailDecorator)
+
+    always_cc = Option("announcer", "email_always_cc", 
+        """Email addresses specified here will always
+        be cc'd on all announcements.
+        """)
+
+    always_bcc = Option("announcer", "email_always_bcc", 
+        """Email addresses specified here will always
+        be bcc'd on all announcements.  
+        """)
+    
+    def decorate_message(self, event, message, decorates=None):
+        for k, v in {'Cc': self.always_cc, 'Bcc': self.always_bcc}.items():
+            if v:
+                self.log.debug("StaticEmailDecorator added '%s' "
+                        "because of rule: email_always_%s"%(v, k.lower())),
+                if message[k] and len(str(message[k]).split(',')) > 0:
+                    recips = ", ".join(str(message[k]), v)
+                else:
+                    recips = v
+                set_header(message, k, recips)
+        return next_decorator(event, message, decorates) 
+
 
 class AnnouncerEmailDecorator(Component):
     """Add some boring headers that should be set."""
