@@ -31,17 +31,27 @@
 import re
 
 from trac.core import *
+from trac.config import BoolOption
+
 from announcer.api import IAnnouncementSubscriptionFilter
 from announcer.api import IAnnouncementPreferenceProvider
+from announcer.util.settings import BoolSubscriptionSetting
 
 class ChangeAuthorFilter(Component):
     implements(IAnnouncementSubscriptionFilter)
     implements(IAnnouncementPreferenceProvider)
+
+    never_notify_author = BoolOption('announcer', 'never_notify_author', True,
+            """User overridable default value.  Stop author from receiving
+            an announcement, even if some other rule says they should receive
+            one.
+            """)
     
     def filter_subscriptions(self, event, subscriptions):
         for subscription in subscriptions:
+            setting = self._setting()
             if event.author == subscription[1] and \
-                    self._author_filter(event.author):
+                    setting.get_user_setting(event.author)[0]:
                 self.log.debug(
                     "Filtering %s because of rule: ChangeAuthorFilter"\
                     %event.author
@@ -50,39 +60,25 @@ class ChangeAuthorFilter(Component):
             else:
                 yield subscription
 
-    def _author_filter(self, sid):
-        db = self.env.get_db_cnx()
-        cursor = db.cursor()
-        cursor.execute("""
-            SELECT value
-              FROM session_attribute
-             WHERE sid=%s
-               AND name='announcer_author_filter'
-        """, (sid,))
-        value = cursor.fetchone()
-        if value == '0':
-            return False
-        else:
-            # default to true
-            return True
-
     def get_announcement_preference_boxes(self, req):
         if req.authname == 'anonymous' and 'email' not in req.session:
             return
         yield 'author_filter', 'Author Filter'
 
     def render_announcement_preference_box(self, req, panel):
+        setting = self._setting()
         if req.method == "POST":
-            opt = req.args.get('author_filter')
-            self.log.error(req.args)
-            if opt == '1':
-                req.session["announcer_author_filter"] = '1'
-            else:
-                req.session["announcer_author_filter"] = '0'
-        # default on
-        attr = req.session.get('announcer_author_filter', '1')
-        opt = attr != '0' and True or None
+            setting.set_user_setting(req.session, 
+                req.args.get('author_filter'))
+        value = setting.get_user_setting(req.session.sid)[0]
         return 'prefs_announcer_author_filter.html', \
-                dict(data=dict(author_filter=opt))
+                dict(data=dict(author_filter=value))
+
+    def _setting(self):
+        return BoolSubscriptionSetting(
+            self.env, 
+            'author_filter',
+            self.never_notify_author
+        )
 
 
