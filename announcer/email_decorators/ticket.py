@@ -30,6 +30,7 @@
 # ----------------------------------------------------------------------------
 from trac.core import * 
 from trac.config import Option 
+from trac.util.text import to_unicode
 from genshi.template import NewTextTemplate
 
 from announcer.distributors.mail import IAnnouncementEmailDecorator 
@@ -52,11 +53,11 @@ class TicketSubjectEmailDecorator(Component):
                 if 'status' in event.changes:
                     action = 'Status -> %s' % (event.target['status'])
             template = NewTextTemplate(self.ticket_email_subject)
-            subject = template.generate(
+            subject = to_unicode(template.generate(
                 ticket=event.target, 
                 event=event, 
                 action=event.category
-            ).render()
+            ).render())
 
             prefix = self.config.get('announcer', 'email_subject_prefix')
             if prefix == '__default__': 

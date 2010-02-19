@@ -45,7 +45,9 @@ def next_decorator(event, message, decorates):
         next = decorates.pop()
         return next.decorate_message(event, message, decorates)
 
-def set_header(message, key, value, charset='ascii'):
+def set_header(message, key, value, charset=None):
+    if not charset:
+        charset = message.get_charset() or 'ascii'
     value = Header(value, charset, MAXHEADERLEN-(len(key)+2))
     if message.has_key(key):
         message.replace_header(key, value)
