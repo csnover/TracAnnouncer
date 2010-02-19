@@ -31,17 +31,26 @@
 import re
 
 from trac.core import *
+from trac.config import BoolOption
 
 from announcer.api import IAnnouncementSubscriptionFilter
 from announcer.api import IAnnouncementPreferenceProvider
+from announcer.util.settings import BoolSubscriptionSetting
 
 class UnsubscribeFilter(Component):
     implements(IAnnouncementSubscriptionFilter, IAnnouncementPreferenceProvider)
+
+    never_announce = BoolOption('announcer', 'never_announce', False,
+            """Default value for user overridable never_announce setting.
+
+            This setting stops any announcements from ever being sent to the
+            user.
+            """)
     
     def filter_subscriptions(self, event, subscriptions):
-        unsubscribed = list(self._unsubscribed())
+        setting = self._setting()
         for subscription in subscriptions:
-            if subscription[1] in unsubscribed:
+            if setting.get_user_setting(subscription[1])[0]:
                 self.log.debug(
                     "Filtering %s because of rule: UnsubscribeFilter"\
                     %subscription[1]
@@ -50,31 +59,23 @@ class UnsubscribeFilter(Component):
             else:
                 yield subscription
 
-    def _unsubscribed(self):
-        db = self.env.get_db_cnx()
-        cursor = db.cursor()
-        cursor.execute("""
-            SELECT sid
-              FROM session_attribute
-             WHERE name=%s
-               AND value=1
-        """, ('announcer_unsubscribe_all',))
-        for result in cursor.fetchall():
-            yield result[0]
-        
     def get_announcement_preference_boxes(self, req):
         if req.authname == "anonymous" and "email" not in req.session:
             return
         yield "unsubscribe_all", "Unsubscribe From All Announcements"
 
     def render_announcement_preference_box(self, req, panel):
+        setting = self._setting()
         if req.method == "POST":
-            opt = req.args.get('unsubscribe_all')
-            if opt:
-                req.session['announcer_unsubscribe_all'] = '1'
-            else:
-                req.session['announcer_unsubscribe_all'] = '0'
-        attr = req.session.get('announcer_unsubscribe_all') 
-        opt = attr == '1' and True or None
+            setting.set_user_setting(req.session, 
+                    req.args.get('unsubscribe_all'))
+        value = setting.get_user_setting(req.session.sid)[0]
         return "prefs_announcer_unsubscribe_all.html", \
-            dict(data=dict(unsubscribe_all = opt))
+            dict(data=dict(unsubscribe_all = value))
+
+    def _setting(self):
+        return BoolSubscriptionSetting(
+            self.env,
+            'never_announce',
+            self.never_announce
+        )
