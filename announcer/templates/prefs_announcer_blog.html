@@ -3,17 +3,17 @@
      xmlns:xi="http://www.w3.org/2001/XInclude">
   <ul>
     <li>
-      <input type="checkbox" name="announcer_blog_my_posts" checked="${data.announcer_blog_my_posts}" value="1" /> Notify me of any changes to my blog posts.
+      <input type="checkbox" name="announcer_blog_my_posts" checked="${data.my_posts}" value="1" /> Notify me of any changes to my blog posts.
     </li>
     <li>
-      <input type="checkbox" name="announcer_blog_new_posts" checked="${data.announcer_blog_new_posts}" value="1" /> Notify me of any new blog posts.
+      <input type="checkbox" name="announcer_blog_new_posts" checked="${data.new_posts}" value="1" /> Notify me of any new blog posts.
     </li>
     <li>
-      <input type="checkbox" name="announcer_blog_all" checked="${data.announcer_blog_all}" value="1" /> Notify me of any blog changes.
+      <input type="checkbox" name="announcer_blog_all" checked="${data.all}" value="1" /> Notify me of any blog changes.
     </li>
     <li>
       <label for="blog_authors">Comma seperated list of blog authors to follow:<br/>
-        <input id="blog_authors" type="text" name="announcer_blog_author_posts" value="${data.announcer_blog_author_posts}"/>
+        <input id="blog_authors" type="text" name="announcer_blog_author_posts" value="${data.author_posts}"/>
       </label>
     </li>
   </ul>
