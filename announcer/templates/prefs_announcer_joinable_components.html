@@ -1,9 +1,9 @@
 <span xmlns="http://www.w3.org/1999/xhtml"
      xmlns:py="http://genshi.edgewall.org/"
      xmlns:xi="http://www.w3.org/2001/XInclude">
- Components are a way to classify trac tickets.  The following components have been defined by the Trac administrators.  If you subscribe to any of these components, you will receive an notification anytime a ticket related to that component is changed or created.  <ul py:for="component in joinable_components">
+ Components are a way to classify trac tickets.  The following components have been defined by the Trac administrators.  If you subscribe to any of these components, you will receive an notification anytime a ticket related to that component is changed or created.  <ul py:for="name, val in components.items()">
     <li>
-      <input type="checkbox" name="joinable_component_${component}" checked="${joinable_components[component]}" value="1" /> ${component}
+      <input type="checkbox" name="component_${name}" checked="${val}" value="1" /> ${name}
     </li>
   </ul>
 </span>

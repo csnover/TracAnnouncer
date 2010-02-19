@@ -37,37 +37,24 @@ from trac.config import ListOption
 
 from announcer.api import IAnnouncementSubscriber, istrue
 from announcer.api import IAnnouncementPreferenceProvider
+from announcer.util.settings import BoolSubscriptionSetting
 
 class TicketComponentSubscriber(Component):
     implements(IAnnouncementSubscriber, IAnnouncementPreferenceProvider)
     
     def subscriptions(self, event):
-        if event.realm == 'ticket':
-            ticket = event.target
-            if event.category in ('changed', 'created', 'attachment added'):
-                for subscriber in self._get_membership(ticket['component']):
-                    self.log.debug("TicketComponentSubscriber added '%s " \
-                            "(%s)' for component '%s'"%(
-                            subscriber[1], subscriber[2], ticket['component']))
-                    yield subscriber
-
-    def _get_membership(self, component):
-        if not component:
+        if event.realm != 'ticket':
             return
-        db = self.env.get_db_cnx()
-        cursor = db.cursor()
-        cursor.execute("""
-            SELECT sid, authenticated
-              FROM session_attribute 
-             WHERE name=%s
-               AND value=%s
-        """, ('announcer_joinable_component_' + component, "1"))
-        for result in cursor.fetchall():
-            if result[1] in (1, '1', True):
-                authenticated = True
-            else:
-                authenticated = False
-            yield ("email", result[0], authenticated, None)
+        if event.category not in ('changed', 'created', 'attachment added'):
+            return
+        settings = self._settings()
+        setting = settings.get(event.target['component'])
+        if setting:
+            for result in setting.get_subscriptions():
+                self.log.debug("TicketComponentSubscriber added '%s " \
+                        "(%s)' for component '%s'"%(
+                        result[1], result[2], event.target['component']))
+                yield result
 
     def get_announcement_preference_boxes(self, req):
         if req.authname == "anonymous" and 'email' not in req.session:
@@ -75,21 +62,23 @@ class TicketComponentSubscriber(Component):
         yield "joinable_components", "Ticket Component Subscriptions"
         
     def render_announcement_preference_box(self, req, panel):
-        cfg = self.config
-        sess = req.session
+        settings = self._settings()
         if req.method == "POST":
-            for component in model.Component.select(self.env):
-                component_opt = 'joinable_component_%s' % component.name
-                result = req.args.get(component_opt, None)
-                if result:
-                    sess["announcer_" + component_opt] = '1'
-                else:                    
-                    if "announcer_" + component_opt in sess:
-                        del sess["announcer_" + component_opt]
-        components = {}
+            for attr, setting in settings.items():
+                setting.set_user_setting(req.session, 
+                    req.args.get('component_%s'%attr), save=False)
+            req.session.save()
+        d = {}
+        for attr, setting in settings.items():
+            d[attr]= setting.get_user_setting(req.session.sid)[0]
+        return "prefs_announcer_joinable_components.html", dict(components=d)
+
+    def _settings(self):
+        settings = {}
         for component in model.Component.select(self.env):
-            components[component.name] = sess.get(
-                    'announcer_joinable_component_%s' % component.name, None)
-        data = dict(joinable_components = components)
-        return "prefs_announcer_joinable_components.html", data
+            settings[component.name] = BoolSubscriptionSetting(
+                self.env,
+                'component_%s'%component.name
+            )
+        return settings
 
