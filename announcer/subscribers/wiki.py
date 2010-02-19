@@ -38,55 +38,44 @@ from trac.web.chrome import add_warning
 
 from announcer.api import IAnnouncementPreferenceProvider
 from announcer.api import IAnnouncementSubscriber, istrue
+from announcer.util.settings import SubscriptionSetting
 
 class GeneralWikiSubscriber(Component):
     implements(IAnnouncementSubscriber, IAnnouncementPreferenceProvider)
         
     def subscriptions(self, event):
-        if event.realm == 'wiki':
-            if event.category in ('changed', 'created', 'attachment added', 
-                    'deleted', 'version deleted'):
-                page = event.target
-                for name, authenticated in self._get_membership(page.name):
-                    yield ('email', name, authenticated, None)
-        
-    def _get_membership(self, name):
-        db = self.env.get_db_cnx()
-        cursor = db.cursor()
-        cursor.execute("""
-            SELECT sid, authenticated, value
-              FROM session_attribute
-             WHERE name=%s
-        """, ('announcer_wiki_interests', ))
-        for sid, authenticated, value in cursor.fetchall():
+        if event.realm != 'wiki':
+            return
+        if event.category not in ('changed', 'created', 'attachment added', 
+                'deleted', 'version deleted'):
+            return
+
+        def match(value):
             for raw in value.split(' '):
                 pat = urllib.unquote(raw).replace('*', '.*')
-                if re.match(pat, name):
-                    self.log.debug(
-                        "GeneralWikiSubscriber added '%s (%s)' because name "\
-                        "'%s' matches pattern: %s"%(sid, authenticated and \
-                        'authenticated' or 'not authenticated', name, pat))
-                    yield sid, authenticated
-                    
+                if re.match(pat, event.target.name):
+                    return True
+
+        setting = self._setting()
+        for result in setting.get_subscriptions(match):
+            self.log.debug("GeneralWikiSubscriber added '%s (%s)'"%(
+                    result[1], result[2]))
+            yield result
+
     def get_announcement_preference_boxes(self, req):
         yield "general_wiki", "General Wiki Announcements"
         
     def render_announcement_preference_box(self, req, panel):
-        sess = req.session
+        setting = self._setting()
         if req.method == "POST":
-            results = req.args.get('wiki_interests', '')
-            if results:
-                options = results.splitlines()
-                sess['announcer_wiki_interests'] = ' '.join(
-                    urllib.quote(x) for x in options
-                )
-        if 'announcer_wiki_interests' in sess:
-            interests = sess['announcer_wiki_interests']
-        else:
-            interests = ''
+            setting.set_user_setting(req.session, 
+                    req.args.get('wiki_interests'))
+        interests = setting.get_user_setting(req.session.sid)[0] or ''
         return "prefs_announcer_wiki.html", dict(
             wiki_interests = '\n'.join(
                 urllib.unquote(x) for x in interests.split(' ')
             )
         )
 
+    def _setting(self):
+        return SubscriptionSetting(self.env, 'wiki_pattern')
