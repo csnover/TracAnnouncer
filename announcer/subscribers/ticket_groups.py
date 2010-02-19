@@ -38,6 +38,7 @@ from trac.config import ListOption
 
 from announcer.api import IAnnouncementSubscriber, istrue
 from announcer.api import IAnnouncementPreferenceProvider
+from announcer.util.settings import BoolSubscriptionSetting
 
 class JoinableGroupSubscriber(Component):
     implements(IAnnouncementSubscriber, IAnnouncementPreferenceProvider)
@@ -53,40 +54,28 @@ class JoinableGroupSubscriber(Component):
         """)
     
     def subscriptions(self, event):
-        if event.realm == 'ticket':
-            if event.category in ('changed', 'created', 'attachment added'):
-                cc = event.target['cc'] or ''
-                for chunk in re.split('\s|,', cc):
-                    chunk = chunk.strip()
-                    if chunk.startswith('@'):
-                        member = None
-                        for member in self._get_membership(chunk[1:]):
-                            self.log.debug(
-                                "JoinableGroupSubscriber added '%s (%s)' " \
-                                "because of opt-in to group: %s"%(member[1], \
-                                member[2] and 'authenticated' or \
-                                'not authenticated', chunk[1:]))
-                            yield member
-                        if member is None:
-                            self.log.debug("JoinableGroupSubscriber found " \
-                                    "no members for group: %s." % chunk[1:])
+        if event.realm != 'ticket':
+            return
+        if event.category not in ('changed', 'created', 'attachment added'):
+            return
+        settings = self._settings()
+        cc = event.target['cc'] or ''
+        for chunk in re.split('\s|,', cc):
+            chunk = chunk.strip()
+            if chunk.startswith('@'):
+                member = None
+                grp = chunk[1:]
+                for member in settings[grp].get_subscriptions():
+                    self.log.debug(
+                        "JoinableGroupSubscriber added '%s (%s)' " \
+                        "because of opt-in to group: %s"%(member[1], \
+                        member[2] and 'authenticated' or \
+                        'not authenticated', grp))
+                    yield member
+                if member is None:
+                    self.log.debug("JoinableGroupSubscriber found " \
+                            "no members for group: %s."%grp)
                             
-    def _get_membership(self, group):
-        db = self.env.get_db_cnx()
-        cursor = db.cursor()
-        cursor.execute("""
-            SELECT sid, authenticated
-              FROM session_attribute 
-             WHERE name=%s
-               AND value=%s
-        """, ('announcer_joinable_group_' + group, "1"))
-        for result in cursor.fetchall():
-            if result[1] in (1, '1', True):
-                authenticated = True
-            else:
-                authenticated = False
-            yield ("email", result[0], authenticated, None)
-
     def get_announcement_preference_boxes(self, req):
         if req.authname == "anonymous" and 'email' not in req.session:
             return
@@ -94,20 +83,21 @@ class JoinableGroupSubscriber(Component):
             yield "joinable_groups", "Group Subscriptions"
         
     def render_announcement_preference_box(self, req, panel):
-        cfg = self.config
-        sess = req.session
+        settings = self._settings()
         if req.method == "POST":
-            for group in self.joinable_groups:
-                group_opt = 'joinable_group_%s' % group[1:]
-                result = req.args.get(group_opt, None)
-                if result:
-                    sess["announcer_" + group_opt] = '1'
-                else:                    
-                    if "announcer_" + group_opt in sess:
-                        del sess["announcer_" + group_opt]
+            for grp, setting in settings.items():
+                setting.set_user_setting(req.session, 
+                    req.args.get('joinable_group_%s'%grp), save=False)
+            req.session.save()
         groups = {}
-        for group in self.joinable_groups:
-            groups[group] = sess.get('announcer_joinable_group_%s' % group, None)
+        for grp, setting in settings.items():
+            groups[grp] = setting.get_user_setting(req.session.sid)[0]
         data = dict(joinable_groups = groups)
         return "prefs_announcer_joinable_groups.html", data
 
+    def _settings(self):
+        settings = {}
+        for grp in self.joinable_groups:
+            settings[grp[1:]] = BoolSubscriptionSetting(
+                    self.env, 'group_%s'%grp[1:])
+        return settings

@@ -2,9 +2,9 @@
      xmlns:py="http://genshi.edgewall.org/"
      xmlns:xi="http://www.w3.org/2001/XInclude">
   The following groups have been defined by the Trac administrators. They are general topics that may be added onto the CC list of tickets (by prepending their name with @).  Case does matter.
-  <ul py:for="group in joinable_groups">
+  <ul py:for="grp, val in joinable_groups.items()">
     <li>
-      <input type="checkbox" name="joinable_group_${group[1:]}" checked="${joinable_groups[group]}" value="1" /> ${group}
+      <input type="checkbox" name="joinable_group_${grp}" checked="${val}" value="1" /> @${grp}
     </li>
   </ul>
 </span>
