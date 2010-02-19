@@ -28,14 +28,15 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # ----------------------------------------------------------------------------
+import re
 
 from trac.core import Component, implements
-from announcer.api import IAnnouncementSubscriber, istrue
-from announcer.api import IAnnouncementPreferenceProvider
 from trac.ticket import model
 from trac.web.chrome import add_warning
 from trac.config import ListOption
-import re
+
+from announcer.api import IAnnouncementSubscriber, istrue
+from announcer.api import IAnnouncementPreferenceProvider
 
 class TicketCustomFieldSubscriber(Component):
     implements(IAnnouncementSubscriber)

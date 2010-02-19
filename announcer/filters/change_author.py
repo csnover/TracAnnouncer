@@ -28,11 +28,11 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # ----------------------------------------------------------------------------
+import re
 
 from trac.core import *
 from announcer.api import IAnnouncementSubscriptionFilter
 from announcer.api import IAnnouncementPreferenceProvider
-import re
 
 class ChangeAuthorFilter(Component):
     implements(IAnnouncementSubscriptionFilter)

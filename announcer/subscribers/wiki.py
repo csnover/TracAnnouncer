@@ -29,14 +29,15 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # ----------------------------------------------------------------------------
+import re, urllib
 
+from trac.config import ListOption
 from trac.core import Component, implements
-from announcer.api import IAnnouncementPreferenceProvider
-from announcer.api import IAnnouncementSubscriber, istrue
 from trac.ticket import model
 from trac.web.chrome import add_warning
-from trac.config import ListOption
-import re, urllib
+
+from announcer.api import IAnnouncementPreferenceProvider
+from announcer.api import IAnnouncementSubscriber, istrue
 
 class GeneralWikiSubscriber(Component):
     implements(IAnnouncementSubscriber, IAnnouncementPreferenceProvider)
