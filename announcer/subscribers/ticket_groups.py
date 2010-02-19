@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2008, Stephen Hansen
-# Copyright (c) 2009, Robert Corsaro
+# Copyright (c) 2009-2010, Robert Corsaro
 # 
 # All rights reserved.
 # 
