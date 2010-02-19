@@ -37,6 +37,7 @@ from trac.config import ListOption
 
 from announcer.api import IAnnouncementSubscriber, istrue
 from announcer.api import IAnnouncementPreferenceProvider
+from announcer.util.settings import SubscriptionSetting
 
 class UserChangeSubscriber(Component):
     """Allows users to get notified anytime a particular user change or 
@@ -46,25 +47,13 @@ class UserChangeSubscriber(Component):
     def subscriptions(self, event):
         if event.realm in ('wiki', 'ticket'):
             if event.category in ('changed', 'created', 'attachment added'):
-                for sub in self._get_membership(event.author):
+                def match(val):
+                    for part in val.split(','):
+                        if part.strip() == event.author:
+                            return True
+                for sub in self._setting().get_subscriptions(match):
+                    self.log.debug("UserChangeSubscriber added '%s'"%sub[1])
                     yield sub
-
-    def _get_membership(self, author):
-        """Check the user's selection.  None means 
-        they haven't selected ."""
-        db = self.env.get_db_cnx()
-        cursor = db.cursor()
-        cursor.execute("""
-            SELECT sid, authenticated, value
-              FROM session_attribute
-             WHERE name='announcer_watch_users'
-        """)
-        for result in cursor.fetchall():
-            for name in result[2].split(','):
-                if name.strip() == author:
-                    name, authenticated = result[0], result[1]
-                    self.log.debug("UserChangeSubscriber added '%s'"%name)
-                    yield ('email', name, authenticated, None)
 
     def get_announcement_preference_boxes(self, req):
         if req.authname == "anonymouse" and 'email' not in req.session:
@@ -72,12 +61,12 @@ class UserChangeSubscriber(Component):
         yield "watch_users", "Watch Users"
 
     def render_announcement_preference_box(self, req, panel):
+        setting = self._setting()
         if req.method == "POST":
-            names = req.args.get("announcer_watch_users")
-            if names:
-                req.session['announcer_watch_users'] = names
-            elif req.session.get('announcer_watch_users'):
-                del req.session['announcer_watch_users']
+            setting.set_user_setting(req.session, req.args.get("announcer_watch_users"))
         return "prefs_announcer_watch_users.html", dict(data=dict(
-            announcer_watch_users=req.session.get('announcer_watch_users', '')
+            announcer_watch_users=setting.get_user_setting(req.session.sid)[0]
         ))
+
+    def _setting(self):
+        return SubscriptionSetting(self.env, 'watch_users')
