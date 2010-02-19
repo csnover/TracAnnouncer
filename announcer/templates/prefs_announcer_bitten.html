@@ -3,5 +3,9 @@
      xmlns:xi="http://www.w3.org/2001/XInclude">
      Subscribe to build announcements.
 
-     <p><input type="checkbox" name="bitten_subscription" checked="${data.announcer_notify_bitten}" value="1" /> Subscribe me to build announcements.</p>
+     <ul>
+         <li><input type="checkbox" name="bitten_started_subscription" checked="${started}" value="1" /> Subscribe me to build started announcements.</li>
+         <li><input type="checkbox" name="bitten_aborted_subscription" checked="${aborted}" value="1" /> Subscribe me to build aborted announcements.</li>
+         <li><input type="checkbox" name="bitten_completed_subscription" checked="${completed}" value="1" /> Subscribe me to build completed announcements.</li>
+     </ul>
 </span>

@@ -38,6 +38,7 @@ from announcer.api import IAnnouncementFormatter, IAnnouncementSubscriber
 from announcer.api import IAnnouncementPreferenceProvider
 from announcer.distributors.mail import IAnnouncementEmailDecorator
 from announcer.util.mail import set_header, next_decorator
+from announcer.util.settings import BoolSubscriptionSetting
 
 from bitten.api import IBuildListener
 from bitten.model import Build, BuildStep, BuildLog
@@ -79,8 +80,9 @@ class BittenAnnouncement(Component):
     # IAnnouncementSubscriber interface
     def subscriptions(self, event):
         if event.realm == 'bitten':
-            if event.target.status in (Build.FAILURE, Build.SUCCESS):
-                for subscriber in self._get_membership(event.target):
+            settings = self._settings()
+            if event.category in settings.keys():
+                for subscriber in settings[event.category].get_subscriptions():
                     self.log.debug("BittenAnnouncementSubscriber added '%s " \
                             "(%s)'", subscriber[1], subscriber[2])
                     yield subscriber
@@ -124,18 +126,16 @@ class BittenAnnouncement(Component):
         yield "bitten_subscription", "Bitten Subscription"
 
     def render_announcement_preference_box(self, req, panel):
+        settings = self._settings()
         if req.method == "POST":
-            if req.args.get('bitten_subscription', None):
-                req.session['announcer_notify_bitten'] = '1'
-            else:
-                if 'announcer_notify_bitten' in sess:
-                    del req.session['announcer_notify_bitten']
-        notify = req.session.get('announcer_notify_bitten', None)
-        return "prefs_announcer_bitten.html", dict(
-            data=dict(
-                announcer_notify_bitten=notify
-            )
-        )
+            for k, setting in settings.items():
+                setting.set_user_setting(req.session, 
+                        req.args.get('bitten_%s_subscription'%k), save=False)
+            req.session.save()
+        data = {}
+        for k, setting in settings.items():
+            data[k] = setting.get_user_setting(req.session.sid)[0]
+        return "prefs_announcer_bitten.html", data
 
     # private methods
     def _notify(self, build, category):
@@ -149,22 +149,11 @@ class BittenAnnouncement(Component):
             self.log.exception("Failure creating announcement for build "
                                "%s: %s", build.id, e)
 
-    def _get_membership(self, build):
-        if not build:
-            return
-        db = self.env.get_db_cnx()
-        cursor = db.cursor()
-        cursor.execute("""
-            SELECT sid, authenticated
-              FROM session_attribute
-             WHERE name='announcer_notify_bitten'
-        """)
-        for result in cursor.fetchall():
-            if result[1] in (1, '1', True):
-                authenticated = True
-            else:
-                authenticated = False
-            yield ('email', result[0], authenticated, None)
+    def _settings(self):
+        ret = {}
+        for p in ('started', 'aborted', 'completed'):
+            ret[p] = BoolSubscriptionSetting(self.env, 'bitten_%s'%p)
+        return ret
 
     def _format_plaintext(self, event):
         failed_steps = BuildStep.select(self.env, build=event.target.id,
