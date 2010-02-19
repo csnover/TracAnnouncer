@@ -44,6 +44,9 @@ from announcer.api import IAnnouncementSubscriber, istrue
 from announcer.api import IAnnouncementPreferenceProvider
 
 class LegacyTicketSubscriber(Component):
+    """Mimics Trac notification settings with added bonus of letting users
+    override their settings.  
+    """
     implements(IAnnouncementSubscriber, IAnnouncementPreferenceProvider)
     
     always_notify_owner = BoolOption("announcer", "always_notify_owner", 'true', 
@@ -203,6 +206,7 @@ class LegacyTicketSubscriber(Component):
         return None
 
 class CarbonCopySubscriber(Component):
+    """Carbon copy subscriber for cc ticket field."""
     implements(IAnnouncementSubscriber)
     
     def subscriptions(self, event):

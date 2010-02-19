@@ -76,20 +76,31 @@ class ThreadingEmailDecorator(Component):
 
 
 class StaticEmailDecorator(Component):
-    """The static ticket subscriber implements a policy to -always- send an 
-    email to a certain address. Controlled via the always_bcc option in 
-    the announcer section of the trac.ini"""
+    """The static ticket decorator implements a policy to -always- send an
+    email to a certain address. 
+    
+    Controlled via the always_cc and always_bcc option in the announcer section
+    of the trac.ini.  If no subscribers are found, then even if always_cc and
+    always_bcc addresses are specified, no announcement will be sent.  Since
+    these fields are added after announcers subscription system, filters such
+    as never_announce and never_notify author won't work with these addresses.
+
+    These settings are considered dangerous if you are using the verify email
+    or reset password features of the accountmanager plugin.
+    """
     
     implements(IAnnouncementEmailDecorator)
 
-    always_cc = Option("announcer", "email_always_cc", 
+    always_cc = Option("announcer", "email_always_cc", None,
         """Email addresses specified here will always
-        be cc'd on all announcements.
+        be cc'd on all announcements.  This setting is dangerous if
+        accountmanager is present.  
         """)
 
-    always_bcc = Option("announcer", "email_always_bcc", 
+    always_bcc = Option("announcer", "email_always_bcc", None,
         """Email addresses specified here will always
-        be bcc'd on all announcements.  
+        be bcc'd on all announcements.  This setting is dangerous if
+        accountmanager is present.  
         """)
     
     def decorate_message(self, event, message, decorates=None):

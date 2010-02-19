@@ -56,22 +56,25 @@ class FullBlogAnnouncement(Component):
 
     always_notify_author = BoolOption('fullblog-announcement', 
             'always_notify_author', 'true', 
-            doc="""Notify the blog author
-            of any changes to her blogs, including changes to comments.
+            """Notify the blog author of any changes to her blogs,
+            including changes to comments.
             """)
 
     blog_email_subject = Option('fullblog-announcement', 'blog_email_subject',
             "Blog: ${blog.name} ${action}",
-            """Format string for the blog email subject.  This is a
-            mini genshi template and it is passed the blog_post and action
-            objects.
+            """Format string for the blog email subject.  
+            
+            This is a mini genshi template and it is passed the blog_post and
+            action objects.
             """)
 
     # IBlogChangeListener interface
     def blog_post_changed(self, postname, version):
-        """Called when a new blog post 'postname' with 'version' is added .
+        """Called when a new blog post 'postname' with 'version' is added.
+
         version==1 denotes a new post, version>1 is a new version on existing 
-        post."""
+        post.
+        """
         blog_post = BlogPost(self.env, postname, version)
         action = 'post created'
         if version > 1:
@@ -87,11 +90,13 @@ class FullBlogAnnouncement(Component):
 
     def blog_post_deleted(self, postname, version, fields):
         """Called when a blog post is deleted:
+
         version==0 means all versions (or last remaining) version is deleted.
         Any version>0 denotes a specific version only.
         Fields is a dict with the pre-existing values of the blog post.
         If all (or last) the dict will contain the 'current' version 
-        contents."""
+        contents.
+        """
         blog_post = BlogPost(self.env, postname, version)
         announcer = AnnouncementSystem(self.env)
         announcer.send(
@@ -118,10 +123,13 @@ class FullBlogAnnouncement(Component):
 
     def blog_comment_deleted(self, postname, number, fields):
         """Called when blog post comment 'number' is deleted.
+
         number==0 denotes all comments is deleted and fields will be empty.
-            (usually follows a delete of the blog post).
+        (usually follows a delete of the blog post).  
+        
         number>0 denotes a specific comment is deleted, and fields will contain
-            the values of the fields as they existed pre-delete."""
+        the values of the fields as they existed pre-delete.
+        """
         blog_post = BlogPost(self.env, postname, 0)
         announcer = AnnouncementSystem(self.env)
         announcer.send(

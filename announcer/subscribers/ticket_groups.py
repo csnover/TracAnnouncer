@@ -42,11 +42,14 @@ class JoinableGroupSubscriber(Component):
     implements(IAnnouncementSubscriber, IAnnouncementPreferenceProvider)
     
     joinable_groups = ListOption('announcer', 'joinable_groups', [], 
-        doc="""Joinable groups represent 'opt-in' groups that users may 
-        freely join. The name of the groups should be a simple alphanumeric 
-        string. By adding the group name preceeded by @ (such as @sec for
-        the sec group) to the CC field of a ticket, everyone in that group
-        will receive an announcement when that ticket is changed.""")
+        """Joinable groups represent 'opt-in' groups that users may 
+        freely join. 
+        
+        The name of the groups should be a simple alphanumeric string. By
+        adding the group name preceeded by @ (such as @sec for the sec group)
+        to the CC field of a ticket, everyone in that group will receive an
+        announcement when that ticket is changed.
+        """)
     
     def subscriptions(self, event):
         if event.realm == 'ticket':
