@@ -38,6 +38,7 @@ from announcer.api import IAnnouncementFormatter, IAnnouncementSubscriber
 from announcer.api import IAnnouncementPreferenceProvider
 from announcer.distributors.mail import IAnnouncementEmailDecorator
 from announcer.util.mail import set_header, next_decorator
+from announcer.util.settings import BoolSubscriptionSetting
 
 from acct_mgr.api import IAccountChangeListener
 
@@ -111,18 +112,16 @@ class AccountManagerAnnouncement(Component):
         yield "acct_mgr_subscription", "Account Manager Subscription"
 
     def render_announcement_preference_box(self, req, panel):
+        settings = self._settings()
         if req.method == "POST":
-            for category in ('created', 'change', 'delete'):
-                if req.args.get('acct_mgr_%s_subscription'%category, None):
-                    req.session['announcer_notify_acct_mgr_%s'%category] = '1'
-                else:
-                    if 'announcer_notify_acct_mgr_%s'%category in req.session:
-                       del req.session['announcer_notify_acct_mgr_%s'%category]
+            for k, setting in settings.items():
+                setting.set_user_setting(req.session, 
+                        req.args.get('acct_mgr_%s_subscription'%k), save=False)
+            req.session.save()
         data = {}
-        for category in ('created', 'change', 'delete'):
-            data[category] = \
-                req.session.get('announcer_notify_acct_mgr_%s'%category, None)
-        return "prefs_announcer_acct_mgr_subscription.html", dict(**data)
+        for k, setting in settings.items():
+            data[k] = setting.get_user_setting(req.session.sid)[0]
+        return "prefs_announcer_acct_mgr_subscription.html", data
 
     # private methods
     def _notify(self, category, username, password=None, token=None):
@@ -135,21 +134,17 @@ class AccountManagerAnnouncement(Component):
             self.log.exception("Failure creating announcement for account "
                                "event %s: %s", username, category)
 
+    def _settings(self):
+        ret = {}
+        for n in ('created', 'change', 'delete'):
+            ret[n] = BoolSubscriptionSetting(self.env, "acct_mgr_%s"%n, None)
+        return ret
+
     def _get_membership(self, event):
-        if event.category in ('created', 'change', 'delete'):
-            db = self.env.get_db_cnx()
-            cursor = db.cursor()
-            cursor.execute("""
-                SELECT sid, authenticated
-                  FROM session_attribute
-                 WHERE name='announcer_notify_acct_mgr_%s'
-            """%event.category)
-            for result in cursor.fetchall():
-                if result[1] in (1, '1', True):
-                    authenticated = True
-                else:
-                    authenticated = False
-                yield ('email', result[0], authenticated, None)
+        settings = self._settings()
+        if event.category in settings.keys():
+            for result in settings[event.category].get_subscriptions():
+                yield result
         elif event.category in ('verify', 'reset'):
             yield ('email', event.username, True, None)
 
