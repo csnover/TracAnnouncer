@@ -87,11 +87,11 @@ class JoinableGroupSubscriber(Component):
         if req.method == "POST":
             for grp, setting in settings.items():
                 setting.set_user_setting(req.session, 
-                    req.args.get('joinable_group_%s'%grp), save=False)
+                    value=req.args.get('joinable_group_%s'%grp), save=False)
             req.session.save()
         groups = {}
         for grp, setting in settings.items():
-            groups[grp] = setting.get_user_setting(req.session.sid)[0]
+            groups[grp] = setting.get_user_setting(req.session.sid)[1]
         data = dict(joinable_groups = groups)
         return "prefs_announcer_joinable_groups.html", data
 

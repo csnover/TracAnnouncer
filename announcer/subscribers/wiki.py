@@ -50,7 +50,7 @@ class GeneralWikiSubscriber(Component):
                 'deleted', 'version deleted'):
             return
 
-        def match(value):
+        def match(dist, value):
             for raw in value.split(' '):
                 pat = urllib.unquote(raw).replace('*', '.*')
                 if re.match(pat, event.target.name):
@@ -69,8 +69,8 @@ class GeneralWikiSubscriber(Component):
         setting = self._setting()
         if req.method == "POST":
             setting.set_user_setting(req.session, 
-                    req.args.get('wiki_interests'))
-        interests = setting.get_user_setting(req.session.sid)[0] or ''
+                    value=req.args.get('wiki_interests'))
+        interests = setting.get_user_setting(req.session.sid)[1] or ''
         return "prefs_announcer_wiki.html", dict(
             wiki_interests = '\n'.join(
                 urllib.unquote(x) for x in interests.split(' ')

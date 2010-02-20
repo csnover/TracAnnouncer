@@ -28,8 +28,18 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # ----------------------------------------------------------------------------
+import pickle
 
 from announcer.api import istrue
+
+def encode(*args):
+    return pickle.dumps(args)
+
+def decode(v):
+    try:
+        return pickle.loads(str(v))
+    except Exception, e:
+        return (tuple(),None)
 
 class SubscriptionSetting(object):
     """Encapsulate user text subscription and filter settings.
@@ -39,14 +49,17 @@ class SubscriptionSetting(object):
     then the default value will be returned.
     """
 
-    def __init__(self, env, name, default=None):
-        self.default = default
+    def __init__(self, env, name, default_value=None, default_dists=('email',)):
+        self.default = {
+            'value': default_value,
+            'dists': default_dists
+        }
         self.env = env
         self.name = name
 
-    def set_user_setting(self, session, value, save=True):
-        """Sets session attribute to 1 or 0."""
-        session[self._attr_name()] = value
+    def set_user_setting(self, session, value=None, dists=('email',), save=True):
+        """Sets session attribute."""
+        session[self._attr_name()] = encode(dists,value)
         if save:
             session.save()
 
@@ -62,15 +75,15 @@ class SubscriptionSetting(object):
         """, (sid, self._attr_name()))
         row = cursor.fetchone()
         if row:
-            value = row[0]
+            pair = decode(row[0])
             authenticated = istrue(row[1])
         else:
-            value = self.default
+            pair = (self.default['dists'], self.default['value'])
             authenticated = False
 
         # We use None here so that Genshi templates check their checkboxes 
         # properly and without confusion.
-        return (value, authenticated)
+        return pair + (authenticated,)
 
     def get_subscriptions(self, match):
         """Generates tuples of (distributor, sid, authenticated, email).  
@@ -89,9 +102,11 @@ class SubscriptionSetting(object):
              WHERE name=%s
         """, (self._attr_name(),))
         for result in cursor.fetchall():
-            if match(result[2]):
-                authenticated = istrue(result[1])
-                yield  ('email', result[0], authenticated, None)
+            dists, val = decode(result[2])
+            for dist in dists:
+                if match(dist, val):
+                    authenticated = istrue(result[1])
+                    yield  (dist, result[0], authenticated, None)
 
     def _attr_name(self):
         return "sub_%s"%(self.name)
@@ -105,17 +120,20 @@ class BoolSubscriptionSetting(object):
     then the default value will be returned.
     """
 
-    def __init__(self, env, name, default=None):
-        self.default = default
+    def __init__(self, env, name, default_value=None, default_dists=('email',)):
+        self.default = {
+            'value': default_value,
+            'dists': default_dists
+        }
         self.env = env
         self.name = name
 
-    def set_user_setting(self, session, value, save=True):
+    def set_user_setting(self, session, value=None, dists=('email',), save=True):
         """Sets session attribute to 1 or 0."""
         if istrue(value):
-            session[self._attr_name()] = '1'
+            session[self._attr_name()] = encode(dists, '1')
         else:
-            session[self._attr_name()] = '0'
+            session[self._attr_name()] = encode(dists, '0')
         if save:
             session.save()
 
@@ -135,15 +153,17 @@ class BoolSubscriptionSetting(object):
         """, (sid, self._attr_name()))
         row = cursor.fetchone()
         if row:
-            value = istrue(row[0])
+            dists, v = decode(row[0])
+            value = istrue(v)
             authenticated = istrue(row[1])
         else:
-            value = istrue(self.default)
+            dists = self.default['dists']
+            value = istrue(self.default['value'])
             authenticated = False
 
         # We use None here so that Genshi templates check their checkboxes 
         # properly and without confusion.
-        return (value and True or None, authenticated)
+        return (dists, value and True or None, authenticated)
 
     def get_subscriptions(self):
         """Generates tuples of (distributor, sid, authenticated, email).  
@@ -159,9 +179,11 @@ class BoolSubscriptionSetting(object):
              WHERE name=%s
         """, (self._attr_name(),))
         for result in cursor.fetchall():
-            if istrue(result[2]):
-                authenticated = istrue(result[1])
-                yield  ('email', result[0], authenticated, None)
+            dists, val = decode(result[2])
+            for dist in dists:
+                if istrue(val):
+                    authenticated = istrue(result[1])
+                    yield  (dist, result[0], authenticated, None)
 
     def _attr_name(self):
         return "sub_%s"%(self.name)

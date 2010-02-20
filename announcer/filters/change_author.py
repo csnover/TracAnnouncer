@@ -51,7 +51,7 @@ class ChangeAuthorFilter(Component):
         for subscription in subscriptions:
             setting = self._setting()
             if event.author == subscription[1] and \
-                    setting.get_user_setting(event.author)[0]:
+                    setting.get_user_setting(event.author)[1]:
                 self.log.debug(
                     "Filtering %s because of rule: ChangeAuthorFilter"\
                     %event.author
@@ -69,8 +69,8 @@ class ChangeAuthorFilter(Component):
         setting = self._setting()
         if req.method == "POST":
             setting.set_user_setting(req.session, 
-                req.args.get('author_filter'))
-        value = setting.get_user_setting(req.session.sid)[0]
+                value=req.args.get('author_filter'))
+        value = setting.get_user_setting(req.session.sid)[1]
         return 'prefs_announcer_author_filter.html', \
                 dict(data=dict(author_filter=value))
 

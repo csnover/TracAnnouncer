@@ -50,7 +50,7 @@ class UnsubscribeFilter(Component):
     def filter_subscriptions(self, event, subscriptions):
         setting = self._setting()
         for subscription in subscriptions:
-            if setting.get_user_setting(subscription[1])[0]:
+            if setting.get_user_setting(subscription[1])[1]:
                 self.log.debug(
                     "Filtering %s because of rule: UnsubscribeFilter"\
                     %subscription[1]
@@ -68,8 +68,8 @@ class UnsubscribeFilter(Component):
         setting = self._setting()
         if req.method == "POST":
             setting.set_user_setting(req.session, 
-                    req.args.get('unsubscribe_all'))
-        value = setting.get_user_setting(req.session.sid)[0]
+                    value=req.args.get('unsubscribe_all'))
+        value = setting.get_user_setting(req.session.sid)[1]
         return "prefs_announcer_unsubscribe_all.html", \
             dict(data=dict(unsubscribe_all = value))
 

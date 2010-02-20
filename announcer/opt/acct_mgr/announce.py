@@ -116,11 +116,12 @@ class AccountManagerAnnouncement(Component):
         if req.method == "POST":
             for k, setting in settings.items():
                 setting.set_user_setting(req.session, 
-                        req.args.get('acct_mgr_%s_subscription'%k), save=False)
+                        value=req.args.get('acct_mgr_%s_subscription'%k),
+                        save=False)
             req.session.save()
         data = {}
         for k, setting in settings.items():
-            data[k] = setting.get_user_setting(req.session.sid)[0]
+            data[k] = setting.get_user_setting(req.session.sid)[1]
         return "prefs_announcer_acct_mgr_subscription.html", data
 
     # private methods

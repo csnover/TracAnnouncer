@@ -66,11 +66,11 @@ class TicketComponentSubscriber(Component):
         if req.method == "POST":
             for attr, setting in settings.items():
                 setting.set_user_setting(req.session, 
-                    req.args.get('component_%s'%attr), save=False)
+                    value=req.args.get('component_%s'%attr), save=False)
             req.session.save()
         d = {}
         for attr, setting in settings.items():
-            d[attr]= setting.get_user_setting(req.session.sid)[0]
+            d[attr]= setting.get_user_setting(req.session.sid)[1]
         return "prefs_announcer_joinable_components.html", dict(components=d)
 
     def _settings(self):

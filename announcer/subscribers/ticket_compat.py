@@ -82,12 +82,12 @@ class LegacyTicketSubscriber(Component):
         if req.method == "POST":
             for attr, setting in settings.items():
                 setting.set_user_setting(req.session, 
-                        req.args.get('legacy_notify_%s'%attr), save=False)
+                    value=req.args.get('legacy_notify_%s'%attr), save=False)
             req.session.save()
 
         vars = {}
         for attr, setting in settings.items():
-            vars[attr] = setting.get_user_setting(req.session.sid)[0]
+            vars[attr] = setting.get_user_setting(req.session.sid)[1]
         return "prefs_announcer_legacy.html", dict(data=vars)
 
     def subscriptions(self, event):
@@ -106,7 +106,7 @@ class LegacyTicketSubscriber(Component):
         try:
             component = model.Component(self.env, ticket['component'])
             if component.owner:
-                if setting.get_user_setting(component.owner)[0]:
+                if setting.get_user_setting(component.owner)[1]:
                     self._log_sub(component.owner, True, setting.name)
                     return ('email', component.owner, True, None)
         except ResourceNotFound, message:
@@ -116,7 +116,7 @@ class LegacyTicketSubscriber(Component):
 
     def _get_owner(self, event, ticket, setting):
         if ticket['owner']:
-            if setting.get_user_setting(ticket['owner'])[0]:
+            if setting.get_user_setting(ticket['owner'])[1]:
                 owner = ticket['owner']
                 if '@' in owner:
                     name, authenticated, address = None, False, owner
@@ -127,7 +127,7 @@ class LegacyTicketSubscriber(Component):
         
     def _get_reporter(self, event, ticket, setting):
         if ticket['reporter']:
-            if setting.get_user_setting(ticket['reporter'])[0]:
+            if setting.get_user_setting(ticket['reporter'])[1]:
                 reporter = ticket['reporter']
                 if '@' in reporter:
                     name, authenticated, address = None, False, reporter
@@ -138,7 +138,7 @@ class LegacyTicketSubscriber(Component):
 
     def _get_updater(self, event, ticket, setting):
         if event.author:
-            if setting.get_user_setting(event.author)[0]:
+            if setting.get_user_setting(event.author)[1]:
                 self._log_sub(event.author, True, setting.name)
                 return ('email', event.author, True, None)
     

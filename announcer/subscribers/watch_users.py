@@ -47,7 +47,7 @@ class UserChangeSubscriber(Component):
     def subscriptions(self, event):
         if event.realm in ('wiki', 'ticket'):
             if event.category in ('changed', 'created', 'attachment added'):
-                def match(val):
+                def match(dist, val):
                     for part in val.split(','):
                         if part.strip() == event.author:
                             return True
@@ -63,9 +63,10 @@ class UserChangeSubscriber(Component):
     def render_announcement_preference_box(self, req, panel):
         setting = self._setting()
         if req.method == "POST":
-            setting.set_user_setting(req.session, req.args.get("announcer_watch_users"))
+            setting.set_user_setting(req.session, 
+                    value=req.args.get("announcer_watch_users"))
         return "prefs_announcer_watch_users.html", dict(data=dict(
-            announcer_watch_users=setting.get_user_setting(req.session.sid)[0]
+            announcer_watch_users=setting.get_user_setting(req.session.sid)[1]
         ))
 
     def _setting(self):

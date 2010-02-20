@@ -218,11 +218,11 @@ class FullBlogAnnouncement(Component):
         if req.method == "POST":
             for attr, setting in settings.items():
                 setting.set_user_setting(req.session, 
-                        req.args.get('announcer_blog_%s'%attr), save=False)
+                    value=req.args.get('announcer_blog_%s'%attr), save=False)
             req.session.save()
         data = {}
         for attr, setting in settings.items():
-            data[attr] = setting.get_user_setting(req.session.sid)[0]
+            data[attr] = setting.get_user_setting(req.session.sid)[1]
         return "prefs_announcer_blog.html", dict(data=data)
 
     # private methods
@@ -247,7 +247,7 @@ class FullBlogAnnouncement(Component):
 
         # My Posts
         result = settings['my_posts'].get_user_setting(event.blog_post.author)
-        if result[0]:
+        if result[1]:
             yield (
                 'email',
                 event.blog_post.author, 
@@ -261,7 +261,7 @@ class FullBlogAnnouncement(Component):
                 yield result + ('New Post',)
 
             # Watched Author Posts
-            def match(value):
+            def match(dist, value):
                 for name in [i.strip() for i in value.split(',')]:
                     if name == event.blog_post.author:
                         return True
