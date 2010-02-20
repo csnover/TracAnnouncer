@@ -259,6 +259,8 @@ class EmailDistributor(Component):
         return self.default_email_format
         
     def _get_preferred_format(self, realm, sid, authenticated):
+        if authenticated is None:
+            authenticated = 0
         db = self.env.get_db_cnx()
         cursor = db.cursor()
         cursor.execute("""
