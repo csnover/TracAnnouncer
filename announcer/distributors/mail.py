@@ -449,7 +449,7 @@ class SmtpEmailSender(Component):
         """SMTP server hostname to use for email notifications.""")
 
     timeout = IntOption('smtp', 'timeout', 10,
-        """SMTP server connection timeout.""")
+        """SMTP server connection timeout. (requires python-2.6)""")
 
     port = IntOption('smtp', 'port', 25,
         """SMTP server port to use for email notification.""")
@@ -475,11 +475,17 @@ class SmtpEmailSender(Component):
         smtpclass = smtplib.SMTP
         if self.use_ssl:
             smtpclass = smtplib.SMTP_SSL
-        smtp = smtpclass(
-            host=self.server,
-            port=self.port,
-            timeout=self.timeout
-        )
+
+        args = {
+            'host': self.server,
+            'port': self.port
+        }
+        # timeout isn't supported until python 2.6
+        vparts = sys.version_info[0:2]
+        if vparts[0] >= 2 and vparts[1] >= 6:
+            args['timeout'] = self.timeout
+
+        smtp = smtpclass(**args)
         smtp.set_debuglevel(self.debuglevel)
         if self.use_tls:
             smtp.ehlo()
