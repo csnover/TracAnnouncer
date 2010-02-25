@@ -132,11 +132,13 @@ class TicketFormatter(Component):
 
     def _header_fields(self, ticket):
         headers = self.ticket_email_header_fields
-        if len(headers) and headers[0].strip() == '*':
-            tsystem = TicketSystem(self.env)
-            headers = tsystem.get_ticket_fields()
-        return headers 
-        
+        fields = TicketSystem(self.env).get_ticket_fields()
+        if len(headers) and headers[0].strip() != '*':
+            def _filter(i):
+                return i['name'] in headers
+            fields = filter(_filter, fields)
+        return fields
+ 
     def _format_html(self, event):
         ticket = event.target
         short_changes = {}
