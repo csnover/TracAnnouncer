@@ -65,6 +65,10 @@ class AnnouncerPreferences(Component):
             boxdata = {}
             if boxes:
                 for boxname, boxlabel in boxes:
+                    if boxname == 'general_wiki' and not req.perm.has_permission('WIKI_VIEW'):
+                        continue
+                    if (boxname == 'legacy' or boxname == 'joinable_groups') and not req.perm.has_permission('TICKET_VIEW'):
+                        continue
                     yield ((boxname, boxlabel) + 
                         pr.render_announcement_preference_box(req, boxname))
 

@@ -2,13 +2,13 @@
 #
 # Copyright (c) 2008, Stephen Hansen
 # Copyright (c) 2009, Robert Corsaro
-# 
+#
 # All rights reserved.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
-# 
-#     * Redistributions of source code must retain the above copyright 
+#
+#     * Redistributions of source code must retain the above copyright
 #       notice, this list of conditions and the following disclaimer.
 #     * Redistributions in binary form must reproduce the above copyright
 #       notice, this list of conditions and the following disclaimer in the
@@ -16,7 +16,7 @@
 #     * Neither the name of the <ORGANIZATION> nor the names of its
 #       contributors may be used to endorse or promote products derived from
 #       this software without specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 # "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 # LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -68,7 +68,7 @@ from announcer.util.mail import set_header
 
 class IEmailSender(Interface):
     """Extension point interface for components that allow sending e-mail."""
-    
+
     def send(self, from_addr, recipients, message):
         """Send message to recipients."""
 
@@ -81,7 +81,7 @@ class IAnnouncementEmailDecorator(Interface):
         """
 
 class EmailDistributor(Component):
-    
+
     implements(IAnnouncementDistributor, IAnnouncementPreferenceProvider)
 
     formatters = ExtensionPoint(IAnnouncementFormatter)
@@ -92,14 +92,14 @@ class EmailDistributor(Component):
 
     resolvers = OrderedExtensionsOption('announcer', 'email_address_resolvers',
         IAnnouncementAddressResolver, 'SpecifiedEmailResolver, '\
-        'SessionEmailResolver, DefaultDomainEmailResolver', 
-        """Comma seperated list of email resolver components in the order 
-        they will be called.  If an email address is resolved, the remaining 
+        'SessionEmailResolver, DefaultDomainEmailResolver',
+        """Comma seperated list of email resolver components in the order
+        they will be called.  If an email address is resolved, the remaining
         resolvers will no be called.
         """)
 
     email_sender = ExtensionOption('announcer', 'email_sender',
-        IEmailSender, 'SmtpEmailSender', 
+        IEmailSender, 'SmtpEmailSender',
         """Name of the component implementing `IEmailSender`.
 
         This component is used by the announcer system to send emails.
@@ -120,7 +120,7 @@ class EmailDistributor(Component):
 
     mime_encoding = Option('announcer', 'mime_encoding', 'base64',
         """Specifies the MIME encoding scheme for emails.
-        
+
         Valid options are 'base64' for Base64 encoding, 'qp' for
         Quoted-Printable, and 'none' for no encoding. Note that the no encoding
         means that non-ASCII characters in text are going to cause problems
@@ -129,33 +129,33 @@ class EmailDistributor(Component):
 
     use_public_cc = BoolOption('announcer', 'use_public_cc', 'false',
         """Recipients can see email addresses of other CC'ed recipients.
-        
+
         If this option is disabled (the default), recipients are put on BCC
         """)
 
     # used in email decorators, but not here
     subject_prefix = Option('announcer', 'email_subject_prefix',
-                                 '__default__', 
-        """Text to prepend to subject line of notification emails. 
-        
+                                 '__default__',
+        """Text to prepend to subject line of notification emails.
+
         If the setting is not defined, then the [$project_name] prefix.
-        If no prefix is desired, then specifying an empty option 
+        If no prefix is desired, then specifying an empty option
         will disable it.
         """)
 
     to = Option('announcer', 'email_to', 'undisclosed-recipients: ;', 'Default To: field')
-    
-    use_threaded_delivery = BoolOption('announcer', 'use_threaded_delivery', 
-            'false', 
-            """If true, the actual delivery of the message will occur 
-            in a separate thread.  Enabling this will improve responsiveness 
-            for requests that end up with an announcement being sent over 
-            email. It requires building Python with threading support 
-            enabled-- which is usually the case. To test, start Python and 
+
+    use_threaded_delivery = BoolOption('announcer', 'use_threaded_delivery',
+            'false',
+            """If true, the actual delivery of the message will occur
+            in a separate thread.  Enabling this will improve responsiveness
+            for requests that end up with an announcement being sent over
+            email. It requires building Python with threading support
+            enabled-- which is usually the case. To test, start Python and
             type 'import threading' to see if it raises an error.
             """)
-    
-    default_email_format = Option('announcer', 'default_email_format', 
+
+    default_email_format = Option('announcer', 'default_email_format',
             'text/plain',
             """The default mime type of the email notifications.  This
             can be overriden on a per user basis through the announcer
@@ -172,7 +172,7 @@ class EmailDistributor(Component):
             thread = DeliveryThread(self.delivery_queue, self.send)
             thread.start()
         return self.delivery_queue
-    
+
     # IAnnouncementDistributor
     def transports(self):
         yield "email"
@@ -185,13 +185,13 @@ class EmailDistributor(Component):
                 formats[style] = f
         self.log.debug(
             "EmailDistributor has found the following formats capable "
-            "of handling '%s' of '%s': %s"%(transport, realm, 
+            "of handling '%s' of '%s': %s"%(transport, realm,
                 ', '.join(formats.keys())))
         if not formats:
             self.log.error("EmailDistributor is unable to continue " \
                     "without supporting formatters.")
         return formats
-        
+
     def distribute(self, transport, recipients, event):
         found = False
         for supported_transport in self.transports():
@@ -239,7 +239,7 @@ class EmailDistributor(Component):
                 self.log.debug("EmailDistributor found the " \
                         "address '%s' for '%s (%s)' via: %s"%(
                         addr, name, authed and \
-                        'authenticated' or 'not authenticated', 
+                        'authenticated' or 'not authenticated',
                         rslvr.__class__.__name__))
                 # ok, we found an addr, add the message
                 msgdict.setdefault(fmt, set()).add((name, authed, addr))
@@ -254,17 +254,17 @@ class EmailDistributor(Component):
                 "EmailDistributor is sending event as '%s' to: %s"%(
                     fmt, ', '.join(x[2] for x in v)))
             self._do_send(transport, event, k, v, fmtdict[k])
-                    
+
     def _get_default_format(self):
         return self.default_email_format
-        
+
     def _get_preferred_format(self, realm, sid, authenticated):
         if authenticated is None:
             authenticated = 0
         db = self.env.get_db_cnx()
         cursor = db.cursor()
         cursor.execute("""
-            SELECT value 
+            SELECT value
               FROM session_attribute
              WHERE sid=%s
                AND authenticated=%s
@@ -308,7 +308,7 @@ class EmailDistributor(Component):
         """Generate a predictable, but sufficiently unique message ID."""
         modtime = time.time()
         rand = random.randint(0,32000)
-        s = '%s.%d.%d.%s' % (self.env.project_url, 
+        s = '%s.%d.%d.%s' % (self.env.project_url,
                           modtime, rand,
                           realm.encode('ascii', 'ignore'))
         dig = md5(s).hexdigest()
@@ -319,15 +319,15 @@ class EmailDistributor(Component):
     def _do_send(self, transport, event, format, recipients, formatter):
         output = formatter.format(transport, event.realm, format, event)
         alternate_style = formatter.alternative_style_for(
-            transport, 
-            event.realm, 
+            transport,
+            event.realm,
             format
         )
         if alternate_style:
             alternate_output = formatter.format(
-                transport, 
-                event.realm, 
-                alternate_style, 
+                transport,
+                event.realm,
+                alternate_style,
                 event
             )
         else:
@@ -412,7 +412,7 @@ class EmailDistributor(Component):
     # IAnnouncementDistributor
     def get_announcement_preference_boxes(self, req):
         yield "email", "E-Mail Format"
-        
+
     def render_announcement_preference_box(self, req, panel):
         supported_realms = {}
         for producer in self.producers:
@@ -424,7 +424,7 @@ class EmailDistributor(Component):
                                 if realm not in supported_realms:
                                     supported_realms[realm] = set()
                                 supported_realms[realm].add(style)
-            
+
         if req.method == "POST":
             for realm in supported_realms:
                 opt = req.args.get('email_format_%s'%realm, False)
@@ -437,14 +437,14 @@ class EmailDistributor(Component):
             realms = supported_realms,
             preferences = prefs,
         )
-        return "prefs_announcer_email.html", data    
-    
-    
+        return "prefs_announcer_email.html", data
+
+
 class SmtpEmailSender(Component):
     """E-mail sender connecting to an SMTP server."""
-    
+
     implements(IEmailSender)
-    
+
     server = Option('smtp', 'server', 'localhost',
         """SMTP server hostname to use for email notifications.""")
 
@@ -465,10 +465,10 @@ class SmtpEmailSender(Component):
 
     use_ssl = BoolOption('smtp', 'use_ssl', 'false',
         """Use ssl for smtp connection.""")
-        
+
     debuglevel = IntOption('smtp', 'debuglevel', 0,
         """Set to 1 for useful smtp debugging on stdout.""")
-        
+
 
     def send(self, from_addr, recipients, message):
         # use defaults to make sure connect() is called in the constructor
@@ -496,7 +496,7 @@ class SmtpEmailSender(Component):
             smtp.ehlo()
         if self.user:
             smtp.login(
-                self.user.encode('utf-8'), 
+                self.user.encode('utf-8'),
                 self.password.encode('utf-8')
             )
         smtp.sendmail(from_addr, recipients, message)
@@ -510,16 +510,16 @@ class SmtpEmailSender(Component):
                 pass
         else:
             smtp.quit()
-        
+
 
 class SendmailEmailSender(Component):
     """E-mail sender using a locally-installed sendmail program."""
-    
+
     implements(IEmailSender)
-    
+
     sendmail_path = Option('sendmail', 'sendmail_path', 'sendmail',
         """Path to the sendmail executable.
-        
+
         The sendmail program must accept the `-i` and `-f` options.
         """)
 
@@ -543,7 +543,7 @@ class DeliveryThread(threading.Thread):
         self._sender = sender
         self._queue = queue
         self.setDaemon(True)
-        
+
     def run(self):
         while 1:
             sendfrom, recipients, message = self._queue.get()
