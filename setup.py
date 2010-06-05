@@ -52,7 +52,7 @@ except ImportError:
 
 setup(
     name = 'AnnouncerPlugin', 
-    version = '0.12',
+    version = '0.12-p2',
     author = 'Robert Corsaro',
     author_email = 'doki_pen@doki-pen.org',
     description = 'Customizable notification system',

@@ -66,6 +66,7 @@ from announcer.api import IAnnouncementProducer
 from announcer.api import _
 
 from announcer.util.mail import set_header
+from announcer.util.mail_crypto import CryptoTxt
 
 
 class IEmailSender(Interface):
@@ -157,7 +158,7 @@ class EmailDistributor(Component):
         Python with threading support enabled-- which is usually the case.
         To test, start Python and type 'import threading' to see
         if it raises an error.
-        """)            
+        """)
 
     default_email_format = Option('announcer', 'default_email_format',
         'text/plain',
@@ -166,6 +167,56 @@ class EmailDistributor(Component):
         This can be overridden on a per user basis through the announcer
         preferences panel.
         """)
+
+    rcpt_allow_regexp = Option('announcer', 'rcpt_allow_regexp', '',
+        """A whitelist pattern to match any address to before adding to
+        recipients list.
+        """)
+
+    rcpt_local_regexp = Option('announcer', 'rcpt_local_regexp', '',
+        """A whitelist pattern to match any address, that should be
+        considered local.
+
+        This will be evaluated only if msg encryption is set too.
+        Recipients with matching email addresses will continue to
+        receive unencrypted email messages.
+        """)
+
+    crypto = Option('announcer', 'email_crypto', '',
+        """Enable cryptographically operation on email msg body.
+
+        Empty string, the default for unset, disables all crypto operations.
+        Valid values are:
+            sign          sign msg body with given privkey
+            encrypt       encrypt msg body with pubkeys of all recipients
+            sign,encrypt  sign, than encrypt msg body
+        """)
+
+    # get GnuPG configuration options
+    gpg_binary = Option('announcer', 'gpg_binary', 'gpg',
+        """GnuPG binary name, allows for full path too.
+
+        Value 'gpg' is same default as in python-gnupg itself.
+        For usual installations location of the gpg binary is auto-detected.
+        """)
+
+    gpg_home = Option('announcer', 'gpg_home', '',
+        """Directory containing keyring files.
+
+        In case of wrong configuration missing keyring files without content
+        will be created in the configured location, provided necessary
+        write permssion is granted for the corresponding parent directory.
+        """)
+
+    private_key = Option('announcer', 'gpg_signing_key', None,
+        """Keyid of private key (last 8 chars or more) used for signing.
+
+        If unset, a private key will be selected from keyring automagicly.
+        The password must be available i.e. provided by running gpg-agent
+        or empty (bad security). On failing to unlock the private key,
+        msg body will get emptied.
+        """)
+
 
     def __init__(self):
         self.delivery_queue = None
@@ -212,6 +263,16 @@ class EmailDistributor(Component):
                     transport, event.realm))
             return
         msgdict = {}
+        msgdict_encrypt = {}
+        msg_pubkey_ids = []
+        # compile pattern before use for better performance
+        RCPT_ALLOW_RE = re.compile(self.rcpt_allow_regexp)
+        RCPT_LOCAL_RE = re.compile(self.rcpt_local_regexp)
+
+        if self.crypto != '':
+            self.log.debug("EmailDistributor attempts crypto operation.")
+            self.enigma = CryptoTxt(self.gpg_binary, self.gpg_home)
+
         for name, authed, addr in recipients:
             fmt = name and \
                 self._get_preferred_format(event.realm, name, authed) or \
@@ -246,8 +307,36 @@ class EmailDistributor(Component):
                         addr, name, authed and \
                         'authenticated' or 'not authenticated',
                         rslvr.__class__.__name__))
+
                 # ok, we found an addr, add the message
-                msgdict.setdefault(fmt, set()).add((name, authed, addr))
+                # but wait, check for allowed rcpt first, if set
+                if RCPT_ALLOW_RE.search(addr) is not None:
+                    # check for local recipients now
+                    local_match = RCPT_LOCAL_RE.search(addr)
+                    if self.crypto in ['encrypt', 'sign,encrypt'] and \
+                            local_match is None:
+                        # search available public keys for matching UID
+                        pubkey_ids = self.enigma.get_pubkey_ids(addr)
+                        if len(pubkey_ids) > 0:
+                            msgdict_encrypt.setdefault(fmt, set()).add((name,
+                                                            authed, addr))
+                            msg_pubkey_ids[len(msg_pubkey_ids):] = pubkey_ids
+                            self.log.debug("EmailDistributor got pubkeys " \
+                                "for %s: %s" % (addr, pubkey_ids))
+                        else:
+                            self.log.debug("EmailDistributor dropped %s " \
+                                "after missing pubkey with corresponding " \
+                                "address %s in any UID" % (name, addr))
+                    else:
+                        msgdict.setdefault(fmt, set()).add((name, authed,
+                                                            addr))
+                        if local_match is not None:
+                            self.log.debug("EmailDistributor expected " \
+                                "local delivery for %s to: %s" % (name, addr))
+                else:
+                    self.log.debug("EmailDistributor dropped %s for " \
+                        "not matching allowed recipient pattern %s" % \
+                        (addr, self.rcpt_allow_regexp))
             else:
                 self.log.debug("EmailDistributor was unable to find an " \
                         "address for: %s (%s)"%(name, authed and \
@@ -259,6 +348,13 @@ class EmailDistributor(Component):
                 "EmailDistributor is sending event as '%s' to: %s"%(
                     fmt, ', '.join(x[2] for x in v)))
             self._do_send(transport, event, k, v, fmtdict[k])
+        for k, v in msgdict_encrypt.items():
+            if not v or not fmtdict.get(k):
+                continue
+            self.log.debug(
+                "EmailDistributor is sending encrypted info on event " \
+                "as '%s' to: %s"%(fmt, ', '.join(x[2] for x in v)))
+            self._do_send(transport, event, k, v, fmtdict[k], msg_pubkey_ids)
 
     def _get_default_format(self):
         return self.default_email_format
@@ -321,22 +417,42 @@ class EmailDistributor(Component):
         msgid = '<%03d.%s@%s>' % (len(s), dig, host)
         return msgid
 
-    def _do_send(self, transport, event, format, recipients, formatter):
+    def _filter_recipients(self, rcpt):
+        return rcpt
+
+    def _do_send(self, transport, event, format, recipients, formatter,
+                 pubkey_ids=[]):
+
         output = formatter.format(transport, event.realm, format, event)
-        alternate_style = formatter.alternative_style_for(
-            transport,
-            event.realm,
-            format
-        )
-        if alternate_style:
-            alternate_output = formatter.format(
+
+        # DEVEL: force message body plaintext style for crypto operations
+        if self.crypto != '' and pubkey_ids != []:
+            if self.crypto == 'sign':
+                output = self.enigma.sign(output, self.private_key)
+            elif self.crypto == 'encrypt':
+                output = self.enigma.encrypt(output, pubkey_ids)
+            elif self.crypto == 'sign,encrypt':
+                output = self.enigma.sign_encrypt(output, pubkey_ids,
+                                                     self.private_key)
+
+            self.log.debug(output)
+            self.log.debug(_("EmailDistributor crypto operaton successful."))
+            alternate_output = None
+        else:
+            alternate_style = formatter.alternative_style_for(
                 transport,
                 event.realm,
-                alternate_style,
-                event
+                format
             )
-        else:
-            alternate_output = None
+            if alternate_style:
+                alternate_output = formatter.format(
+                    transport,
+                    event.realm,
+                    alternate_style,
+                    event
+                )
+            else:
+                alternate_output = None
 
         # sanity check
         if not self._charset.body_encoding:
@@ -368,12 +484,13 @@ class EmailDistributor(Component):
         if alternate_output:
             parentMessage = MIMEMultipart('alternative')
             rootMessage.attach(parentMessage)
-        else:
-            parentMessage = rootMessage
-        if alternate_output:
+
             alt_msg_format = 'html' in alternate_style and 'html' or 'plain'
             msgText = MIMEText(alternate_output, alt_msg_format)
             parentMessage.attach(msgText)
+        else:
+            parentMessage = rootMessage
+
         msg_format = 'html' in format and 'html' or 'plain'
         msgText = MIMEText(output, msg_format)
         del msgText['Content-Transfer-Encoding']
@@ -394,6 +511,8 @@ class EmailDistributor(Component):
         # replace with localized bcc hint
         if headers['To'] == 'undisclosed-recipients: ;':
             set_header(rootMessage, 'To', _('undisclosed-recipients: ;'))
+
+        self.log.debug("Content of recip_adds: %s" %(recip_adds))
         package = (from_header, recip_adds, rootMessage.as_string())
         start = time.time()
         if self.use_threaded_delivery:
