@@ -2,6 +2,7 @@
 #
 # Copyright (c) 2008, Stephen Hansen
 # Copyright (c) 2009, Robert Corsaro
+# Copyright (c) 2010, Steffen Hoffmann
 # 
 # All rights reserved.
 # 
@@ -32,8 +33,10 @@
 
 from trac.core import Component, implements, TracError
 from trac.web.chrome import add_stylesheet
+
 from announcer.api import IAnnouncementSubscriber
 from announcer.api import IAnnouncementPreferenceProvider
+from announcer.api import _
 from announcer.query import *
 
 class RuleBasedTicketSubscriber(Component):

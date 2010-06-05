@@ -2,6 +2,7 @@
 #
 # Copyright (c) 2008, Stephen Hansen
 # Copyright (c) 2009, Robert Corsaro
+# Copyright (c) 2010, Steffen Hoffmann
 # 
 # All rights reserved.
 # 
@@ -37,11 +38,12 @@ from trac.config import BoolOption, Option
 from trac.resource import ResourceNotFound
 from trac.ticket import model
 from trac.util.text import to_unicode
-from trac.util.translation import _
 from trac.web.chrome import add_warning
 
 from announcer.api import IAnnouncementSubscriber, istrue
 from announcer.api import IAnnouncementPreferenceProvider
+from announcer.api import _
+
 from announcer.util.settings import BoolSubscriptionSetting
 
 class LegacyTicketSubscriber(Component):

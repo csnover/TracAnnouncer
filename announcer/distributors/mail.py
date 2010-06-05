@@ -2,6 +2,7 @@
 #
 # Copyright (c) 2008, Stephen Hansen
 # Copyright (c) 2009, Robert Corsaro
+# Copyright (c) 2010, Steffen Hoffmann
 #
 # All rights reserved.
 #
@@ -55,7 +56,6 @@ from trac.config import ExtensionOption
 from trac.util import get_pkginfo, md5
 from trac.util.datefmt import to_timestamp
 from trac.util.text import to_unicode, CRLF
-from trac.util.translation import _
 
 from announcer.api import AnnouncementSystem
 from announcer.api import IAnnouncementAddressResolver
@@ -63,6 +63,8 @@ from announcer.api import IAnnouncementDistributor
 from announcer.api import IAnnouncementFormatter
 from announcer.api import IAnnouncementPreferenceProvider
 from announcer.api import IAnnouncementProducer
+from announcer.api import _
+
 from announcer.util.mail import set_header
 
 

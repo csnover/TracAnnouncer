@@ -1,6 +1,7 @@
 #-*- coding: utf-8 -*-
 #
 # Copyright (c) 2010, Robert Corsaro
+# Copyright (c) 2010, Steffen Hoffmann
 # 
 # All rights reserved.
 # 
@@ -36,6 +37,7 @@ from genshi.template import NewTextTemplate, TemplateLoader
 from announcer.api import AnnouncementSystem, AnnouncementEvent
 from announcer.api import IAnnouncementFormatter, IAnnouncementSubscriber
 from announcer.api import IAnnouncementPreferenceProvider
+from announcer.api import _
 from announcer.distributors.mail import IAnnouncementEmailDecorator
 from announcer.util.mail import set_header, next_decorator
 from announcer.util.settings import BoolSubscriptionSetting

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2009, Robert Corsaro
+# Copyright (c) 2010, Steffen Hoffmann
 # 
 # All rights reserved.
 # 
@@ -37,6 +38,8 @@ from trac.config import ListOption
 
 from announcer.api import IAnnouncementSubscriber, istrue
 from announcer.api import IAnnouncementPreferenceProvider
+from announcer.api import _
+
 from announcer.util.settings import BoolSubscriptionSetting
 
 class TicketComponentSubscriber(Component):

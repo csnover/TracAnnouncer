@@ -2,6 +2,7 @@
 #
 # Copyright (c) 2008, Stephen Hansen
 # Copyright (c) 2009, Robert Corsaro
+# Copyright (c) 2010, Steffen Hoffmann
 # 
 # All rights reserved.
 # 
@@ -35,6 +36,7 @@ from trac.util.compat import sorted
 
 from announcer.api import IAnnouncementAddressResolver
 from announcer.api import IAnnouncementPreferenceProvider
+from announcer.api import _
 
 class SpecifiedEmailResolver(Component):
     implements(IAnnouncementAddressResolver, IAnnouncementPreferenceProvider)

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2009, Robert Corsaro
+# Copyright (c) 2010, Steffen Hoffmann
 # 
 # All rights reserved.
 # 
@@ -35,6 +36,8 @@ from trac.config import BoolOption
 
 from announcer.api import IAnnouncementSubscriptionFilter
 from announcer.api import IAnnouncementPreferenceProvider
+from announcer.api import _
+
 from announcer.util.settings import BoolSubscriptionSetting
 
 class ChangeAuthorFilter(Component):

@@ -2,7 +2,8 @@
 #
 # Copyright (c) 2008, Stephen Hansen
 # Copyright (c) 2009, Robert Corsaro
-# 
+# Copyright (c) 2010, Robert Corsaro
+#
 # All rights reserved.
 # 
 # Redistribution and use in source and binary forms, with or without
@@ -37,7 +38,8 @@ from trac.web import IRequestHandler
 
 from pkg_resources import resource_filename
 
-from announcer.api import IAnnouncementPreferenceProvider
+from announcer.api import IAnnouncementPreferenceProvider, \
+                          _, tag_, N_
 
 def truth(v):
     if v in (False, 'False', 'false', 0, '0', ''):

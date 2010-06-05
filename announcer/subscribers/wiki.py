@@ -2,6 +2,7 @@
 #
 # Copyright (c) 2008, Stephen Hansen
 # Copyright (c) 2009-2010, Robert Corsaro
+# Copyright (c) 2010, Steffen Hoffmann
 # 
 # All rights reserved.
 # 
@@ -38,6 +39,7 @@ from trac.web.chrome import add_warning
 
 from announcer.api import IAnnouncementPreferenceProvider
 from announcer.api import IAnnouncementSubscriber, istrue
+from announcer.api import _
 from announcer.util.settings import SubscriptionSetting
 
 class GeneralWikiSubscriber(Component):

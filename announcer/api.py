@@ -2,6 +2,7 @@
 #
 # Copyright (c) 2008, Stephen Hansen
 # Copyright (c) 2009, Robert Corsaro
+# Copyright (c) 2010, Steffen Hoffmann
 #
 # All rights reserved.
 #
@@ -30,12 +31,15 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # ----------------------------------------------------------------------------
 
+import pkg_resources
+
+import time
+
 from trac.core import *
 from trac.util.compat import set
 from trac.db import Table, Column, Index
 from trac.db import DatabaseManager
 from trac.env import IEnvironmentSetupParticipant
-import time
 
 class IAnnouncementProducer(Interface):
     """blah."""
@@ -257,6 +261,22 @@ _TRUE_VALUES = ('yes', 'true', 'enabled', 'on', 'aye', '1', 1, True)
 def istrue(value, otherwise=False):
     return True and (value in _TRUE_VALUES) or otherwise
 
+
+try:
+    from trac.util.translation import domain_functions
+
+    _, tag_, N_, add_domain = \
+        domain_functions('announcer', ('_', 'tag_', 'N_', 'add_domain'))
+
+except ImportError:
+    # fall back to 0.11 behavior, i18n functions are no-ops then
+    def add_domain():
+        pass
+
+    _ = N_ = tag_ = _noop = lambda string: string
+    pass
+
+
 class AnnouncementSystem(Component):
     """AnnouncementSystem represents the entry-point into the announcement
     system, and is also the central controller that handles passing notices
@@ -305,6 +325,11 @@ class AnnouncementSystem(Component):
             Index(['realm', 'category', 'enabled']),
         ]
     ]
+
+    def __init__(self):
+        # bind the 'announcer' catalog to the locale directory
+        locale_dir = pkg_resources.resource_filename(__name__, 'locale')
+        add_domain(self.env.path, locale_dir)
 
     def environment_created(self):
         self._upgrade_db(self.env.get_db_cnx())

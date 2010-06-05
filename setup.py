@@ -2,6 +2,7 @@
 #
 # Copyright (c) 2008, Stephen Hansen
 # Copyright (c) 2009, Robert Corsaro
+# Copyright (c) 2010, Steffen Hoffmann
 # 
 # All rights reserved.
 # 
@@ -34,6 +35,21 @@
 
 from setuptools import find_packages, setup
 
+extra = {}
+try:
+    extractors = [
+        ('**.py',                'python', None),
+        ('**/templates/**.html', 'genshi', None),
+        ('**/templates/**.txt',  'genshi', {
+            'template_class': 'genshi.template:TextTemplate'
+        }),
+    ]
+    extra['message_extractors'] = {
+        'announcer': extractors,
+    }
+except ImportError:
+    pass
+
 setup(
     name = 'AnnouncerPlugin', 
     version = '0.12',
@@ -52,7 +68,8 @@ setup(
             'templates/*.html', 
             'templates/*.txt', 
             'htdocs/*.*', 
-            'htdocs/css/*.*'
+            'htdocs/css/*.*',
+            'locale/*/LC_MESSAGES/*.mo',
         ]
     },
     install_requires = [
@@ -96,4 +113,5 @@ setup(
         ]    
     },
     test_suite = 'announcer.tests',
+    **extra
 )
