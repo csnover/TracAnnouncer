@@ -62,8 +62,8 @@ class BittenAnnouncement(Component):
     )
 
     readable_states = {
-        Build.SUCCESS: 'Successful',
-        Build.FAILURE: 'Failed',
+        Build.SUCCESS: _('Successful'),
+        Build.FAILURE: _('Failed'),
     }
 
     # IBuildListener interface
@@ -125,7 +125,7 @@ class BittenAnnouncement(Component):
     def get_announcement_preference_boxes(self, req):
         if req.authname == "anonymous" and 'email' not in req.session:
             return
-        yield "bitten_subscription", "Bitten Subscription"
+        yield "bitten_subscription", _("Bitten Subscription")
 
     def render_announcement_preference_box(self, req, panel):
         settings = self._settings()

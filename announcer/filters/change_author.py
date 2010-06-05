@@ -66,7 +66,7 @@ class ChangeAuthorFilter(Component):
     def get_announcement_preference_boxes(self, req):
         if req.authname == 'anonymous' and 'email' not in req.session:
             return
-        yield 'author_filter', 'Author Filter'
+        yield 'author_filter', _('Author Filter')
 
     def render_announcement_preference_box(self, req, panel):
         setting = self._setting()

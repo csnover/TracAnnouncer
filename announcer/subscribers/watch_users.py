@@ -60,7 +60,7 @@ class UserChangeSubscriber(Component):
     def get_announcement_preference_boxes(self, req):
         if req.authname == "anonymouse" and 'email' not in req.session:
             return
-        yield "watch_users", "Watch Users"
+        yield "watch_users", _("Watch Users")
 
     def render_announcement_preference_box(self, req, panel):
         setting = self._setting()

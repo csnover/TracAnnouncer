@@ -59,7 +59,7 @@ class SpecifiedEmailResolver(Component):
     # IAnnouncementDistributor
     def get_announcement_preference_boxes(self, req):
         if req.authname != "anonymous":
-            yield "emailaddress", "Announcement Email Address"
+            yield "emailaddress", _("Announcement Email Address")
         
     def render_announcement_preference_box(self, req, panel):
         cfg = self.config

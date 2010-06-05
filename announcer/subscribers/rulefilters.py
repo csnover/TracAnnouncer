@@ -83,7 +83,7 @@ class RuleBasedTicketSubscriber(Component):
         
     # IAnnouncementPreferenceProvider
     def get_announcement_preference_boxes(self, req):
-        yield ('rules', 'Rule-based subscriptions')
+        yield ('rules', _('Rule-based subscriptions'))
         
     def render_announcement_preference_box(self, req, box):
         add_stylesheet(req, 'announcer/css/rulediv.css')

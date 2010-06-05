@@ -111,7 +111,7 @@ class AccountManagerAnnouncement(Component):
     def get_announcement_preference_boxes(self, req):
         if req.authname == "anonymous" and 'email' not in req.session:
             return
-        yield "acct_mgr_subscription", "Account Manager Subscription"
+        yield "acct_mgr_subscription", _("Account Manager Subscription")
 
     def render_announcement_preference_box(self, req, panel):
         settings = self._settings()

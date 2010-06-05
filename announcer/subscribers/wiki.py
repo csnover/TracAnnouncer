@@ -65,7 +65,7 @@ class GeneralWikiSubscriber(Component):
             yield result
 
     def get_announcement_preference_boxes(self, req):
-        yield "general_wiki", "General Wiki Announcements"
+        yield "general_wiki", _("General Wiki Announcements")
         
     def render_announcement_preference_box(self, req, panel):
         setting = self._setting()

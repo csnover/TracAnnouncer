@@ -391,6 +391,9 @@ class EmailDistributor(Component):
                     len(str(rootMessage[field]).split(',')) > 0:
                 for addy in str(rootMessage[field]).split(','):
                     self._add_recipient(recip_adds, addy)
+        # replace with localized bcc hint
+        if headers['To'] == 'undisclosed-recipients: ;':
+            set_header(rootMessage, 'To', _('undisclosed-recipients: ;'))
         package = (from_header, recip_adds, rootMessage.as_string())
         start = time.time()
         if self.use_threaded_delivery:
@@ -416,7 +419,7 @@ class EmailDistributor(Component):
 
     # IAnnouncementDistributor
     def get_announcement_preference_boxes(self, req):
-        yield "email", "E-Mail Format"
+        yield "email", _("E-Mail Format")
 
     def render_announcement_preference_box(self, req, panel):
         supported_realms = {}

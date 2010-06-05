@@ -87,7 +87,7 @@ class FullBlogAnnouncement(Component):
             """)
 
     blog_email_subject = Option('fullblog-announcement', 'blog_email_subject',
-            "Blog: ${blog.name} ${action}",
+            _("Blog: ${blog.name} ${action}"),
             """Format string for the blog email subject.  
             
             This is a mini genshi template and it is passed the blog_post and
@@ -213,7 +213,7 @@ class FullBlogAnnouncement(Component):
     def get_announcement_preference_boxes(self, req):
         if req.authname == "anonymous" and 'email' not in req.session:
             return
-        yield "blog", "Blog Subscriptions"
+        yield "blog", _("Blog Subscriptions")
         
     def render_announcement_preference_box(self, req, panel):
         settings = self._settings()
@@ -255,12 +255,12 @@ class FullBlogAnnouncement(Component):
                 event.blog_post.author, 
                 result[1],
                 None,
-                'My Post'
+                _('My Post')
             )
 
         if event.category == 'post created':
             for result in settings['new_posts'].get_subscriptions():
-                yield result + ('New Post',)
+                yield result + (_('New Post'),)
 
             # Watched Author Posts
             def match(dist, value):
@@ -269,11 +269,11 @@ class FullBlogAnnouncement(Component):
                         return True
                 return False
             for result in settings['author_posts'].get_subscriptions(match):
-                yield result + ('Author Post',)
+                yield result + (_('Author Post'),)
 
         # All
         for result in settings['all'].get_subscriptions():
-            yield result + ('All Blog Events',)
+            yield result + (_('All Blog Events'),)
 
     def _format_plaintext(self, event):
         blog_post = event.blog_post

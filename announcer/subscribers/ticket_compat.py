@@ -77,7 +77,7 @@ class LegacyTicketSubscriber(Component):
         """)
     
     def get_announcement_preference_boxes(self, req):
-        yield "legacy", "Ticket Subscriptions"
+        yield "legacy", _("Ticket Subscriptions")
 
     def render_announcement_preference_box(self, req, panel):
         settings = self._settings()

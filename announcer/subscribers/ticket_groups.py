@@ -82,7 +82,7 @@ class JoinableGroupSubscriber(Component):
         if req.authname == "anonymous" and 'email' not in req.session:
             return
         if self.joinable_groups:
-            yield "joinable_groups", "Group Subscriptions"
+            yield "joinable_groups", _("Group Subscriptions")
         
     def render_announcement_preference_box(self, req, panel):
         settings = self._settings()

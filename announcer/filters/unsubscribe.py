@@ -65,7 +65,7 @@ class UnsubscribeFilter(Component):
     def get_announcement_preference_boxes(self, req):
         if req.authname == "anonymous" and "email" not in req.session:
             return
-        yield "unsubscribe_all", "Unsubscribe From All Announcements"
+        yield "unsubscribe_all", _("Unsubscribe From All Announcements")
 
     def render_announcement_preference_box(self, req, panel):
         setting = self._setting()

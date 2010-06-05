@@ -62,7 +62,7 @@ class TicketComponentSubscriber(Component):
     def get_announcement_preference_boxes(self, req):
         if req.authname == "anonymous" and 'email' not in req.session:
             return
-        yield "joinable_components", "Ticket Component Subscriptions"
+        yield "joinable_components", _("Ticket Component Subscriptions")
         
     def render_announcement_preference_box(self, req, panel):
         settings = self._settings()
