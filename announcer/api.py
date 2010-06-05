@@ -42,7 +42,7 @@ class IAnnouncementProducer(Interface):
 
     def realms():
         """Returns an iterable that lists all the realms that this producer
-        is capable of producing eventss for.
+        is capable of producing events for.
         """
 
 class IAnnouncementSubscriber(Interface):

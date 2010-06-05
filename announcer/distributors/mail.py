@@ -76,7 +76,7 @@ class IEmailSender(Interface):
 class IAnnouncementEmailDecorator(Interface):
     def decorate_message(event, message, decorators):
         """Manipulate the message before it is sent on it's way.  The callee
-        should call the next decorator by by popping decorators and calling the
+        should call the next decorator by popping decorators and calling the
         popped decorator.  If decorators is empty, don't worry about it.
         """
 
@@ -95,7 +95,7 @@ class EmailDistributor(Component):
         'SessionEmailResolver, DefaultDomainEmailResolver',
         """Comma seperated list of email resolver components in the order
         they will be called.  If an email address is resolved, the remaining
-        resolvers will no be called.
+        resolvers will not be called.
         """)
 
     email_sender = ExtensionOption('announcer', 'email_sender',
@@ -143,24 +143,27 @@ class EmailDistributor(Component):
         will disable it.
         """)
 
-    to = Option('announcer', 'email_to', 'undisclosed-recipients: ;', 'Default To: field')
+    to = Option('announcer', 'email_to', 'undisclosed-recipients: ;',
+        'Default To: field')
 
     use_threaded_delivery = BoolOption('announcer', 'use_threaded_delivery',
-            'false',
-            """If true, the actual delivery of the message will occur
-            in a separate thread.  Enabling this will improve responsiveness
-            for requests that end up with an announcement being sent over
-            email. It requires building Python with threading support
-            enabled-- which is usually the case. To test, start Python and
-            type 'import threading' to see if it raises an error.
-            """)
+        'false',
+        """Do message delivery in a separate thread.
+
+        Enabling this will improve responsiveness for requests that end up
+        with an announcement being sent over email. It requires building
+        Python with threading support enabled-- which is usually the case.
+        To test, start Python and type 'import threading' to see
+        if it raises an error.
+        """)            
 
     default_email_format = Option('announcer', 'default_email_format',
-            'text/plain',
-            """The default mime type of the email notifications.  This
-            can be overriden on a per user basis through the announcer
-            preferences panel.
-            """)
+        'text/plain',
+        """The default mime type of the email notifications.
+
+        This can be overridden on a per user basis through the announcer
+        preferences panel.
+        """)
 
     def __init__(self):
         self.delivery_queue = None
