@@ -1,59 +1,60 @@
-# German translations for AnnouncerPlugin.
+# German (Germany) translations for AnnouncerPlugin.
 # Copyright (C) 2010
 # This file is distributed under the same license as the AnnouncerPlugin
 # project.
-# Steffen Hoffmann <hoff.st@web.de>, 2010.
 #
+# Steffen Hoffmann <hoff.st@web.de>, 2010.
 msgid ""
 msgstr ""
 "Project-Id-Version: AnnouncerPlugin 0.12\n"
 "Report-Msgid-Bugs-To: hoff.st@web.de\n"
-"POT-Creation-Date: 2010-05-25 23:49+0200\n"
-"PO-Revision-Date: 2010-05-25 20:32+0200\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: de <LL@li.org>\n"
+"POT-Creation-Date: 2010-06-23 21:42+0200\n"
+"PO-Revision-Date: 2010-07-23 11:39+0200\n"
+"Last-Translator: Steffen Hoffmann <hoff.st@web.de>\n"
+"Language-Team: German <de_DE <trac-dev@googlegroups.com>>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.0dev-r482\n"
+"X-Generator: KBabel 1.11.4\n"
 
 #: announcer/pref.py:62 announcer/templates/prefs_announcer.html:9
 msgid "Announcements"
-msgstr ""
+msgstr "Benachrichtigungen"
 
 #: announcer/distributors/mail.py:310
 #, python-format
 msgid "Invalid email encoding setting: %s"
-msgstr ""
+msgstr "Ungültige Einstellung der E-mail-Codierung: %s"
 
 #: announcer/distributors/mail.py:346
 msgid "Ticket contains non-ASCII chars. Please change encoding setting"
-msgstr ""
+msgstr "Das Ticket enthält Nicht-ASCII-Zeichen. Bitte ändern Sie die Codierungseinstellung"
 
 #: announcer/distributors/mail.py:396
 msgid "undisclosed-recipients: ;"
-msgstr ""
+msgstr "Verborgene_Empfaenger:;"
 
 #: announcer/distributors/mail.py:422
 msgid "E-Mail Format"
-msgstr ""
+msgstr "E-mail-Format"
 
 #: announcer/distributors/mail.py:501
 msgid "TLS enabled but server does not support TLS"
-msgstr ""
+msgstr "TLS aktiviert, wird vom Server aber nicht unterstützt"
 
 #: announcer/filters/change_author.py:69
 msgid "Author Filter"
-msgstr ""
+msgstr "Autoren-Filter"
 
 #: announcer/filters/unsubscribe.py:68
 msgid "Unsubscribe From All Announcements"
-msgstr ""
+msgstr "Alle Abonnements stornieren"
 
 #: announcer/opt/acct_mgr/announce.py:114
 msgid "Account Manager Subscription"
-msgstr ""
+msgstr "Abonnement für Nutzerkontenverwaltung (Account Manager)"
 
 #: announcer/opt/bitten/announce.py:65
 msgid "Successful"
@@ -65,7 +66,7 @@ msgstr ""
 
 #: announcer/opt/bitten/announce.py:128
 msgid "Bitten Subscription"
-msgstr ""
+msgstr "Bitten-Abonnement"
 
 #: announcer/opt/fullblog/announce.py:90
 msgid "Blog: ${blog.name} ${action}"
@@ -73,7 +74,7 @@ msgstr ""
 
 #: announcer/opt/fullblog/announce.py:216
 msgid "Blog Subscriptions"
-msgstr ""
+msgstr "Blog-Abonnement"
 
 #: announcer/opt/fullblog/announce.py:258
 msgid "My Post"
@@ -93,43 +94,59 @@ msgstr ""
 
 #: announcer/resolvers/specified.py:62
 msgid "Announcement Email Address"
-msgstr ""
+msgstr "E-mail-Adresse für Benachrichtigungen"
 
 #: announcer/subscribers/rulefilters.py:86
 msgid "Rule-based subscriptions"
-msgstr ""
+msgstr "Regelgestützte Abonnements"
 
 #: announcer/subscribers/ticket_compat.py:80
 msgid "Ticket Subscriptions"
-msgstr ""
+msgstr "Abonnement für Tickets"
 
 #: announcer/subscribers/ticket_compat.py:117
 #, python-format
 msgid ""
 "LegacyTicketSubscriber couldn't add component owner because component was"
 " not found, message: '%s'"
-msgstr ""
+msgstr "LegacyTicketSubscriber (generisches Ticket-Abonnement) konnte den Verantwortlichen für die Komponente nicht hinzufügen, weil die Komponente nicht gefunden wurde; Meldung: '%s'"
 
 #: announcer/subscribers/ticket_compat.py:182
 #, python-format
 msgid "CarbonCopySubscriber added '%s <%s>' because of rule: carbon copied"
-msgstr ""
+msgstr "CarbonCopySubscriber (Kopie-Abonnement) fügte '%s <%s>' hinzu wegen folgender Regel: carbon copied (Ticket-Cc)"
 
 #: announcer/subscribers/ticket_components.py:65
 msgid "Ticket Component Subscriptions"
-msgstr ""
+msgstr "Abonnement für Komponenten"
 
 #: announcer/subscribers/ticket_groups.py:85
 msgid "Group Subscriptions"
-msgstr ""
+msgstr "Gruppen-Abonnements"
 
 #: announcer/subscribers/watch_users.py:63
 msgid "Watch Users"
+msgstr "Beobachtung von Nutzern"
+
+#: announcer/subscribers/watchers.py:57 announcer/subscribers/watchers.py:194
+msgid "Watch This"
+msgstr ""
+
+#: announcer/subscribers/watchers.py:57 announcer/subscribers/watchers.py:191
+msgid "Unwatch This"
+msgstr ""
+
+#: announcer/subscribers/watchers.py:83
+msgid "You are no longer receiving change notifications about this resource."
+msgstr ""
+
+#: announcer/subscribers/watchers.py:87
+msgid "You are now receiving change notifications about this resource."
 msgstr ""
 
 #: announcer/subscribers/wiki.py:68
 msgid "General Wiki Announcements"
-msgstr ""
+msgstr "Allgemeine Wiki-Abonnements"
 
 #: announcer/templates/acct_mgr_reset_password_plaintext.txt:1
 msgid ""
@@ -139,6 +156,11 @@ msgid ""
 "\n"
 "Login URL: <"
 msgstr ""
+"Ihr Kennwort für Trac wurde zurückgesetzt.\n"
+"\n"
+"Hier ist Ihre Nutzerkonteninformation:\n"
+"\n"
+"Anmelde-URL: <"
 
 #: announcer/templates/acct_mgr_reset_password_plaintext.txt:5
 #: announcer/templates/acct_mgr_verify_plaintext.txt:3
@@ -146,14 +168,16 @@ msgid ""
 ">\n"
 "Username:"
 msgstr ""
+">\n"
+"Benutzername:"
 
 #: announcer/templates/acct_mgr_reset_password_plaintext.txt:6
 msgid "Password:"
-msgstr ""
+msgstr "Kennwort:"
 
 #: announcer/templates/acct_mgr_user_change_plaintext.txt:1
 msgid "for user"
-msgstr ""
+msgstr "für Nutzer"
 
 #: announcer/templates/acct_mgr_verify_plaintext.txt:1
 msgid ""
@@ -161,10 +185,13 @@ msgid ""
 "\n"
 "Verification URL: <"
 msgstr ""
+"Bitte gehen Sie zu der folgenden URL, um Ihre E-mail-Adresse zu bestätigen.\n"
+"\n"
+"Bestätigungs-URL: <"
 
 #: announcer/templates/acct_mgr_verify_plaintext.txt:4
 msgid "Verification Token:"
-msgstr ""
+msgstr "Bestätigungsschlüssel:"
 
 #: announcer/templates/bitten_plaintext.txt:1
 msgid "build of"
@@ -341,30 +368,35 @@ msgid ""
 "those\n"
 "      topics that you subscribe to."
 msgstr ""
+"Benachrichtigungen dienen in Trac dazu, Ihnen Ereignisse mitzuteilen; \n"
+"      das Erstellen eines Tickets, die Änderung einer Wiki-Seite und anderes. "
+"Durch\n"
+"      das Benachrichtigungssystem erhalten Sie nur Nachrichten zu den\n"
+"      Bereichen, die Sie anfordern."
 
 #: announcer/templates/prefs_announcer_acct_mgr_subscription.html:3
 msgid "Subscribe to user account announcements."
-msgstr ""
+msgstr "Abonnement für Nutzer-Konten-Benachrichtigungen"
 
 #: announcer/templates/prefs_announcer_acct_mgr_subscription.html:7
 msgid "Send me announcements when new users are created."
-msgstr ""
+msgstr "Sende mir eine Benachrichtigung, wenn neue Nutzer erstellt werden."
 
 #: announcer/templates/prefs_announcer_acct_mgr_subscription.html:8
 msgid "Send me announcements when users accounts are changed."
-msgstr ""
+msgstr "Sende mir eine Benachrichtigung, wenn Nutzer-Konten geändert werden."
 
 #: announcer/templates/prefs_announcer_acct_mgr_subscription.html:9
 msgid "Send me announcements when users accounts are deleted."
-msgstr ""
+msgstr "Sende mir eine Benachrichtigung, wenn Nutzer-Konten gelöscht werden."
 
 #: announcer/templates/prefs_announcer_author_filter.html:3
 msgid "Opt-out of announcements about my own changes."
-msgstr ""
+msgstr "Benachrichtigungen über eigene Änderungen werden ablehnt."
 
 #: announcer/templates/prefs_announcer_author_filter.html:6
 msgid "Never notify me when I make a change."
-msgstr ""
+msgstr "Benachrichte mich niemals, wenn ich selbst Änderungen vornehme."
 
 #: announcer/templates/prefs_announcer_bitten.html:3
 msgid "Subscribe to build announcements."
@@ -407,7 +439,7 @@ msgstr ""
 
 #: announcer/templates/prefs_announcer_email.html:7
 msgid "announcements:"
-msgstr ""
+msgstr "Benachrichtigungen:"
 
 #: announcer/templates/prefs_announcer_emailaddress.html:3
 msgid ""
@@ -415,10 +447,12 @@ msgid ""
 "address then the main one provided\n"
 "  in Trac, you may specify the address here:"
 msgstr ""
+"Falls Sie Benachrichtigungen an eine andere als die in Trac gespeicherte Adresse versenden lassen möchten,\n"
+" dann können Sie diese Adresse hier angeben:"
 
 #: announcer/templates/prefs_announcer_emailaddress.html:8
 msgid "Email address:"
-msgstr ""
+msgstr "E-mail-Adresse:"
 
 #: announcer/templates/prefs_announcer_joinable_components.html:3
 msgid ""
@@ -426,41 +460,41 @@ msgid ""
 "have been defined by the Trac administrators.  If you subscribe to any of"
 " these components, you will receive an notification anytime a ticket "
 "related to that component is changed or created."
-msgstr ""
+msgstr "Komponenten stellen eine Möglichkeit zur Klassifizierung von Trac-Tickets dar. Die folgenden Komponenten sind von Trac-Administratoren vorgegeben worden. Falls Sie eine davon abonnieren, werden Sie benachrichtigt, wenn ein Ticket zu dieser Komponente erstellt oder geändert wird. "
 
 #: announcer/templates/prefs_announcer_joinable_groups.html:3
 msgid ""
 "The following groups have been defined by the Trac administrators. They "
 "are general topics that may be added onto the CC list of tickets (by "
 "prepending their name with @).  Case does matter."
-msgstr ""
+msgstr "Die folgenden Gruppen sind von Trac-Administratoren vorgegeben worden. Dies sind übergeordnete Themen, die in Kopie-Listen (Ticket-Cc) eingefügt werden können (durch Voranstellen von @ vor deren Namen). Groß-/Kleinschreibung ist zu beachten."
 
 #: announcer/templates/prefs_announcer_legacy.html:6
 msgid "Notify me of changes to tickets that belong to components that I own."
-msgstr ""
+msgstr "Benachrichtige mich über alle Änderungen an Tickets, die zu Komponenten gehören, für die ich verantwortlich bin."
 
 #: announcer/templates/prefs_announcer_legacy.html:10
 msgid "Notify me of changes to tickets that I own."
-msgstr ""
+msgstr "Benachrichtige mich über Änderungen an Tickets, für die ich verantwortlich bin."
 
 #: announcer/templates/prefs_announcer_legacy.html:14
 msgid "Notify me of changes to tickets that I reported."
-msgstr ""
+msgstr "Benachrichtige mich über alle Änderungen an Tickets, die ich erstellt habe."
 
 #: announcer/templates/prefs_announcer_legacy.html:18
 msgid "Notify me when I update a ticket."
-msgstr ""
+msgstr "Benachrichtige mich, wenn ich selbst ein Ticket aktualisiere."
 
 #: announcer/templates/prefs_announcer_rules.html:4
 msgid ""
 "The rule-based subscription module is for advanced users, and allows you "
 "to use filters to specify which events you are interested in hearing "
 "about."
-msgstr ""
+msgstr "Das regelgestützte Abonnement für erfahrene Nutzer erlaubt Ihnen, Filter zur Beschreibung von Ereignissen zu nutzen, von denen Sie gern benachrichtigt werden möchten."
 
 #: announcer/templates/prefs_announcer_rules.html:7
 msgid "Every rule is in the form of:"
-msgstr ""
+msgstr "Jede Regel hat die folgende Form:"
 
 #: announcer/templates/prefs_announcer_rules.html:9
 msgid "realm"
@@ -476,22 +510,22 @@ msgstr ""
 
 #: announcer/templates/prefs_announcer_unsubscribe_all.html:3
 msgid "Opt-out of all announcements."
-msgstr ""
+msgstr "Aller Benachrichtigungen werden ablehnt."
 
 #: announcer/templates/prefs_announcer_unsubscribe_all.html:6
 msgid "Never notify me of any changes."
-msgstr ""
+msgstr "Benachrichte mich niemals über Änderungen."
 
 #: announcer/templates/prefs_announcer_watch_users.html:3
 msgid ""
 "A comma seperated list of users you would like to watch.  Watched users "
 "will create an announcement each time the user creates or changes a wiki "
 "page or ticket."
-msgstr ""
+msgstr "Das ist eine Liste mit durch Kommata getrennten Nutzernamen, die Sie beobachten möchten. Beobachtete Nutzer erzeugen immer dann eine Benachrichtigung, wenn diese eine Wiki-Seite oder ein Ticket erstellen oder ändern."
 
 #: announcer/templates/prefs_announcer_watch_users.html:5
 msgid "Watch Users:"
-msgstr ""
+msgstr "Beobachte Nutzer:"
 
 #: announcer/templates/prefs_announcer_wiki.html:5
 msgid ""
@@ -499,26 +533,26 @@ msgid ""
 "pages, you may list here\n"
 "    pages that are of interest to you. Each page should be on a separate "
 "line."
-msgstr ""
+msgstr "Ergänzend zu anderen Methoden, die Sie über Änderungen von Wiki-Seiten benachrichtigen, können Sie hier Seiten angeben, die Sie interessieren. Jede Seite gehört dabei auf eine eigene Zeile."
 
 #: announcer/templates/prefs_announcer_wiki.html:10
 msgid ""
 "You may use wild cards, so that if you want to hear about any page that "
 "starts with the name 'Trac'\n"
 "    you would enter on it's own line:"
-msgstr ""
+msgstr "Sie können Platzhalter verwenden. Wenn Sie über alle Seiten benachrichtigt werden möchten, deren Name mit 'Trac' beginnt, dann geben Sie auf einer Zeile ein:"
 
 #: announcer/templates/prefs_announcer_wiki.html:12
 msgid "Trac*"
-msgstr ""
+msgstr "Trac*"
 
 #: announcer/templates/prefs_announcer_wiki.html:15
 msgid "To receive a notice about all wiki changes, simply include a"
-msgstr ""
+msgstr "Um Benachrichtigungen über alle Wiki-Seiten-Änderungen zu erhalten, geben Sie bitte nur"
 
 #: announcer/templates/prefs_announcer_wiki.html:16
 msgid "by itself."
-msgstr ""
+msgstr "ein."
 
 #: announcer/templates/ticket_email_mimic.html:114
 msgid "Ticket #"
@@ -746,5 +780,17 @@ msgid ""
 "{% end %}\\\n"
 "--\n"
 "Page URL: <URL:"
+msgstr ""
+
+#: announcer/util/mail_crypto.py:57
+msgid ""
+"Unable to load the python-gnupg module. Please check and correct your "
+"installation."
+msgstr ""
+
+#: announcer/util/mail_crypto.py:64
+msgid ""
+"Missing the crypto binary. Please check and set full path with option "
+"'gpg_binary'."
 msgstr ""
 
