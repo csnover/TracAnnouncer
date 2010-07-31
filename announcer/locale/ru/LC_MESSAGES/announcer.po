@@ -1,0 +1,900 @@
+# Russian translations for AnnouncerPlugin.
+# Copyright (C) 2010
+# This file is distributed under the same license as the AnnouncerPlugin
+# project.
+# Dmitri Bogomolov <4glitch@gmail.com>, 2010.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: AnnouncerPlugin 0.12\n"
+"Report-Msgid-Bugs-To: hoff.st@web.de\n"
+"POT-Creation-Date: 2010-06-23 21:42+0200\n"
+"PO-Revision-Date: 2010-06-23 22:31+0200\n"
+"Last-Translator: Dmitri Bogomolov <4glitch@gmail.com>\n"
+"Language-Team: ru <LL@li.org>\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 1.0dev-r482\n"
+
+#: announcer/pref.py:62 announcer/templates/prefs_announcer.html:9
+msgid "Announcements"
+msgstr "Извещения"
+
+#: announcer/distributors/mail.py:406
+#, python-format
+msgid "Invalid email encoding setting: %s"
+msgstr "Неправильный выбор почтовой кодировки: %s"
+
+#: announcer/distributors/mail.py:439
+msgid "EmailDistributor crypto operaton successful."
+msgstr ""
+
+#: announcer/distributors/mail.py:462
+msgid "Ticket contains non-ASCII chars. Please change encoding setting"
+msgstr "Билет содержит не-ASCII символы. Пожалуйста измените настройку кодировки"
+
+#: announcer/distributors/mail.py:513
+msgid "undisclosed-recipients: ;"
+msgstr "скрытые адресаты: ;"
+
+#: announcer/distributors/mail.py:541
+msgid "E-Mail Format"
+msgstr "Формат писем"
+
+#: announcer/distributors/mail.py:620
+msgid "TLS enabled but server does not support TLS"
+msgstr "TLS включен, но сервер его не поддерживает"
+
+#: announcer/filters/change_author.py:69
+msgid "Author Filter"
+msgstr "Фильтр автора"
+
+#: announcer/filters/unsubscribe.py:68
+msgid "Unsubscribe From All Announcements"
+msgstr "Отписаться от всех извещений"
+
+#: announcer/opt/acct_mgr/announce.py:114
+msgid "Account Manager Subscription"
+msgstr "Подписки Account Manager"
+
+#: announcer/opt/bitten/announce.py:65
+msgid "Successful"
+msgstr "Успешно"
+
+#: announcer/opt/bitten/announce.py:66
+msgid "Failed"
+msgstr "Неудачно"
+
+#: announcer/opt/bitten/announce.py:128
+msgid "Bitten Subscription"
+msgstr "Подписки Bitten"
+
+#: announcer/opt/fullblog/announce.py:90
+msgid "Blog: ${blog.name} ${action}"
+msgstr "Блог: ${blog.name} ${action}"
+
+#: announcer/opt/fullblog/announce.py:216
+msgid "Blog Subscriptions"
+msgstr "Подписки на блог"
+
+#: announcer/opt/fullblog/announce.py:258
+msgid "My Post"
+msgstr "Моя заметка"
+
+#: announcer/opt/fullblog/announce.py:263
+msgid "New Post"
+msgstr "Новая заметка"
+
+#: announcer/opt/fullblog/announce.py:272
+msgid "Author Post"
+msgstr "Заметка автора"
+
+#: announcer/opt/fullblog/announce.py:276
+msgid "All Blog Events"
+msgstr "Все события блога"
+
+#: announcer/resolvers/specified.py:62
+msgid "Announcement Email Address"
+msgstr "Почтовый адрес для извещений"
+
+#: announcer/subscribers/rulefilters.py:86
+#, fuzzy
+msgid "Rule-based subscriptions"
+msgstr "Подписки по правилам"
+
+#: announcer/subscribers/ticket_compat.py:80
+msgid "Ticket Subscriptions"
+msgstr "Подписки на билеты"
+
+#: announcer/subscribers/ticket_compat.py:117
+#, python-format
+msgid ""
+"LegacyTicketSubscriber couldn't add component owner because component was"
+" not found, message: '%s'"
+msgstr ""
+"LegacyTicketSubscriber не удается добавить владельца компонента, потому "
+"что компонент не найден, сообщение: '%s'"
+
+#: announcer/subscribers/ticket_compat.py:182
+#, fuzzy, python-format
+msgid "CarbonCopySubscriber added '%s <%s>' because of rule: carbon copied"
+msgstr "CarbonCopySubscriber добавил '%s <%s>' по правилу: точная копия"
+
+#: announcer/subscribers/ticket_components.py:65
+msgid "Ticket Component Subscriptions"
+msgstr "Подписки по компонентам"
+
+#: announcer/subscribers/ticket_groups.py:85
+msgid "Group Subscriptions"
+msgstr "Групповые подписки"
+
+#: announcer/subscribers/watch_users.py:63
+msgid "Watch Users"
+msgstr "Наблюдение за пользователями"
+
+#: announcer/subscribers/watchers.py:57 announcer/subscribers/watchers.py:194
+msgid "Watch This"
+msgstr "Наблюдать"
+
+#: announcer/subscribers/watchers.py:57 announcer/subscribers/watchers.py:191
+msgid "Unwatch This"
+msgstr "Не наблюдать"
+
+#: announcer/subscribers/watchers.py:83
+msgid "You are no longer receiving change notifications about this resource."
+msgstr "Вы больше не получаете уведомления по изменениям этомго ресурса."
+
+#: announcer/subscribers/watchers.py:87
+msgid "You are now receiving change notifications about this resource."
+msgstr "Вы теперь получаете уведомления по изменениям этого ресурса."
+
+#: announcer/subscribers/wiki.py:68
+msgid "General Wiki Announcements"
+msgstr "Общие извещения Wiki"
+
+#: announcer/templates/acct_mgr_reset_password_plaintext.txt:1
+msgid ""
+"Your Trac password has been reset.\n"
+"\n"
+"Here is your account information:\n"
+"\n"
+"Login URL: <"
+msgstr ""
+"Ваш пароль trac был сброшен.\n"
+"\n"
+"Здесь информация по вашей учетной записи:\n"
+"\n"
+"URL входа: "
+
+#: announcer/templates/acct_mgr_reset_password_plaintext.txt:5
+#: announcer/templates/acct_mgr_verify_plaintext.txt:3
+msgid ""
+">\n"
+"Username:"
+msgstr ""
+">\n"
+"Имя:"
+
+#: announcer/templates/acct_mgr_reset_password_plaintext.txt:6
+msgid "Password:"
+msgstr "Пароль:"
+
+#: announcer/templates/acct_mgr_user_change_plaintext.txt:1
+msgid "for user"
+msgstr "для пользователя"
+
+#: announcer/templates/acct_mgr_verify_plaintext.txt:1
+msgid ""
+"Please visit the following URL to confirm your email address.\n"
+"\n"
+"Verification URL: <"
+msgstr ""
+"Пожалуйста посетите следующий URL для подтверждения вашего почтового "
+"адреса.\n"
+"\n"
+"Проверочный URL:"
+
+#: announcer/templates/acct_mgr_verify_plaintext.txt:4
+msgid "Verification Token:"
+msgstr "Проверочное слово:"
+
+#: announcer/templates/bitten_plaintext.txt:1
+msgid "build of"
+msgstr ""
+
+#: announcer/templates/bitten_plaintext.txt:1
+msgid ""
+"]\n"
+"---------------------------------------------------------------------\n"
+"\n"
+"  Changeset:"
+msgstr ""
+"]\n"
+"---------------------------------------------------------------------\n"
+"  Набор изменений:"
+
+#: announcer/templates/bitten_plaintext.txt:4
+msgid ""
+">\n"
+"  Committed by:"
+msgstr ""
+">\n"
+"  Зафиксирован пользователем:"
+
+#: announcer/templates/bitten_plaintext.txt:5
+msgid "Build Configuration:"
+msgstr "Конфигурация сборки:"
+
+#: announcer/templates/bitten_plaintext.txt:7
+msgid "Build Slave:"
+msgstr ""
+
+#: announcer/templates/bitten_plaintext.txt:8
+msgid "Build Number:"
+msgstr "Номер сборки:"
+
+#: announcer/templates/bitten_plaintext.txt:9
+#, python-format
+msgid ""
+">\n"
+"{% if build.failed_steps %}\\\n"
+"\n"
+"  Failures:\n"
+"{% for step in build.failed_steps %}\\\n"
+"    Step:"
+msgstr ""
+
+#: announcer/templates/bitten_plaintext.txt:14
+msgid "Errors:"
+msgstr "Ошибки:"
+
+#: announcer/templates/bitten_plaintext.txt:15
+msgid "Log:"
+msgstr "Журнал:"
+
+#: announcer/templates/bitten_plaintext.txt:20
+#, python-format
+msgid ""
+"{% end %}\\\n"
+"{% end %}\\\n"
+"\n"
+"--\n"
+"Build URL: <"
+msgstr ""
+
+#: announcer/templates/fullblog_plaintext.txt:1
+#, python-format
+msgid ""
+"{% if category == 'post created' or category == 'post updated' %}\n"
+"{% if category == 'post created' %}\n"
+"Added post \""
+msgstr ""
+"{% if category == 'post created' or category == 'post updated' %}\n"
+"{% if category == 'post created' %}\n"
+"Добавлена заметка \""
+
+#: announcer/templates/fullblog_plaintext.txt:4
+#: announcer/templates/fullblog_plaintext.txt:7
+#: announcer/templates/fullblog_plaintext.txt:25
+#: announcer/templates/fullblog_plaintext.txt:29
+#: announcer/templates/fullblog_plaintext.txt:33
+msgid "\" by"
+msgstr "\" от"
+
+#: announcer/templates/fullblog_plaintext.txt:4
+#: announcer/templates/fullblog_plaintext.txt:7
+#: announcer/templates/fullblog_plaintext.txt:25
+#: announcer/templates/fullblog_plaintext.txt:29
+#: announcer/templates/fullblog_plaintext.txt:33
+msgid "at"
+msgstr "в"
+
+#: announcer/templates/fullblog_plaintext.txt:4
+#, python-format
+msgid ""
+"{% end %}\\\n"
+"{% if category == 'post updated' %}\\\n"
+"Changed post \""
+msgstr ""
+"{% end %}\\\n"
+"{% if category == 'post updated' %}\\\n"
+"Изменена заметка \""
+
+#: announcer/templates/fullblog_plaintext.txt:7
+msgid ""
+". \n"
+"Revision:"
+msgstr ""
+". \n"
+"Правка:"
+
+#: announcer/templates/fullblog_plaintext.txt:8
+#, python-format
+msgid ""
+"{% end %}\\\n"
+"Page URL:"
+msgstr ""
+"{% end %}\\\n"
+"URL страницы:"
+
+#: announcer/templates/fullblog_plaintext.txt:10
+msgid ""
+"Content:\n"
+"\n"
+"Title:"
+msgstr ""
+"Содержимое:\n"
+"\n"
+"Заголовок:"
+
+#: announcer/templates/fullblog_plaintext.txt:15
+#, python-format
+msgid ""
+"{% if comment %}\\\n"
+"Comment:"
+msgstr ""
+"{% if comment %}\\\n"
+"Комментарий:"
+
+#: announcer/templates/fullblog_plaintext.txt:20
+#, python-format
+msgid ""
+"{% end %}\\\n"
+"{% end %}\\\n"
+"\n"
+"{% if category == 'post deleted' %}\\\n"
+"Deleted post \""
+msgstr ""
+"{% end %}\\\n"
+"{% end %}\\\n"
+"\n"
+"{% if category == 'post deleted' %}\\\n"
+"Удалена заметка \""
+
+#: announcer/templates/fullblog_plaintext.txt:25
+#, python-format
+msgid ""
+"{% end %}\\\n"
+"{% if category == 'post deleted' %}\\\n"
+"Page URL:"
+msgstr ""
+"{% end %}\\\n"
+"{% if category == 'post deleted' %}\\\n"
+"URL страницы:"
+
+#: announcer/templates/fullblog_plaintext.txt:28
+msgid "Deleted version \""
+msgstr "Удалена версия \""
+
+#: announcer/templates/fullblog_plaintext.txt:29
+msgid "\" of post \""
+msgstr "\" заметки \""
+
+#: announcer/templates/fullblog_plaintext.txt:29
+#, python-format
+msgid ""
+"{% end %}\\\n"
+"\n"
+"{% if category == 'comment created' %}\\\n"
+"Comment added to post \""
+msgstr ""
+"{% end %}\\\n"
+"\n"
+"{% if category == 'comment created' %}\\\n"
+"Добавлен комментарий к заметке \""
+
+#: announcer/templates/fullblog_plaintext.txt:33
+msgid "Page URL:"
+msgstr "URL страницы:"
+
+#: announcer/templates/fullblog_plaintext.txt:34
+msgid "Content:"
+msgstr "Содержимое:"
+
+#: announcer/templates/fullblog_plaintext.txt:37
+#, python-format
+msgid "{% end %}"
+msgstr ""
+
+#: announcer/templates/prefs_announcer.html:12
+msgid ""
+"Announcements serve as a method for Trac to communicate events to you; \n"
+"      the creation of a ticket, the change of a Wiki page, and so on. "
+"Under\n"
+"      the Announcement system, you will only receive notifications to "
+"those\n"
+"      topics that you subscribe to."
+msgstr ""
+"Извещения это способ сообщать вам о событиях Trac: \n"
+"      создание билета, изменения страницы Wiki, и т.п. В подходе "
+"извещений вы получаете уведомления только о тех темах,\n"
+"      на которые вы сами подписались."
+
+#: announcer/templates/prefs_announcer_acct_mgr_subscription.html:3
+msgid "Subscribe to user account announcements."
+msgstr "Подписаться на извещения о пользовательских профилях."
+
+#: announcer/templates/prefs_announcer_acct_mgr_subscription.html:7
+msgid "Send me announcements when new users are created."
+msgstr "Посылать извещения при создании новых пользователей."
+
+#: announcer/templates/prefs_announcer_acct_mgr_subscription.html:8
+#, fuzzy
+msgid "Send me announcements when users accounts are changed."
+msgstr "Посылать извещения при изменении пользовательских профилей."
+
+#: announcer/templates/prefs_announcer_acct_mgr_subscription.html:9
+msgid "Send me announcements when users accounts are deleted."
+msgstr "Посылать извещения при удалении пользовательских профилей."
+
+#: announcer/templates/prefs_announcer_author_filter.html:3
+msgid "Opt-out of announcements about my own changes."
+msgstr "Отказаться от извещений о моих собственных действиях."
+
+#: announcer/templates/prefs_announcer_author_filter.html:6
+msgid "Never notify me when I make a change."
+msgstr "Никогда не извещать о моих изменениях."
+
+#: announcer/templates/prefs_announcer_bitten.html:3
+msgid "Subscribe to build announcements."
+msgstr ""
+
+#: announcer/templates/prefs_announcer_bitten.html:7
+msgid "Subscribe me to build started announcements."
+msgstr ""
+
+#: announcer/templates/prefs_announcer_bitten.html:8
+msgid "Subscribe me to build aborted announcements."
+msgstr ""
+
+#: announcer/templates/prefs_announcer_bitten.html:9
+msgid "Subscribe me to build completed announcements."
+msgstr ""
+
+#: announcer/templates/prefs_announcer_blog.html:6
+msgid "Notify me of any changes to my blog posts."
+msgstr "Уведомлять о любых изменениях моих заметок в блоге."
+
+#: announcer/templates/prefs_announcer_blog.html:9
+msgid "Notify me of any new blog posts."
+msgstr "Уведомлять о любых новых заметках в блоге."
+
+#: announcer/templates/prefs_announcer_blog.html:12
+msgid "Notify me of any blog changes."
+msgstr "Уведомлять о любых изменениях в блоге."
+
+#: announcer/templates/prefs_announcer_blog.html:15
+msgid "Comma seperated list of blog authors to follow:"
+msgstr ""
+
+#: announcer/templates/prefs_announcer_email.html:3
+msgid ""
+"By default, the Announcer will deliver all notices to you in a plaintext "
+"format. You\n"
+"  may override this for each realm that may generate announcements."
+msgstr ""
+"По умолчанию все уведомления доставляются в виде простого текста. Вы "
+"можете переопределить это поведение для каждого раздела, который может "
+"генерировать извещения."
+
+#: announcer/templates/prefs_announcer_email.html:7
+msgid "announcements:"
+msgstr "извещения:"
+
+#: announcer/templates/prefs_announcer_emailaddress.html:3
+msgid ""
+"If you would like to have announcement notices sent to a different "
+"address then the main one provided\n"
+"  in Trac, you may specify the address here:"
+msgstr ""
+"Если вы хотите получать извещения на адрес, отличный от указанного "
+"глобально в Trac, вы можете указать его здесь:"
+
+#: announcer/templates/prefs_announcer_emailaddress.html:8
+msgid "Email address:"
+msgstr "Почтовый адрес"
+
+#: announcer/templates/prefs_announcer_joinable_components.html:3
+msgid ""
+"Components are a way to classify trac tickets.  The following components "
+"have been defined by the Trac administrators.  If you subscribe to any of"
+" these components, you will receive an notification anytime a ticket "
+"related to that component is changed or created."
+msgstr ""
+"Компоненты это способ классификации билетов. Следующие компоненты созданы"
+" администратором Trac. Если вы подпишетесь на компонент, то будете "
+"получать уведомление при создании или изменении билетов, связанных с этим"
+" компонентом."
+
+#: announcer/templates/prefs_announcer_joinable_groups.html:3
+msgid ""
+"The following groups have been defined by the Trac administrators. They "
+"are general topics that may be added onto the CC list of tickets (by "
+"prepending their name with @).  Case does matter."
+msgstr ""
+"Следующие группы созданы администратором Trac. Они являются обобщенными "
+"адресатами, которые могут быть добавлены в список CC билета (имена "
+"предваряются @). Регистр не имеет значения."
+
+#: announcer/templates/prefs_announcer_legacy.html:6
+msgid "Notify me of changes to tickets that belong to components that I own."
+msgstr "Уведомлять меня об изменениях билетов из компонентов, которыми я владею."
+
+#: announcer/templates/prefs_announcer_legacy.html:10
+msgid "Notify me of changes to tickets that I own."
+msgstr "Уведомлять меня об изменениях в моих билетах."
+
+#: announcer/templates/prefs_announcer_legacy.html:14
+msgid "Notify me of changes to tickets that I reported."
+msgstr "Уведомлять меня об изменениях в билетах, которые я открыл."
+
+#: announcer/templates/prefs_announcer_legacy.html:18
+msgid "Notify me when I update a ticket."
+msgstr "Уведомлять меня о моих изменениях в билетах."
+
+#: announcer/templates/prefs_announcer_rules.html:4
+msgid ""
+"The rule-based subscription module is for advanced users, and allows you "
+"to use filters to specify which events you are interested in hearing "
+"about."
+msgstr ""
+"Модуль подписок по правилам предназначен для опытных пользователей и "
+"позволяет вам использовать фильтры для указания событий, о которых вам "
+"интересно узнать."
+
+#: announcer/templates/prefs_announcer_rules.html:7
+msgid "Every rule is in the form of:"
+msgstr "Каждое правило в формате:"
+
+#: announcer/templates/prefs_announcer_rules.html:9
+msgid "realm"
+msgstr "раздел"
+
+#: announcer/templates/prefs_announcer_rules.html:9
+msgid "category"
+msgstr "категория"
+
+#: announcer/templates/prefs_announcer_rules.html:9
+#, fuzzy
+msgid "query rule"
+msgstr "правило запроса"
+
+#: announcer/templates/prefs_announcer_unsubscribe_all.html:3
+msgid "Opt-out of all announcements."
+msgstr "Отказаться от всех извещений."
+
+#: announcer/templates/prefs_announcer_unsubscribe_all.html:6
+msgid "Never notify me of any changes."
+msgstr "Не уведомлять меня ни о каких изменениях."
+
+#: announcer/templates/prefs_announcer_watch_users.html:3
+msgid ""
+"A comma seperated list of users you would like to watch.  Watched users "
+"will create an announcement each time the user creates or changes a wiki "
+"page or ticket."
+msgstr ""
+"Список наблюдаемых пользователей, разделенных запятыми. Извещение будет "
+"приходить каждый раз, когда один из указанных пользователей создает или "
+"меняет страницу wiki или билет."
+
+#: announcer/templates/prefs_announcer_watch_users.html:5
+msgid "Watch Users:"
+msgstr "Наблюдать за пользователями:"
+
+#: announcer/templates/prefs_announcer_wiki.html:5
+msgid ""
+"In addition to other methods that may notify you of changes to Wiki "
+"pages, you may list here\n"
+"    pages that are of interest to you. Each page should be on a separate "
+"line."
+msgstr ""
+"В дополнение к прочим методом уведемления об изменениях в wiki, здесь вы "
+"можете указать интересующие вас страницы. Каждое имя должно быть на "
+"отдельной строке."
+
+#: announcer/templates/prefs_announcer_wiki.html:10
+msgid ""
+"You may use wild cards, so that if you want to hear about any page that "
+"starts with the name 'Trac'\n"
+"    you would enter on it's own line:"
+msgstr ""
+"Вы можете использовать сокращения, так, если вы хотите следить за всеми "
+"страницами, с именем, начинающимся 'Trac', нужно в новой строке вписать:"
+
+#: announcer/templates/prefs_announcer_wiki.html:12
+msgid "Trac*"
+msgstr ""
+
+#: announcer/templates/prefs_announcer_wiki.html:15
+msgid "To receive a notice about all wiki changes, simply include a"
+msgstr "Для получения сообщения о любых изменениях в wiki просто вставьте"
+
+#: announcer/templates/prefs_announcer_wiki.html:16
+msgid "by itself."
+msgstr "саму по себе"
+
+#: announcer/templates/ticket_email_mimic.html:114
+msgid "Ticket #"
+msgstr "Билет №"
+
+#: announcer/templates/ticket_email_mimic.html:124
+msgid "Description"
+msgstr "Описание"
+
+#: announcer/templates/ticket_email_mimic.html:129
+msgid "Changes: (by"
+msgstr "Изменения: (от"
+
+#: announcer/templates/ticket_email_mimic.html:132
+msgid ""
+"changed \n"
+"          from"
+msgstr ""
+"изменено \n"
+"         с"
+
+#: announcer/templates/ticket_email_mimic.html:133
+msgid "to"
+msgstr "на"
+
+#: announcer/templates/ticket_email_mimic.html:145
+msgid "Attachments:"
+msgstr "Вложения:"
+
+#: announcer/templates/ticket_email_mimic.html:147
+msgid "File"
+msgstr "Файл"
+
+#: announcer/templates/ticket_email_mimic.html:147
+msgid "added"
+msgstr "добавлен"
+
+#: announcer/templates/ticket_email_mimic.html:151
+msgid "Comments:"
+msgstr "Комментарии:"
+
+#: announcer/templates/ticket_email_mimic.html:151
+msgid "(by"
+msgstr "(от"
+
+#: announcer/templates/ticket_email_mimic.html:157
+msgid "Ticket URL:"
+msgstr "Адрес билета:"
+
+#: announcer/templates/ticket_email_plaintext.txt:1
+#, python-format
+msgid ""
+"---------------------------------------------------------------------\n"
+"{% for field in fields %}\\\n"
+"{% choose %}\\\n"
+"{% when ticket[field['name']] %}\\"
+msgstr ""
+
+#: announcer/templates/ticket_email_plaintext.txt:5
+#, python-format
+msgid ""
+"{% end %}\\\n"
+"{% otherwise %}\\"
+msgstr ""
+
+#: announcer/templates/ticket_email_plaintext.txt:7
+#, python-format
+msgid ""
+": (None)\n"
+"{% end %}\\\n"
+"{% end %}\\\n"
+"{% end %}\\\n"
+"{% if category == 'created' %}\\\n"
+"---------------------------------------------------------------------"
+msgstr ""
+
+#: announcer/templates/ticket_email_plaintext.txt:12
+#, python-format
+msgid ""
+"{% end %}\\\n"
+"{% if has_changes or attachment %}\\\n"
+"---------------------------------------------------------------------\n"
+"Changes (by"
+msgstr ""
+"{% end %}\\\n"
+"{% if has_changes or attachment %}\\\n"
+"---------------------------------------------------------------------\n"
+"Изменения (от"
+
+#: announcer/templates/ticket_email_plaintext.txt:16
+#, python-format
+msgid ""
+"): \n"
+"{% for change in short_changes %}\n"
+" *"
+msgstr ""
+
+#: announcer/templates/ticket_email_plaintext.txt:18
+msgid "from '"
+msgstr "с '"
+
+#: announcer/templates/ticket_email_plaintext.txt:18
+#, python-format
+msgid ""
+"' to \\\n"
+"{% choose %}\\\n"
+"{% when short_changes[change][1] %}\\\n"
+"'"
+msgstr ""
+"' на \\\n"
+"{% choose %}\\\n"
+"{% when short_changes[change][1] %}\\\n"
+"'"
+
+#: announcer/templates/ticket_email_plaintext.txt:21
+#, python-format
+msgid ""
+"'{% end %}\\\n"
+"{% otherwise %}\\\n"
+"(deleted){% end %}\\\n"
+"{% end %}\\\n"
+"{% end %}\\\n"
+"{% for change in long_changes %}\\\n"
+"\n"
+" *"
+msgstr ""
+
+#: announcer/templates/ticket_email_plaintext.txt:28
+#, python-format
+msgid ""
+"{% end %}\\\n"
+"{% end %}\\\n"
+"{% if attachment %}\\\n"
+"Attachment:\n"
+" * File '"
+msgstr ""
+"{% end %}\\\n"
+"{% end %}\\\n"
+"{% if attachment %}\\\n"
+"Вложение:\n"
+" * Файл '"
+
+#: announcer/templates/ticket_email_plaintext.txt:33
+#, python-format
+msgid "' added{% if attachment.description %}:"
+msgstr "' добавлен{% if attachment.description %}:"
+
+#: announcer/templates/ticket_email_plaintext.txt:33
+#, python-format
+msgid ""
+"{% end %}\n"
+"{% end %}\\\n"
+"{% if comment %}\\\n"
+"\n"
+"---------------------------------------------------------------------\n"
+"Comment{% if not has_changes %} (by"
+msgstr ""
+"{% end %}\n"
+"{% end %}\\\n"
+"{% if comment %}\\\n"
+"\n"
+"---------------------------------------------------------------------\n"
+"Комментарий{% if not has_changes %} (от"
+
+#: announcer/templates/ticket_email_plaintext.txt:38
+#, python-format
+msgid "){% end %}:"
+msgstr ""
+
+#: announcer/templates/ticket_email_plaintext.txt:39
+#, python-format
+msgid ""
+"\\\n"
+"{% end %}\\\n"
+"\n"
+"--\n"
+"Ticket URL: <URL:"
+msgstr ""
+"\\\n"
+"{% end %}\\\n"
+"\n"
+"--\n"
+"Адрес билета: <URL:"
+
+#: announcer/templates/ticket_email_plaintext.txt:43
+#: announcer/templates/wiki_email_plaintext.txt:11
+msgid "<URL:"
+msgstr ""
+
+#: announcer/templates/wiki_email_plaintext.txt:1
+#, python-format
+msgid ""
+"{% choose %}\\\n"
+"{% when action == \"created\" %} * The user '"
+msgstr ""
+"{% choose %}\\\n"
+"{% when action == \\\"created\\\" %} * Пользователь '"
+
+#: announcer/templates/wiki_email_plaintext.txt:2
+msgid "' has created the page:"
+msgstr "' создал страницу:"
+
+#: announcer/templates/wiki_email_plaintext.txt:2
+#, python-format
+msgid ""
+". {% end %}\\\n"
+"{% when action == \"changed\" %} * The user '"
+msgstr ""
+". {% end %}\\\n"
+"{% when action == \\\"changed\\\" %} * Пользователь '"
+
+#: announcer/templates/wiki_email_plaintext.txt:3
+msgid "' has changed the page:"
+msgstr "' изменил страницу:"
+
+#: announcer/templates/wiki_email_plaintext.txt:3
+msgid ""
+".\n"
+" * Diff link: <URL:"
+msgstr ""
+".\n"
+" * Ссылка на разницу: <URL:"
+
+#: announcer/templates/wiki_email_plaintext.txt:4
+#, python-format
+msgid ""
+"{% end %}\\\n"
+"{% when action == \"attachment added\" %} * The user '"
+msgstr ""
+"{% end %}\\\n"
+"{% when action == \\\"attachment added\\\" %} * Пользователь '"
+
+#: announcer/templates/wiki_email_plaintext.txt:6
+msgid "' has added the attachment '"
+msgstr "' добавил вложение '"
+
+#: announcer/templates/wiki_email_plaintext.txt:6
+msgid "' to the page:"
+msgstr "' к странице:"
+
+#: announcer/templates/wiki_email_plaintext.txt:6
+#, python-format
+msgid ""
+". {% end %}\\\n"
+"{% when action == \"version deleted\" %} * The page '"
+msgstr ""
+". {% end %}\\\n"
+"{% when action == \\\"version deleted\\\" %} * Страница '"
+
+#: announcer/templates/wiki_email_plaintext.txt:7
+#, python-format
+msgid ""
+"' has been reverted to its previous version. {% end %}\\\n"
+"{% when action == \"deleted\" %} * The '"
+msgstr ""
+"' возвращена к предыдущей версии. {% end %}\\\n"
+"{% when action == \\\"deleted\\\" %} * '"
+
+#: announcer/templates/wiki_email_plaintext.txt:8
+#, python-format
+msgid ""
+"' has been deleted. {% end %}\\\n"
+"{% end %}\\\n"
+"--\n"
+"Page URL: <URL:"
+msgstr ""
+"' была удалена. {% end %}\\\n"
+"{% end %}\\\n"
+"--\n"
+"Адрес страницы: <URL:"
+
+#: announcer/util/mail_crypto.py:57
+msgid ""
+"Unable to load the python-gnupg module. Please check and correct your "
+"installation."
+msgstr "Не удалось загрузить модуль python-gnupg. Пожалуйста, проверьте и исправьте вашу установку."
+
+#: announcer/util/mail_crypto.py:64
+msgid ""
+"Missing the crypto binary. Please check and set full path with option "
+"'gpg_binary'."
+msgstr ""
+
