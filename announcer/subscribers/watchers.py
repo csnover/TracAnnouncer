@@ -43,7 +43,7 @@ from trac.ticket.api import ITicketChangeListener
 from trac.wiki.api import IWikiChangeListener
 from trac.util.text import to_unicode
 from genshi.builder import tag
-from announcer.api import IAnnouncementSubscriber
+from announcer.api import IAnnouncementSubscriber, _
 
 class WatchSubscriber(Component):
 
@@ -54,7 +54,7 @@ class WatchSubscriber(Component):
         'wiki/*,ticket/*',
         doc='List of URL paths to allow watching. Globs are supported.')
     ctxtnav_names = ListOption('announcer', 'ctxtnav_names',
-        ['Watch This','Unwatch This'],
+        [_('Watch This'),_('Unwatch This')],
         doc="Text of context navigation entries. "
             "An empty list removes them from the context navigation bar.")
 
@@ -80,12 +80,12 @@ class WatchSubscriber(Component):
         realm, resource = resource.split('/', 1)
         if self.is_watching(sid, authenticated, realm, resource):
             self.set_unwatch(sid, authenticated, realm, resource)
-            self._schedule_notice(req, 'You are no longer receiving ' \
-                    'change notifications about this resource.')
+            self._schedule_notice(req, _('You are no longer receiving ' \
+                    'change notifications about this resource.'))
         else:
             self.set_watch(sid, authenticated, realm, resource)
-            self._schedule_notice(req, 'You are now receiving ' \
-                    'change notifications about this resource.')
+            self._schedule_notice(req, _('You are now receiving ' \
+                    'change notifications about this resource.'))
             
     def _schedule_notice(self, req, message):
         req.session['_announcer_watch_message_'] = message
@@ -188,10 +188,10 @@ class WatchSubscriber(Component):
         if self.is_watching(req.session.sid, not req.authname == 'anonymous', 
                 realm, resource):
             action_name = len(self.ctxtnav_names) >= 2 and \
-                    self.ctxtnav_names[1] or 'Unwatch This'
+                    self.ctxtnav_names[1] or _('Unwatch This')
         else:
             action_name = len(self.ctxtnav_names) and \
-                    self.ctxtnav_names[0] or 'Watch This'
+                    self.ctxtnav_names[0] or _('Watch This')
         add_ctxtnav(req, 
             tag.a(
                 action_name, href=req.href.watch(realm, resource)

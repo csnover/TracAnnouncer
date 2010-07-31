@@ -61,7 +61,7 @@ class CryptoTxt:
             # get list of available public keys once for later use
             self.pubkeys = self.gpg.list_keys() # same as gpg.list_keys(False)
         except ValueError:
-            raise TracError(_("Missing the crypto binary." \
+            raise TracError(_("Missing the crypto binary. " \
                               "Please check and set full path " \
                               "with option 'gpg_binary'."))
 

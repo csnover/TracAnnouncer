@@ -7,9 +7,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: AnnouncerPlugin 0.12\n"
+"Project-Id-Version: AnnouncerPlugin 0.12-p2\n"
 "Report-Msgid-Bugs-To: hoff.st@web.de\n"
-"POT-Creation-Date: 2010-05-25 23:49+0200\n"
+"POT-Creation-Date: 2010-06-23 21:42+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,24 +22,28 @@ msgstr ""
 msgid "Announcements"
 msgstr ""
 
-#: announcer/distributors/mail.py:310
+#: announcer/distributors/mail.py:406
 #, python-format
 msgid "Invalid email encoding setting: %s"
 msgstr ""
 
-#: announcer/distributors/mail.py:346
+#: announcer/distributors/mail.py:439
+msgid "EmailDistributor crypto operaton successful."
+msgstr ""
+
+#: announcer/distributors/mail.py:462
 msgid "Ticket contains non-ASCII chars. Please change encoding setting"
 msgstr ""
 
-#: announcer/distributors/mail.py:396
+#: announcer/distributors/mail.py:513
 msgid "undisclosed-recipients: ;"
 msgstr ""
 
-#: announcer/distributors/mail.py:422
+#: announcer/distributors/mail.py:541
 msgid "E-Mail Format"
 msgstr ""
 
-#: announcer/distributors/mail.py:501
+#: announcer/distributors/mail.py:620
 msgid "TLS enabled but server does not support TLS"
 msgstr ""
 
@@ -125,6 +129,24 @@ msgstr ""
 
 #: announcer/subscribers/watch_users.py:63
 msgid "Watch Users"
+msgstr ""
+
+#: announcer/subscribers/watchers.py:57
+#: announcer/subscribers/watchers.py:194
+msgid "Watch This"
+msgstr ""
+
+#: announcer/subscribers/watchers.py:57
+#: announcer/subscribers/watchers.py:191
+msgid "Unwatch This"
+msgstr ""
+
+#: announcer/subscribers/watchers.py:83
+msgid "You are no longer receiving change notifications about this resource."
+msgstr ""
+
+#: announcer/subscribers/watchers.py:87
+msgid "You are now receiving change notifications about this resource."
 msgstr ""
 
 #: announcer/subscribers/wiki.py:68
@@ -752,5 +774,17 @@ msgid ""
 "{% end %}\\\n"
 "--\n"
 "Page URL: <URL:"
+msgstr ""
+
+#: announcer/util/mail_crypto.py:57
+msgid ""
+"Unable to load the python-gnupg module. Please check and correct your"
+" installation."
+msgstr ""
+
+#: announcer/util/mail_crypto.py:64
+msgid ""
+"Missing the crypto binary. Please check and set full path with option"
+" 'gpg_binary'."
 msgstr ""
 
