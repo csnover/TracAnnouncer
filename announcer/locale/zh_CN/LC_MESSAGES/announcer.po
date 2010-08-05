@@ -8,19 +8,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: AnnouncerPlugin 0.12\n"
 "Report-Msgid-Bugs-To: hoff.st@web.de\n"
-"POT-Creation-Date: 2010-06-23 21:42+0200\n"
+"POT-Creation-Date: 2010-08-05 13:11+0200\n"
 "PO-Revision-Date: 2010-07-23 15:35+0800\n"
 "Last-Translator: Jake Li <gnozil@gmail.com>\n"
 "Language-Team: Simplified Chinese\n"
+"Plural-Forms: nplurals=1; plural=0\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.0dev-r482\n"
-"X-Poedit-Language: Chinese\n"
-"X-Poedit-Country: CHINA\n"
 
-#: announcer/pref.py:62
-#: announcer/templates/prefs_announcer.html:9
+#: announcer/pref.py:62 announcer/templates/prefs_announcer.html:9
 msgid "Announcements"
 msgstr "声明"
 
@@ -111,7 +109,9 @@ msgstr ""
 
 #: announcer/subscribers/ticket_compat.py:117
 #, python-format
-msgid "LegacyTicketSubscriber couldn't add component owner because component was not found, message: '%s'"
+msgid ""
+"LegacyTicketSubscriber couldn't add component owner because component was"
+" not found, message: '%s'"
 msgstr ""
 
 #: announcer/subscribers/ticket_compat.py:182
@@ -131,13 +131,11 @@ msgstr ""
 msgid "Watch Users"
 msgstr ""
 
-#: announcer/subscribers/watchers.py:57
-#: announcer/subscribers/watchers.py:194
+#: announcer/subscribers/watchers.py:57 announcer/subscribers/watchers.py:194
 msgid "Watch This"
 msgstr ""
 
-#: announcer/subscribers/watchers.py:57
-#: announcer/subscribers/watchers.py:191
+#: announcer/subscribers/watchers.py:57 announcer/subscribers/watchers.py:191
 msgid "Unwatch This"
 msgstr ""
 
@@ -359,8 +357,10 @@ msgstr ""
 #: announcer/templates/prefs_announcer.html:12
 msgid ""
 "Announcements serve as a method for Trac to communicate events to you; \n"
-"      the creation of a ticket, the change of a Wiki page, and so on. Under\n"
-"      the Announcement system, you will only receive notifications to those\n"
+"      the creation of a ticket, the change of a Wiki page, and so on. "
+"Under\n"
+"      the Announcement system, you will only receive notifications to "
+"those\n"
 "      topics that you subscribe to."
 msgstr ""
 
@@ -422,7 +422,8 @@ msgstr ""
 
 #: announcer/templates/prefs_announcer_email.html:3
 msgid ""
-"By default, the Announcer will deliver all notices to you in a plaintext format. You\n"
+"By default, the Announcer will deliver all notices to you in a plaintext "
+"format. You\n"
 "  may override this for each realm that may generate announcements."
 msgstr ""
 
@@ -432,7 +433,8 @@ msgstr "声明："
 
 #: announcer/templates/prefs_announcer_emailaddress.html:3
 msgid ""
-"If you would like to have announcement notices sent to a different address then the main one provided\n"
+"If you would like to have announcement notices sent to a different "
+"address then the main one provided\n"
 "  in Trac, you may specify the address here:"
 msgstr ""
 
@@ -441,11 +443,18 @@ msgid "Email address:"
 msgstr "邮件地址："
 
 #: announcer/templates/prefs_announcer_joinable_components.html:3
-msgid "Components are a way to classify trac tickets.  The following components have been defined by the Trac administrators.  If you subscribe to any of these components, you will receive an notification anytime a ticket related to that component is changed or created."
+msgid ""
+"Components are a way to classify trac tickets.  The following components "
+"have been defined by the Trac administrators.  If you subscribe to any of"
+" these components, you will receive an notification anytime a ticket "
+"related to that component is changed or created."
 msgstr ""
 
 #: announcer/templates/prefs_announcer_joinable_groups.html:3
-msgid "The following groups have been defined by the Trac administrators. They are general topics that may be added onto the CC list of tickets (by prepending their name with @).  Case does matter."
+msgid ""
+"The following groups have been defined by the Trac administrators. They "
+"are general topics that may be added onto the CC list of tickets (by "
+"prepending their name with @).  Case does matter."
 msgstr ""
 
 #: announcer/templates/prefs_announcer_legacy.html:6
@@ -465,7 +474,10 @@ msgid "Notify me when I update a ticket."
 msgstr ""
 
 #: announcer/templates/prefs_announcer_rules.html:4
-msgid "The rule-based subscription module is for advanced users, and allows you to use filters to specify which events you are interested in hearing about."
+msgid ""
+"The rule-based subscription module is for advanced users, and allows you "
+"to use filters to specify which events you are interested in hearing "
+"about."
 msgstr ""
 
 #: announcer/templates/prefs_announcer_rules.html:7
@@ -493,22 +505,28 @@ msgid "Never notify me of any changes."
 msgstr ""
 
 #: announcer/templates/prefs_announcer_watch_users.html:3
-msgid "A comma seperated list of users you would like to watch.  Watched users will create an announcement each time the user creates or changes a wiki page or ticket."
+msgid ""
+"A comma separated list of users you would like to watch. A watched user \n"
+"     will create an announcement each time he/she creates or changes\n"
+"     a wiki page or ticket."
 msgstr ""
 
-#: announcer/templates/prefs_announcer_watch_users.html:5
+#: announcer/templates/prefs_announcer_watch_users.html:7
 msgid "Watch Users:"
 msgstr ""
 
 #: announcer/templates/prefs_announcer_wiki.html:5
 msgid ""
-"In addition to other methods that may notify you of changes to Wiki pages, you may list here\n"
-"    pages that are of interest to you. Each page should be on a separate line."
+"In addition to other methods that may notify you of changes to Wiki "
+"pages, you may list here\n"
+"    pages that are of interest to you. Each page should be on a separate "
+"line."
 msgstr ""
 
 #: announcer/templates/prefs_announcer_wiki.html:10
 msgid ""
-"You may use wild cards, so that if you want to hear about any page that starts with the name 'Trac'\n"
+"You may use wild cards, so that if you want to hear about any page that "
+"starts with the name 'Trac'\n"
 "    you would enter on it's own line:"
 msgstr ""
 
@@ -753,10 +771,14 @@ msgid ""
 msgstr ""
 
 #: announcer/util/mail_crypto.py:57
-msgid "Unable to load the python-gnupg module. Please check and correct your installation."
+msgid ""
+"Unable to load the python-gnupg module. Please check and correct your "
+"installation."
 msgstr ""
 
 #: announcer/util/mail_crypto.py:64
-msgid "Missing the crypto binary. Please check and set full path with option 'gpg_binary'."
+msgid ""
+"Missing the crypto binary. Please check and set full path with option "
+"'gpg_binary'."
 msgstr ""
 

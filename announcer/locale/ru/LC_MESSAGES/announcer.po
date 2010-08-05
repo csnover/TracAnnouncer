@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: AnnouncerPlugin 0.12\n"
 "Report-Msgid-Bugs-To: hoff.st@web.de\n"
-"POT-Creation-Date: 2010-06-23 21:42+0200\n"
+"POT-Creation-Date: 2010-08-05 13:11+0200\n"
 "PO-Revision-Date: 2010-06-23 22:31+0200\n"
 "Last-Translator: Dmitri Bogomolov <4glitch@gmail.com>\n"
 "Language-Team: ru <LL@li.org>\n"
@@ -571,16 +571,17 @@ msgid "Never notify me of any changes."
 msgstr "Не уведомлять меня ни о каких изменениях."
 
 #: announcer/templates/prefs_announcer_watch_users.html:3
+#, fuzzy
 msgid ""
-"A comma seperated list of users you would like to watch.  Watched users "
-"will create an announcement each time the user creates or changes a wiki "
-"page or ticket."
+"A comma separated list of users you would like to watch. A watched user \n"
+"     will create an announcement each time he/she creates or changes\n"
+"     a wiki page or ticket."
 msgstr ""
 "Список наблюдаемых пользователей, разделенных запятыми. Извещение будет "
 "приходить каждый раз, когда один из указанных пользователей создает или "
 "меняет страницу wiki или билет."
 
-#: announcer/templates/prefs_announcer_watch_users.html:5
+#: announcer/templates/prefs_announcer_watch_users.html:7
 msgid "Watch Users:"
 msgstr "Наблюдать за пользователями:"
 
@@ -890,7 +891,9 @@ msgstr ""
 msgid ""
 "Unable to load the python-gnupg module. Please check and correct your "
 "installation."
-msgstr "Не удалось загрузить модуль python-gnupg. Пожалуйста, проверьте и исправьте вашу установку."
+msgstr ""
+"Не удалось загрузить модуль python-gnupg. Пожалуйста, проверьте и "
+"исправьте вашу установку."
 
 #: announcer/util/mail_crypto.py:64
 msgid ""
