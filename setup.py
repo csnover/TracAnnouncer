@@ -73,7 +73,7 @@ setup(
         ]
     },
     install_requires = [
-        'trac>=0.11',
+        'trac>=0.12dev',
     ],
     extras_require={
         'acct_mgr': 'TracAccountManager',
