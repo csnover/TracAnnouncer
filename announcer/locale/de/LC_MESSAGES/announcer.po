@@ -8,17 +8,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: AnnouncerPlugin 0.12\n"
 "Report-Msgid-Bugs-To: hoff.st@web.de\n"
-"POT-Creation-Date: 2010-08-05 13:11+0200\n"
+"POT-Creation-Date: 2010-08-23 01:26+0200\n"
 "PO-Revision-Date: 2010-07-23 11:39+0200\n"
 "Last-Translator: Steffen Hoffmann <hoff.st@web.de>\n"
-"Language-Team: German <de_DE <trac-dev@googlegroups.com>>\n"
+"Language-Team: German de_DE <trac-dev@googlegroups.com>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.0dev-r482\n"
 
-#: announcer/pref.py:62 announcer/templates/prefs_announcer.html:9
+#: announcer/pref.py:62 announcer/templates/prefs_announcer.html:11
 msgid "Announcements"
 msgstr "Benachrichtigungen"
 
@@ -370,7 +370,7 @@ msgstr ""
 msgid "{% end %}"
 msgstr ""
 
-#: announcer/templates/prefs_announcer.html:12
+#: announcer/templates/prefs_announcer.html:14
 msgid ""
 "Announcements serve as a method for Trac to communicate events to you; \n"
 "      the creation of a ticket, the change of a Wiki page, and so on. "
@@ -379,80 +379,83 @@ msgid ""
 "those\n"
 "      topics that you subscribe to."
 msgstr ""
-"Benachrichtigungen dienen in Trac dazu, Ihnen Ereignisse mitzuteilen; \n"
-"      das Erstellen eines Tickets, die Änderung einer Wiki-Seite und "
-"anderes. Durch\n"
-"      das Benachrichtigungssystem erhalten Sie nur Nachrichten zu den\n"
-"      Bereichen, die Sie anfordern."
+"Benachrichtigungen dienen in Trac dazu, Ihnen Ereignisse mitzuteilen: "
+"das Erstellen eines Tickets, die Änderung einer Wiki-Seite und anderes. "
+"Durch das Benachrichtigungssystem erhalten Sie nur Nachrichten zu den "
+"Bereichen, die Sie anfordern."
 
-#: announcer/templates/prefs_announcer_acct_mgr_subscription.html:3
+#: announcer/templates/prefs_announcer_acct_mgr_subscription.html:5
 msgid "Subscribe to user account announcements."
 msgstr "Abonnement für Nutzer-Konten-Benachrichtigungen"
 
-#: announcer/templates/prefs_announcer_acct_mgr_subscription.html:7
+#: announcer/templates/prefs_announcer_acct_mgr_subscription.html:9
 msgid "Send me announcements when new users are created."
 msgstr "Sende mir eine Benachrichtigung, wenn neue Nutzer erstellt werden."
 
-#: announcer/templates/prefs_announcer_acct_mgr_subscription.html:8
+#: announcer/templates/prefs_announcer_acct_mgr_subscription.html:10
 msgid "Send me announcements when users accounts are changed."
 msgstr "Sende mir eine Benachrichtigung, wenn Nutzer-Konten geändert werden."
 
-#: announcer/templates/prefs_announcer_acct_mgr_subscription.html:9
+#: announcer/templates/prefs_announcer_acct_mgr_subscription.html:11
 msgid "Send me announcements when users accounts are deleted."
 msgstr "Sende mir eine Benachrichtigung, wenn Nutzer-Konten gelöscht werden."
 
-#: announcer/templates/prefs_announcer_author_filter.html:3
+#: announcer/templates/prefs_announcer_author_filter.html:5
 msgid "Opt-out of announcements about my own changes."
 msgstr "Benachrichtigungen über eigene Änderungen werden ablehnt."
 
-#: announcer/templates/prefs_announcer_author_filter.html:6
+#: announcer/templates/prefs_announcer_author_filter.html:8
 msgid "Never notify me when I make a change."
 msgstr "Benachrichte mich niemals, wenn ich selbst Änderungen vornehme."
 
-#: announcer/templates/prefs_announcer_bitten.html:3
+#: announcer/templates/prefs_announcer_bitten.html:5
 msgid "Subscribe to build announcements."
 msgstr ""
 
-#: announcer/templates/prefs_announcer_bitten.html:7
+#: announcer/templates/prefs_announcer_bitten.html:9
 msgid "Subscribe me to build started announcements."
 msgstr ""
 
-#: announcer/templates/prefs_announcer_bitten.html:8
+#: announcer/templates/prefs_announcer_bitten.html:10
 msgid "Subscribe me to build aborted announcements."
 msgstr ""
 
-#: announcer/templates/prefs_announcer_bitten.html:9
+#: announcer/templates/prefs_announcer_bitten.html:11
 msgid "Subscribe me to build completed announcements."
 msgstr ""
 
-#: announcer/templates/prefs_announcer_blog.html:6
+#: announcer/templates/prefs_announcer_blog.html:8
 msgid "Notify me of any changes to my blog posts."
 msgstr ""
 
-#: announcer/templates/prefs_announcer_blog.html:9
+#: announcer/templates/prefs_announcer_blog.html:11
 msgid "Notify me of any new blog posts."
 msgstr ""
 
-#: announcer/templates/prefs_announcer_blog.html:12
+#: announcer/templates/prefs_announcer_blog.html:14
 msgid "Notify me of any blog changes."
 msgstr ""
 
-#: announcer/templates/prefs_announcer_blog.html:15
+#: announcer/templates/prefs_announcer_blog.html:17
 msgid "Comma seperated list of blog authors to follow:"
 msgstr ""
 
-#: announcer/templates/prefs_announcer_email.html:3
+#: announcer/templates/prefs_announcer_email.html:5
 msgid ""
 "By default, the Announcer will deliver all notices to you in a plaintext "
 "format. You\n"
 "  may override this for each realm that may generate announcements."
 msgstr ""
+"Das Benachrichtigungssystem wird Ihnen alle Nachrichten normalerweise "
+"als reiner Text formatiert zusenden. Sie können für jeden Bereich, "
+"der Benachrichtigungen erzeugen kann, eine abweichende Einstellung "
+"vornehmen."
 
-#: announcer/templates/prefs_announcer_email.html:7
+#: announcer/templates/prefs_announcer_email.html:9
 msgid "announcements:"
 msgstr "Benachrichtigungen:"
 
-#: announcer/templates/prefs_announcer_emailaddress.html:3
+#: announcer/templates/prefs_announcer_emailaddress.html:5
 msgid ""
 "If you would like to have announcement notices sent to a different "
 "address then the main one provided\n"
@@ -462,11 +465,11 @@ msgstr ""
 "Adresse versenden lassen möchten,\n"
 " dann können Sie diese Adresse hier angeben:"
 
-#: announcer/templates/prefs_announcer_emailaddress.html:8
+#: announcer/templates/prefs_announcer_emailaddress.html:10
 msgid "Email address:"
 msgstr "E-mail-Adresse:"
 
-#: announcer/templates/prefs_announcer_joinable_components.html:3
+#: announcer/templates/prefs_announcer_joinable_components.html:5
 msgid ""
 "Components are a way to classify trac tickets.  The following components "
 "have been defined by the Trac administrators.  If you subscribe to any of"
@@ -478,7 +481,7 @@ msgstr ""
 "worden. Falls Sie eine davon abonnieren, werden Sie benachrichtigt, wenn "
 "ein Ticket zu dieser Komponente erstellt oder geändert wird. "
 
-#: announcer/templates/prefs_announcer_joinable_groups.html:3
+#: announcer/templates/prefs_announcer_joinable_groups.html:5
 msgid ""
 "The following groups have been defined by the Trac administrators. They "
 "are general topics that may be added onto the CC list of tickets (by "
@@ -489,29 +492,29 @@ msgstr ""
 " werden können (durch Voranstellen von @ vor deren Namen). "
 "Groß-/Kleinschreibung ist zu beachten."
 
-#: announcer/templates/prefs_announcer_legacy.html:6
+#: announcer/templates/prefs_announcer_legacy.html:8
 msgid "Notify me of changes to tickets that belong to components that I own."
 msgstr ""
 "Benachrichtige mich über alle Änderungen an Tickets, die zu Komponenten "
 "gehören, für die ich verantwortlich bin."
 
-#: announcer/templates/prefs_announcer_legacy.html:10
+#: announcer/templates/prefs_announcer_legacy.html:12
 msgid "Notify me of changes to tickets that I own."
 msgstr ""
 "Benachrichtige mich über Änderungen an Tickets, für die ich "
 "verantwortlich bin."
 
-#: announcer/templates/prefs_announcer_legacy.html:14
+#: announcer/templates/prefs_announcer_legacy.html:16
 msgid "Notify me of changes to tickets that I reported."
 msgstr ""
 "Benachrichtige mich über alle Änderungen an Tickets, die ich erstellt "
 "habe."
 
-#: announcer/templates/prefs_announcer_legacy.html:18
+#: announcer/templates/prefs_announcer_legacy.html:20
 msgid "Notify me when I update a ticket."
 msgstr "Benachrichtige mich, wenn ich selbst ein Ticket aktualisiere."
 
-#: announcer/templates/prefs_announcer_rules.html:4
+#: announcer/templates/prefs_announcer_rules.html:6
 msgid ""
 "The rule-based subscription module is for advanced users, and allows you "
 "to use filters to specify which events you are interested in hearing "
@@ -521,31 +524,23 @@ msgstr ""
 "zur Beschreibung von Ereignissen zu nutzen, von denen Sie gern "
 "benachrichtigt werden möchten."
 
-#: announcer/templates/prefs_announcer_rules.html:7
-msgid "Every rule is in the form of:"
-msgstr "Jede Regel hat die folgende Form:"
-
 #: announcer/templates/prefs_announcer_rules.html:9
-msgid "realm"
+msgid ""
+"Every rule is in the form of: \n"
+"      [1:[2:realm], [3:category]: [4:query rule]]"
 msgstr ""
+"Jede Regel hat die folgende Form: [1:[2:realm], [3:category]: [4:query "
+"rule]]"
 
-#: announcer/templates/prefs_announcer_rules.html:9
-msgid "category"
-msgstr ""
-
-#: announcer/templates/prefs_announcer_rules.html:9
-msgid "query rule"
-msgstr ""
-
-#: announcer/templates/prefs_announcer_unsubscribe_all.html:3
+#: announcer/templates/prefs_announcer_unsubscribe_all.html:5
 msgid "Opt-out of all announcements."
 msgstr "Aller Benachrichtigungen werden ablehnt."
 
-#: announcer/templates/prefs_announcer_unsubscribe_all.html:6
+#: announcer/templates/prefs_announcer_unsubscribe_all.html:8
 msgid "Never notify me of any changes."
 msgstr "Benachrichte mich niemals über Änderungen."
 
-#: announcer/templates/prefs_announcer_watch_users.html:3
+#: announcer/templates/prefs_announcer_watch_users.html:5
 msgid ""
 "A comma separated list of users you would like to watch. A watched user \n"
 "     will create an announcement each time he/she creates or changes\n"
@@ -556,11 +551,11 @@ msgstr ""
 "Benachrichtigung, wenn er/sie eine Wiki-Seite oder ein Ticket erstellt "
 "oder ändert."
 
-#: announcer/templates/prefs_announcer_watch_users.html:7
+#: announcer/templates/prefs_announcer_watch_users.html:9
 msgid "Watch Users:"
 msgstr "Beobachte Nutzer:"
 
-#: announcer/templates/prefs_announcer_wiki.html:5
+#: announcer/templates/prefs_announcer_wiki.html:7
 msgid ""
 "In addition to other methods that may notify you of changes to Wiki "
 "pages, you may list here\n"
@@ -571,29 +566,23 @@ msgstr ""
 "benachrichtigen, können Sie hier Seiten angeben, die Sie interessieren. "
 "Jede Seite gehört dabei auf eine eigene Zeile."
 
-#: announcer/templates/prefs_announcer_wiki.html:10
+#: announcer/templates/prefs_announcer_wiki.html:12
 msgid ""
 "You may use wild cards, so that if you want to hear about any page that "
 "starts with the name 'Trac'\n"
-"    you would enter on it's own line:"
+"    you would enter on it's own line: [1:Trac*]"
 msgstr ""
 "Sie können Platzhalter verwenden. Wenn Sie über alle Seiten "
 "benachrichtigt werden möchten, deren Name mit 'Trac' beginnt, dann geben "
-"Sie auf einer Zeile ein:"
+"Sie auf einer Zeile ein: [1:Trac*]"
 
-#: announcer/templates/prefs_announcer_wiki.html:12
-msgid "Trac*"
-msgstr "Trac*"
-
-#: announcer/templates/prefs_announcer_wiki.html:15
-msgid "To receive a notice about all wiki changes, simply include a"
+#: announcer/templates/prefs_announcer_wiki.html:17
+msgid ""
+"To receive a notice about all wiki changes, simply include a [1:*] by "
+"itself."
 msgstr ""
 "Um Benachrichtigungen über alle Wiki-Seiten-Änderungen zu erhalten, geben"
-" Sie bitte nur"
-
-#: announcer/templates/prefs_announcer_wiki.html:16
-msgid "by itself."
-msgstr "ein."
+" Sie bitte nur [1:*] ein."
 
 #: announcer/templates/ticket_email_mimic.html:114
 msgid "Ticket #"
