@@ -36,7 +36,10 @@
 from setuptools import find_packages, setup
 
 extra = {}
+
 try:
+    import babel
+
     extractors = [
         ('**.py',                'python', None),
         ('**/templates/**.html', 'genshi', None),
@@ -47,7 +50,11 @@ try:
     extra['message_extractors'] = {
         'announcer': extractors,
     }
-except ImportError:
+
+    from trac.util.dist import get_l10n_cmdclass
+    extra['cmdclass'] = get_l10n_cmdclass()
+
+except ImportError, e:
     pass
 
 setup(
