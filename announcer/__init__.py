@@ -30,4 +30,4 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # ----------------------------------------------------------------------------
 
-__version__ = __import__('pkg_resources').get_distribution('AnnouncerPlugin').version
+__version__ = __import__('pkg_resources').get_distribution('TracAnnouncer').version
