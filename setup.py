@@ -51,23 +51,23 @@ except ImportError:
     pass
 
 setup(
-    name = 'AnnouncerPlugin', 
+    name = 'TracAnnouncer',
     version = '0.12-p2',
     author = 'Robert Corsaro',
-    author_email = 'doki_pen@doki-pen.org',
+    author_email = 'rcorsaro@gmail.com',
     description = 'Customizable notification system',
     license = """
-    Copyright (c) 2008, Stephen Hansen. 
-    Copyright (c) 2009, Robert Corsaro.  
-    All rights reserved. Released under the 3-clause BSD license. 
+    Copyright (c) 2008, Stephen Hansen.
+    Copyright (c) 2009, Robert Corsaro.
+    All rights reserved. Released under the 3-clause BSD license.
     """,
     url = "http://www.trac-hacks.org/wiki/AnnouncerPlugin",
     packages = find_packages(exclude=['*.tests*']),
     package_data = {
         'announcer': [
-            'templates/*.html', 
-            'templates/*.txt', 
-            'htdocs/*.*', 
+            'templates/*.html',
+            'templates/*.txt',
+            'htdocs/*.*',
             'htdocs/css/*.*',
             'locale/*/LC_MESSAGES/*.mo',
         ]
@@ -98,7 +98,6 @@ setup(
             'announcer.resolvers.defaultdomain = announcer.resolvers.defaultdomain',
             'announcer.resolvers.sessionemail = announcer.resolvers.sessionemail',
             'announcer.resolvers.specified = announcer.resolvers.specified',
-            #'announcer.subscribers.rulefilters = announcer.subscribers.rulefilters',
             'announcer.subscribers.ticket_compat = announcer.subscribers.ticket_compat',
             'announcer.subscribers.ticket_components = announcer.subscribers.ticket_components',
             'announcer.subscribers.ticket_custom = announcer.subscribers.ticket_custom',
@@ -110,7 +109,7 @@ setup(
             'announcer.opt.acct_mgr.announce = announcer.opt.acct_mgr.announce[acct_mgr]',
             'announcer.opt.bitten.announce = announcer.opt.bitten.announce[bitten]',
             'announcer.opt.fullblog.announce = announcer.opt.fullblog.announce[fullblog]',
-        ]    
+        ]
     },
     test_suite = 'announcer.tests',
     **extra
