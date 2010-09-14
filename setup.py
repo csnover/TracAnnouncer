@@ -59,7 +59,7 @@ except ImportError, e:
 
 setup(
     name = 'TracAnnouncer',
-    version = '0.12-p2',
+    version = '0.12.1',
     author = 'Robert Corsaro',
     author_email = 'rcorsaro@gmail.com',
     description = 'Customizable notification system',
