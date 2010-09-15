@@ -44,7 +44,7 @@ class ChangeAuthorFilter(Component):
     implements(IAnnouncementSubscriptionFilter)
     implements(IAnnouncementPreferenceProvider)
 
-    never_notify_author = BoolOption('announcer', 'never_notify_author', True,
+    never_notify_author = BoolOption('announcer', 'never_notify_author', 'true',
             """User overridable default value.  Stop author from receiving
             an announcement, even if some other rule says they should receive
             one.

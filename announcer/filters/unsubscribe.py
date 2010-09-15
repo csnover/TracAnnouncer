@@ -43,7 +43,7 @@ from announcer.util.settings import BoolSubscriptionSetting
 class UnsubscribeFilter(Component):
     implements(IAnnouncementSubscriptionFilter, IAnnouncementPreferenceProvider)
 
-    never_announce = BoolOption('announcer', 'never_announce', False,
+    never_announce = BoolOption('announcer', 'never_announce', 'false',
             """Default value for user overridable never_announce setting.
 
             This setting stops any announcements from ever being sent to the
