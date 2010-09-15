@@ -463,7 +463,6 @@ class EmailDistributor(Component):
                                   "Please change encoding setting"))
 
         rootMessage = MIMEMultipart("related")
-        rootMessage.set_charset(self._charset)
 
         headers = dict()
         headers['Message-ID'] = self._message_id(event.realm)
