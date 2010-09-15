@@ -36,7 +36,7 @@ from genshi import HTML
 from genshi.template import NewTextTemplate, MarkupTemplate
 from genshi.template import TemplateLoader
 
-from trac.config import Option, IntOption, ListOption
+from trac.config import Option, IntOption, ListOption, BoolOption
 from trac.core import *
 from trac.mimeview import Context
 from trac.test import Mock, MockPerm
@@ -72,6 +72,11 @@ class TicketFormatter(Component):
             'owner, reporter, milestone, priority, severity',
             doc="""Comma seperated list of fields to appear in tickets.  
             Use * to include all headers.""")
+
+    ticket_link_with_comment = BoolOption('announcer',
+            'ticket_link_with_comment',
+            'false',
+            """Include last change anchor to the ticket URL.""")
     
     def styles(self, transport, realm):
         if realm == "ticket":
@@ -88,6 +93,38 @@ class TicketFormatter(Component):
                 return self._format_plaintext(event)
             elif style == "text/html":
                 return self._format_html(event)
+
+    def _ticket_link(self, ticket):
+        ticket_link = self.env.abs_href('ticket', ticket.id)
+        if self.ticket_link_with_comment == False:
+            return ticket_link
+
+        cnum = self._ticket_last_comment(ticket)
+        if cnum != None:
+            ticket_link += "#comment:%s" % str(cnum)
+
+        return ticket_link
+
+    def _ticket_last_comment(self, ticket):
+        cnum = -1
+
+        for entry in ticket.get_changelog():
+            (time, author, field, oldvalue, newvalue, permanent) = entry
+            if field != "comment":
+                continue
+
+            try:
+                n = int(oldvalue)
+            except:
+                continue
+
+            if cnum < n:
+                cnum = n
+
+        if cnum == -1:
+            return None
+        else:
+            return cnum
 
     def _format_plaintext(self, event):
         ticket = event.target
@@ -109,7 +146,7 @@ class TicketFormatter(Component):
             comment = event.comment,
             fields = self._header_fields(ticket),
             category = event.category,
-            ticket_link = self.env.abs_href('ticket', ticket.id),
+            ticket_link = self._ticket_link(ticket),
             project_name = self.env.project_name,
             project_desc = self.env.project_description,
             project_link = self.env.project_url or self.env.abs_href(),
@@ -189,7 +226,7 @@ class TicketFormatter(Component):
             fields = self._header_fields(ticket),
             comment = temp,
             category = event.category,
-            ticket_link = self.env.abs_href('ticket', ticket.id),
+            ticket_link = self._ticket_link(ticket),
             project_name = self.env.project_name,
             project_desc = self.env.project_description,
             project_link = self.env.project_url or self.env.abs_href(),
