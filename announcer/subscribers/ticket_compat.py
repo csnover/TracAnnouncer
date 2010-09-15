@@ -52,26 +52,26 @@ class LegacyTicketSubscriber(Component):
     """
     implements(IAnnouncementSubscriber, IAnnouncementPreferenceProvider)
     
-    owner = BoolOption("announcer", "always_notify_owner", True,
+    owner = BoolOption("announcer", "always_notify_owner", 'true',
         """The always_notify_owner option mimics the option of the same name 
         in the notification section, except users can override in their 
         preferences.
         """)
 
-    reporter = BoolOption("announcer", "always_notify_reporter", True, 
+    reporter = BoolOption("announcer", "always_notify_reporter", 'true', 
         """The always_notify_reporter option mimics the option of the 
         same name in the notification section, except users can override in 
         their preferences.
         """)
 
-    updater = BoolOption("announcer", "always_notify_updater", True, 
+    updater = BoolOption("announcer", "always_notify_updater", 'true', 
         """The always_notify_updater option mimics the option of the 
         same name in the notification section, except users can override in 
         their preferences. 
         """)
 
     component_owner = BoolOption("announcer", "always_notify_component_owner", 
-        True,
+        'true',
         """Whether or not to notify the owner of the ticket's component.  The
         user can override this setting in their preferences.
         """)
