@@ -54,9 +54,10 @@ class GeneralWikiSubscriber(Component):
 
         def match(dist, value):
             for raw in value.split(' '):
-                pat = urllib.unquote(raw).replace('*', '.*')
-                if re.match(pat, event.target.name):
-                    return True
+                if raw != '':
+                    pat = urllib.unquote(raw).replace('*', '.*')
+                    if re.match(pat, event.target.name):
+                        return True
 
         setting = self._setting()
         for result in setting.get_subscriptions(match):
