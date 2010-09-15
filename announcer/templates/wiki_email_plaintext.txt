@@ -9,6 +9,6 @@ ${diff}
 {% when action == "deleted" %} * The '${page.name}' has been deleted. {% end %}\
 {% end %}\
 --
-Page URL: <URL:${page_link}>
-${project_name} <URL:${project_link}>
+Page URL: <${page_link}>
+${project_name} URL: <${project_link}>
 ${project_desc}
