@@ -109,8 +109,8 @@ class EmailDistributor(Component):
         Currently, `SmtpEmailSender` and `SendmailEmailSender` are provided.
         """)
 
-    enabled = BoolOption('announcer', 'email_enabled', 'false',
-        """Enable SMTP (email) notification.""")
+    enabled = BoolOption('announcer', 'email_enabled', 'true',
+        """Enable email notification.""")
 
     email_from = Option('announcer', 'email_from', 'trac@localhost',
         """Sender address to use in notification emails.""")
