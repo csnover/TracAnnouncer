@@ -202,26 +202,36 @@ class TicketFormatter(Component):
             else:
                 short_changes[field.capitalize()] = (old_value, new_value)
 
-        try:
-            req = Mock(
-                href=Href(self.env.abs_href()),
-                abs_href=self.env.abs_href(),
-                authname=event.author, 
-                perm=MockPerm(),
-                chrome=dict(
-                    warnings=[],
-                    notices=[]
-                ),
-                args={}
-            )
-            context = Context.from_request(req, event.realm, event.target.id)
-            formatter = HtmlFormatter(self.env, context, event.comment)
-            temp = formatter.generate(True)
-        except Exception, e:
-            self.log.error(exception_to_unicode(e, traceback=True))
-            temp = 'Comment in plain text: %s'%event.comment
+        def render_wiki_to_html_without_req(event, wikitext):
+            if wikitext is None:
+                return ""
+            try:
+                req = Mock(
+                    href=Href(self.env.abs_href()),
+                    abs_href=self.env.abs_href,
+                    authname=event.author, 
+                    perm=MockPerm(),
+                    chrome=dict(
+                        warnings=[],
+                        notices=[]
+                    ),
+                    args={}
+                )
+                context = Context.from_request(req, event.realm, event.target.id)
+                formatter = HtmlFormatter(self.env, context, wikitext)
+                return formatter.generate(True)
+            except Exception, e:
+                raise
+                self.log.error("Failed to render %s", repr(wikitext))
+                self.log.error(exception_to_unicode(e, traceback=True))
+                return wikitext
+
+        description = render_wiki_to_html_without_req(event, ticket['description'])
+        temp        = render_wiki_to_html_without_req(event, event.comment)
+                
         data = dict(
             ticket = ticket,
+            description = description,
             author = event.author,
             fields = self._header_fields(ticket),
             comment = temp,
