@@ -46,7 +46,7 @@ class JoinableGroupSubscriber(Component):
     implements(IAnnouncementSubscriber, IAnnouncementPreferenceProvider)
     
     joinable_groups = ListOption('announcer', 'joinable_groups', [], 
-        """Joinable groups represent 'opt-in' groups that users may 
+        doc="""Joinable groups represent 'opt-in' groups that users may 
         freely join. 
         
         The name of the groups should be a simple alphanumeric string. By
