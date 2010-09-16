@@ -105,6 +105,7 @@ setup(
             'announcer.resolvers.defaultdomain = announcer.resolvers.defaultdomain',
             'announcer.resolvers.sessionemail = announcer.resolvers.sessionemail',
             'announcer.resolvers.specified = announcer.resolvers.specified',
+            'announcer.subscribers.ticket_all = announcer.subscribers.ticket_all',
             'announcer.subscribers.ticket_compat = announcer.subscribers.ticket_compat',
             'announcer.subscribers.ticket_components = announcer.subscribers.ticket_components',
             'announcer.subscribers.ticket_custom = announcer.subscribers.ticket_custom',
