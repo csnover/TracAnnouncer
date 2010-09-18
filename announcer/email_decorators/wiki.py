@@ -47,12 +47,12 @@ class WikiSubjectEmailDecorator(Component):
 
     def decorate_message(self, event, message, decorates=None):
         if event.realm == 'wiki':
-            template = NewTextTemplate(self.wiki_email_subject)
+            template = NewTextTemplate(self.wiki_email_subject.encode('utf8'))
             subject = template.generate(
-                page=event.target, 
-                event=event, 
+                page=event.target,
+                event=event,
                 action=event.category
-            ).render()
+            ).render('text', encoding=None)
 
             prefix = self.config.get('announcer', 'email_subject_prefix')
             if prefix == '__default__': 

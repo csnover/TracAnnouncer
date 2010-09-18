@@ -188,11 +188,11 @@ class FullBlogAnnouncement(Component):
     # IAnnouncementEmailDecorator
     def decorate_message(self, event, message, decorates=None):
         if event.realm == "blog":
-            template = NewTextTemplate(self.blog_email_subject)
+            template = NewTextTemplate(self.blog_email_subject.encode('utf8'))
             subject = template.generate(
                 blog=event.blog_post, 
                 action=event.category
-            ).render()
+            ).render('text', encoding=None)
             set_header(message, 'Subject', subject) 
         return next_decorator(event, message, decorates)
 
