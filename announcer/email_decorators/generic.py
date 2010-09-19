@@ -30,6 +30,7 @@ from email.utils import parseaddr
 import trac
 from trac.core import *
 from trac.config import ListOption, Option
+from trac.util.text import to_unicode
 
 import announcer
 from announcer.distributors.mail import IAnnouncementEmailDecorator
@@ -44,8 +45,8 @@ class ThreadingEmailDecorator(Component):
     implements(IAnnouncementEmailDecorator)
 
     supported_realms = ListOption('announcer', 'email_threaded_realms',
-        ['ticket', 'wiki'],
-        """These are realms with announcements that should be threaded
+        'ticket,wiki',
+        doc="""These are realms with announcements that should be threaded
         emails.  In order for email threads to work, the announcer
         system needs to give the email recreatable Message-IDs based
         on the resources in the realm.  The resources must have a unique
@@ -60,7 +61,7 @@ class ThreadingEmailDecorator(Component):
         References, In-Reply-To and Message-ID are just so email clients can
         make sense of the threads.
         """
-        if event.realm in self.supported_realms:
+        if to_unicode(event.realm) in self.supported_realms:
             uid = uid_encode(self.env.abs_href(), event.realm, event.target)
             email_from = self.config.get('announcer', 'email_from', 'localhost')
             _, email_addr = parseaddr(email_from)
