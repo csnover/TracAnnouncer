@@ -34,6 +34,8 @@ try:
 except:
     from email.Header import Header
 
+from trac.util.text import to_unicode
+
 MAXHEADERLEN = 76
 
 def next_decorator(event, message, decorates):
@@ -62,7 +64,7 @@ def set_header(message, key, value, charset=None):
 def uid_encode(projurl, realm, target):
     """
     Unique identifier used to track resources in relation to emails.
-    projurl included to avoid Message-ID collisions.  Returns a base32 encode 
+    projurl included to avoid Message-ID collisions.  Returns a base64 encode 
     UID string.
 
     Set project_url in trac.ini for proper results.
@@ -74,13 +76,13 @@ def uid_encode(projurl, realm, target):
     else:
         id = str(target)
     uid = ','.join((projurl, realm, id))
-    return b32encode(uid)
+    return b32encode(uid.encode('utf8'))
 
 def uid_decode(encoded_uid):
     """
     Returns a tuple of projurl, realm, id and change_num.
     """
-    uid = b32decode(encoded_uid)
+    uid = b32decode(encoded_uid).decode('utf8')
     return uid.split(',')
 
 def msgid(uid, host='localhost'):
