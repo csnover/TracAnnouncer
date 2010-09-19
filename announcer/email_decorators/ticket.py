@@ -52,12 +52,12 @@ class TicketSubjectEmailDecorator(Component):
             if event.changes:
                 if 'status' in event.changes:
                     action = 'Status -> %s' % (event.target['status'])
-            template = NewTextTemplate(self.ticket_email_subject)
-            subject = to_unicode(template.generate(
+            template = NewTextTemplate(self.ticket_email_subject.encode('utf8'))
+            subject = template.generate(
                 ticket=event.target, 
                 event=event, 
                 action=event.category
-            ).render())
+            ).render('text', encoding=None)
 
             prefix = self.config.get('announcer', 'email_subject_prefix')
             if prefix == '__default__': 
