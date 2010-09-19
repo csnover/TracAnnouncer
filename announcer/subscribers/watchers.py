@@ -54,7 +54,7 @@ class WatchSubscriber(Component):
         'wiki/*,ticket/*',
         doc='List of URL paths to allow watching. Globs are supported.')
     ctxtnav_names = ListOption('announcer', 'ctxtnav_names',
-        [_('Watch This'),_('Unwatch This')],
+        "Watch This, Unwatch This",
         doc="Text of context navigation entries. "
             "An empty list removes them from the context navigation bar.")
 
@@ -188,13 +188,13 @@ class WatchSubscriber(Component):
         if self.is_watching(req.session.sid, not req.authname == 'anonymous', 
                 realm, resource):
             action_name = len(self.ctxtnav_names) >= 2 and \
-                    self.ctxtnav_names[1] or _('Unwatch This')
+                    self.ctxtnav_names[1] or 'Unwatch This'
         else:
             action_name = len(self.ctxtnav_names) and \
-                    self.ctxtnav_names[0] or _('Watch This')
+                    self.ctxtnav_names[0] or 'Watch This'
         add_ctxtnav(req, 
             tag.a(
-                action_name, href=req.href.watch(realm, resource)
+                _(action_name), href=req.href.watch(realm, resource)
             )
         )
 
