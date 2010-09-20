@@ -44,7 +44,7 @@ from announcer.util.settings import SubscriptionSetting
 
 class GeneralWikiSubscriber(Component):
     implements(IAnnouncementSubscriber, IAnnouncementPreferenceProvider)
-        
+
     def subscriptions(self, event):
         if event.realm != 'wiki':
             return
@@ -66,19 +66,21 @@ class GeneralWikiSubscriber(Component):
             yield result
 
     def get_announcement_preference_boxes(self, req):
-        yield "general_wiki", _("General Wiki Announcements")
-        
+        if req.perm.has_permission('WIKI_VIEW'):
+            yield "general_wiki", _("General Wiki Announcements")
+
     def render_announcement_preference_box(self, req, panel):
-        setting = self._setting()
-        if req.method == "POST":
-            setting.set_user_setting(req.session, 
-                    value=req.args.get('wiki_interests'))
-        interests = setting.get_user_setting(req.session.sid)[1] or ''
-        return "prefs_announcer_wiki.html", dict(
-            wiki_interests = '\n'.join(
-                urllib.unquote(x) for x in interests.split(' ')
+        if req.perm.has_permission('WIKI_VIEW'):
+            setting = self._setting()
+            if req.method == "POST":
+                setting.set_user_setting(req.session, 
+                        value=req.args.get('wiki_interests'))
+            interests = setting.get_user_setting(req.session.sid)[1] or ''
+            return "prefs_announcer_wiki.html", dict(
+                wiki_interests = '\n'.join(
+                    urllib.unquote(x) for x in interests.split(' ')
+                )
             )
-        )
 
     def _setting(self):
         return SubscriptionSetting(self.env, 'wiki_pattern')
