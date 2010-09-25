@@ -36,10 +36,12 @@ from trac.web.chrome import add_warning
 from trac.config import ListOption
 
 from announcer.api import IAnnouncementSubscriber, istrue
+from announcer.api import INewAnnouncementSubscriber
 from announcer.api import IAnnouncementPreferenceProvider
 
 class TicketCustomFieldSubscriber(Component):
     implements(IAnnouncementSubscriber)
+    implements(INewAnnouncementSubscriber)
 
     custom_cc_fields = ListOption('announcer', 'custom_cc_fields',
             doc="Field names that contain users that should be notified on "
@@ -51,6 +53,12 @@ class TicketCustomFieldSubscriber(Component):
             if event.category in ('changed', 'created', 'attachment added'):
                 for sub in self._get_membership(event.target):
                     yield sub + (None,)
+
+    def new_subscriptions(self, event):
+        yield
+
+    def description(self):
+        return "notify me when I'm listed in the (%s) field"%self.custom_cc_fields
 
     def _get_membership(self, ticket):
         for field in self.custom_cc_fields:
