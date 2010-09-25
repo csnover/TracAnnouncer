@@ -38,12 +38,21 @@ from trac.ticket import model
 from trac.web.chrome import add_warning
 
 from announcer.api import IAnnouncementPreferenceProvider
+from announcer.api import INewAnnouncementSubscriber
 from announcer.api import IAnnouncementSubscriber, istrue
 from announcer.api import _
 from announcer.util.settings import SubscriptionSetting
 
 class GeneralWikiSubscriber(Component):
-    implements(IAnnouncementSubscriber, IAnnouncementPreferenceProvider)
+    implements(IAnnouncementSubscriber)
+    implements(INewAnnouncementSubscriber)
+    implements(IAnnouncementPreferenceProvider)
+
+    def new_subscriptions(self, event):
+        yield
+
+    def description(self):
+        return "notify me when a wiki that matches my wiki watch pattern is created, or updated"
 
     def subscriptions(self, event):
         if event.realm != 'wiki':
