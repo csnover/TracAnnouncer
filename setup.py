@@ -98,6 +98,7 @@ setup(
             'announcer.filters.unsubscribe = announcer.filters.unsubscribe',
             'announcer.formatters.ticket = announcer.formatters.ticket',
             'announcer.formatters.wiki = announcer.formatters.wiki',
+            'announcer.model = announcer.model',
             'announcer.pref = announcer.pref',
             'announcer.producers.attachment = announcer.producers.attachment',
             'announcer.producers.ticket = announcer.producers.ticket',
