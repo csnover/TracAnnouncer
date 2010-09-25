@@ -41,16 +41,183 @@ from trac.util.text import to_unicode
 from trac.web.chrome import add_warning
 
 from announcer.api import IAnnouncementSubscriber, istrue
+from announcer.api import INewAnnouncementSubscriber
 from announcer.api import IAnnouncementPreferenceProvider
 from announcer.api import _
+from announcer.model import Subscription
 
 from announcer.util.settings import BoolSubscriptionSetting
+
+class TicketOwnerSubscriber(Component):
+    implements(INewAnnouncementSubscriber)
+
+    owner = BoolOption("announcer", "always_notify_owner", 'true',
+        """The always_notify_owner option mimics the option of the same name 
+        in the notification section, except users can override in their 
+        preferences.
+        """)
+
+    def new_subscriptions(self, event):
+        if event.realm != "ticket":
+            return
+        if event.category not in ('created', 'changed', 'attachment added'):
+            return
+        ticket = event.target
+        if not ticket['owner']:
+            return
+
+        subs = Subscription.find_by_sids_and_class(
+                self.env, (ticket['owner'],), self.__class__.__name__)
+        for s in subs:
+            yield s.subscription_tuple()
+
+    def description(self):
+        return "notify me when a ticket that I own is created or modified"
+
+class TicketComponentOwnerSubscriber(Component):
+    implements(INewAnnouncementSubscriber)
+
+    component_owner = BoolOption("announcer", "always_notify_component_owner", 
+        'true',
+        """Whether or not to notify the owner of the ticket's component.  The
+        user can override this setting in their preferences.
+        """)
+
+    def new_subscriptions(self, event):
+        if event.realm != "ticket":
+            return
+        if event.category not in ('created', 'changed', 'attachment added'):
+            return
+        ticket = event.target
+        try:
+            component = model.Component(self.env, ticket['component'])
+            if component.owner:
+                if '@' in component.owner:
+                    yield (self.__class__.__name__, 'email', None, False, component.owner, None, 1, 'always')
+                else:
+                    subs = Subscription.find_by_sids_and_class(
+                            self.env, (component.owner,), self.__class__.__name__)
+                    for s in subs:
+                        yield s.subscription_tuple()
+        except:
+            self.log.debug("Component for ticket (%s) not found"%ticket['id'])
+
+    def description(self):
+        return "notify me when a ticket that belongs to a component that I own is created or modified"
+
+class TicketUpdaterSubscriber(Component):
+    implements(INewAnnouncementSubscriber)
+
+    updater = BoolOption("announcer", "always_notify_updater", 'true', 
+        """The always_notify_updater option mimics the option of the 
+        same name in the notification section, except users can override in 
+        their preferences. 
+        """)
+
+    def new_subscriptions(self, event):
+        if event.realm != "ticket":
+            return
+        if event.category not in ('created', 'changed', 'attachment added'):
+            return
+
+        if event.author:
+            subs = Subscription.find_by_sids_and_class(
+                    self.env, (event.author,), self.__class__.__name__)
+            for s in subs:
+                yield s.subscription_tuple()
+
+    def description(self):
+        return "notify me when I update a ticket"
+
+class TicketReporterSubscriber(Component):
+    implements(INewAnnouncementSubscriber)
+
+    reporter = BoolOption("announcer", "always_notify_reporter", 'true', 
+        """The always_notify_reporter option mimics the option of the 
+        same name in the notification section, except users can override in 
+        their preferences.
+        """)
+
+    def new_subscriptions(self, event):
+        if event.realm != "ticket":
+            return
+        if event.category not in ('created', 'changed', 'attachment added'):
+            return
+
+        ticket = event.target
+        if ticket['reporter']:
+            reporter = ticket['reporter']
+            if '@' in reporter and self.reporter:
+                yield (self.__class__.__name__, 'email', None, False, reporter, None, 1, 'always')
+            else:
+                subs = Subscription.find_by_sids_and_class(
+                        self.env, (reporter,), self.__class__.__name__)
+                for s in subs:
+                    yield s.subscription_tuple()
+
+    def description(self):
+        return "notify me when a ticket that I reported is updated"
+
+class CarbonCopySubscriber(Component):
+    """Carbon copy subscriber for cc ticket field."""
+    implements(IAnnouncementSubscriber)
+    implements(INewAnnouncementSubscriber)
+
+    def subscriptions(self, event):
+        if event.realm == 'ticket':
+            if event.category in ('created', 'changed', 'attachment added'):
+                cc = event.target['cc'] or ''
+                for chunk in re.split('\s|,', cc):
+                    chunk = chunk.strip()
+                    if not chunk or chunk.startswith('@'):
+                        continue
+                    if '@' in chunk:
+                        address = chunk
+                        name = None
+                    else:
+                        name = chunk
+                        address = None
+                    if name or address:
+                        self.log.debug(_("CarbonCopySubscriber added '%s " \
+                            "<%s>' because of rule: carbon copied" \
+                            %(name,address)))
+                        yield ('email', name, name and True or False, address, None)
+
+    def new_subscriptions(self, event):
+        if event.realm != 'ticket':
+            return
+        if event.category not in ('created', 'changed', 'attachment added'):
+            return
+
+        cc = event.target['cc'] or ''
+        for chunk in re.split('\s|,', cc):
+            chunk = chunk.strip()
+            if not chunk or chunk.startswith('@'):
+                continue
+            if '@' in chunk:
+                address = chunk
+                sid = None
+            else:
+                sid = chunk
+                address = None
+            if sid or address:
+                if not sid:
+                    yield (self.__class__.__name__, 'email', None, False, address, None, 1, 'always')
+                else:
+                    subs = Subscription.find_by_sids_and_class(
+                            self.env, (sid,), self.__class__.__name__)
+                    for s in subs:
+                        yield s.subscription_tuple()
+
+    def description(self):
+        return "notify me when I'm listed in the CC field of a ticket"
 
 class LegacyTicketSubscriber(Component):
     """Mimics Trac notification settings with added bonus of letting users
     override their settings.  
     """
-    implements(IAnnouncementSubscriber, IAnnouncementPreferenceProvider)
+    implements(IAnnouncementSubscriber)
+    implements(IAnnouncementPreferenceProvider)
     
     owner = BoolOption("announcer", "always_notify_owner", 'true',
         """The always_notify_owner option mimics the option of the same name 
@@ -157,28 +324,3 @@ class LegacyTicketSubscriber(Component):
             default = self.__getattribute__(p)
             ret[p] = BoolSubscriptionSetting(self.env, "ticket_%s"%p, default)
         return ret
-
-class CarbonCopySubscriber(Component):
-    """Carbon copy subscriber for cc ticket field."""
-    implements(IAnnouncementSubscriber)
-    
-    def subscriptions(self, event):
-        if event.realm == 'ticket':
-            if event.category in ('created', 'changed', 'attachment added'):
-                cc = event.target['cc'] or ''
-                for chunk in re.split('\s|,', cc):
-                    chunk = chunk.strip()
-                    if not chunk or chunk.startswith('@'):
-                        continue
-                    if '@' in chunk:
-                        address = chunk
-                        name = None
-                    else:
-                        name = chunk
-                        address = None
-                    if name or address:
-                        self.log.debug(_("CarbonCopySubscriber added '%s " \
-                            "<%s>' because of rule: carbon copied" \
-                            %(name,address)))
-                        yield ('email', name, name and True or False, address, None)
-        
