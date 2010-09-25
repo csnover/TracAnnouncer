@@ -41,14 +41,18 @@ from trac.util.text import to_unicode
 from trac.web.chrome import add_warning
 
 from announcer.api import IAnnouncementSubscriber, istrue
+from announcer.api import INewAnnouncementSubscriber
 from announcer.api import IAnnouncementPreferenceProvider
 from announcer.api import _
+from announcer.model import Subscription
 
 from announcer.util.settings import BoolSubscriptionSetting
 
 class AllTicketSubscriber(Component):
     """Subscriber for all ticket changes."""
-    implements(IAnnouncementSubscriber, IAnnouncementPreferenceProvider)
+    implements(IAnnouncementSubscriber)
+    implements(INewAnnouncementSubscriber)
+    implements(IAnnouncementPreferenceProvider)
 
     def get_announcement_preference_boxes(self, req):
         yield "tickets", _("Ticket Subscriptions")
@@ -61,6 +65,9 @@ class AllTicketSubscriber(Component):
         vars = {}
         vars['ticket_all'] = setting.get_user_setting(req.session.sid)[1]
         return "prefs_announcer_ticket_all.html", dict(data=vars)
+
+    def description(self):
+        return "notify me when any ticket changes"
 
     def subscriptions(self, event):
         if event.realm != 'ticket':
@@ -84,3 +91,7 @@ class AllTicketSubscriber(Component):
                     "'."%sid))
                 yield (dist, sid, authed, None, None)
 
+    def new_subscriptions(self, event):
+        klass = self.__class__.__name__
+        for i in Subscription.find_by_class(self.env, klass):
+            yield i.subscription_tuple()

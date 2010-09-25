@@ -35,6 +35,7 @@ from trac.core import Component, implements, TracError
 from trac.web.chrome import add_stylesheet
 
 from announcer.api import IAnnouncementSubscriber
+from announcer.api import INewAnnouncementSubscriber
 from announcer.api import IAnnouncementPreferenceProvider
 from announcer.api import _
 from announcer.query import *
