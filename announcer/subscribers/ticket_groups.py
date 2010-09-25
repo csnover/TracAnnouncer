@@ -38,12 +38,15 @@ from trac.web.chrome import add_warning
 from trac.config import ListOption
 
 from announcer.api import IAnnouncementSubscriber, istrue
+from announcer.api import INewAnnouncementSubscriber
 from announcer.api import IAnnouncementPreferenceProvider
 from announcer.api import _
 from announcer.util.settings import BoolSubscriptionSetting
 
 class JoinableGroupSubscriber(Component):
-    implements(IAnnouncementSubscriber, IAnnouncementPreferenceProvider)
+    implements(IAnnouncementSubscriber)
+    implements(INewAnnouncementSubscriber)
+    implements(IAnnouncementPreferenceProvider)
     
     joinable_groups = ListOption('announcer', 'joinable_groups', [], 
         doc="""Joinable groups represent 'opt-in' groups that users may 
@@ -55,7 +58,13 @@ class JoinableGroupSubscriber(Component):
         a ticket, everyone in that group will receive an announcement when that
         ticket is changed.
         """)
-    
+
+    def new_subscriptions(self, event):
+        yield
+
+    def description(self):
+        return "notify me on ticket changes in one of my subscribed groups"
+
     def subscriptions(self, event):
         if event.realm != 'ticket':
             return
