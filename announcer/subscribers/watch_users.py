@@ -37,6 +37,7 @@ from trac.web.chrome import add_warning
 from trac.config import ListOption
 
 from announcer.api import IAnnouncementSubscriber, istrue
+from announcer.api import INewAnnouncementSubscriber
 from announcer.api import IAnnouncementPreferenceProvider
 from announcer.api import _
 from announcer.util.settings import SubscriptionSetting
@@ -44,7 +45,15 @@ from announcer.util.settings import SubscriptionSetting
 class UserChangeSubscriber(Component):
     """Allows users to get notified anytime a particular user change or 
     modifies a ticket or wiki page."""
-    implements(IAnnouncementSubscriber, IAnnouncementPreferenceProvider)
+    implements(IAnnouncementSubscriber)
+    implements(INewAnnouncementSubscriber)
+    implements(IAnnouncementPreferenceProvider)
+
+    def new_subscriptions(self, event):
+        yield
+
+    def description(self):
+        return "notify me when one of my watched users changes something"
 
     def subscriptions(self, event):
         if event.realm in ('wiki', 'ticket'):
