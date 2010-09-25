@@ -37,14 +37,18 @@ from trac.web.chrome import add_warning
 from trac.config import ListOption
 
 from announcer.api import IAnnouncementSubscriber, istrue
+from announcer.api import INewAnnouncementSubscriber
 from announcer.api import IAnnouncementPreferenceProvider
 from announcer.api import _
+from announcer.model import Subscription
 
 from announcer.util.settings import BoolSubscriptionSetting
 
 class TicketComponentSubscriber(Component):
-    implements(IAnnouncementSubscriber, IAnnouncementPreferenceProvider)
-    
+    implements(IAnnouncementSubscriber)
+    implements(INewAnnouncementSubscriber)
+    implements(IAnnouncementPreferenceProvider)
+
     def subscriptions(self, event):
         if event.realm != 'ticket':
             return
@@ -59,11 +63,38 @@ class TicketComponentSubscriber(Component):
                         result[1], result[2], event.target['component']))
                 yield result + (None,)
 
+    def new_subscriptions(self, event):
+        if event.realm != 'ticket':
+            return
+        if event.category not in ('changed', 'created', 'attachment added'):
+            return
+
+        component = event.target['component']
+        if not component:
+            return
+
+        db = self.env.get_db_cnx()
+        cursor = db.cursor()
+        cursor.execute("""
+            SELECT sid
+              FROM subscription_attribute
+             WHERE value=%s
+               AND class=%s
+        """, (component,self.__class__.__name__))
+        sids = map(lambda x: x[0], cursor.fetchall())
+
+        klass = self.__class__.__name__
+        for i in Subscription.find_by_sids_and_class(self.env, sids, klass):
+            yield i.subscription_tuple()
+
+    def description(self):
+        return "notify me when a ticket associated with a component I'm watching changes"
+
     def get_announcement_preference_boxes(self, req):
         if req.authname == "anonymous" and 'email' not in req.session:
             return
         yield "joinable_components", _("Ticket Component Subscriptions")
-        
+
     def render_announcement_preference_box(self, req, panel):
         settings = self._settings()
         if req.method == "POST":
@@ -71,6 +102,25 @@ class TicketComponentSubscriber(Component):
                 setting.set_user_setting(req.session, 
                     value=req.args.get('component_%s'%attr), save=False)
             req.session.save()
+            @self.env.with_transaction()
+            def update(db):
+                cursor = db.cursor()
+                cursor.execute("""
+                DELETE FROM subscription_attribute
+                      WHERE sid = %s
+                        AND class = %s
+                """, (req.session.sid,self.__class__.__name__))
+                for i in req.args.keys():
+                    g = re.match('^component_(.*)', i)
+                    if g:
+                        if istrue(req.args.get(i)):
+                            cursor.execute("""
+                            INSERT INTO subscription_attribute
+                                        (sid, class, value)
+                                 VALUES (%s, %s, %s)
+                            """, (req.session.sid,
+                                self.__class__.__name__, g.groups()[0]))
+
         d = {}
         for attr, setting in settings.items():
             d[attr]= setting.get_user_setting(req.session.sid)[1]
