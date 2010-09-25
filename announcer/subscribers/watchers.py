@@ -44,13 +44,18 @@ from trac.wiki.api import IWikiChangeListener
 from trac.util.text import to_unicode
 from genshi.builder import tag
 from announcer.api import IAnnouncementSubscriber, _
+from announcer.api import INewAnnouncementSubscriber
 
 class WatchSubscriber(Component):
 
-    implements(IRequestFilter, IRequestHandler, IAnnouncementSubscriber,
-        ITicketChangeListener, IWikiChangeListener)
+    implements(IRequestFilter)
+    implements(IRequestHandler)
+    implements(IAnnouncementSubscriber)
+    implements(INewAnnouncementSubscriber)
+    implements(ITicketChangeListener)
+    implements(IWikiChangeListener)
 
-    watchable_paths = ListOption('announcer', 'watchable_paths', 
+    watchable_paths = ListOption('announcer', 'watchable_paths',
         'wiki/*,ticket/*',
         doc='List of URL paths to allow watching. Globs are supported.')
     ctxtnav_names = ListOption('announcer', 'ctxtnav_names',
@@ -249,8 +254,14 @@ class WatchSubscriber(Component):
                AND rule=%s
         """, ('watcher', 'ticket', to_unicode(ticket.id)))
         db.commit()
+
+    def new_subscriptions(self, event):
+        yield
     
-    # IAnnouncementSubscriber    
+    def description(self):
+        return "notify me when one of my watched wiki or tickets is updated"
+
+    # IAnnouncementSubscriber
     def subscriptions(self, event):
         if event.realm in ('wiki', 'ticket'):
             db = self.env.get_db_cnx()
@@ -262,10 +273,10 @@ class WatchSubscriber(Component):
                    AND realm=%s
                    AND category=%s
                    AND rule=%s
-            """, ('watcher', event.realm, '*', 
-                to_unicode(self._get_target_identifier(event.realm, 
+            """, ('watcher', event.realm, '*',
+                to_unicode(self._get_target_identifier(event.realm,
                 event.target))))
-        
+
             for transport, sid, authenticated in cursor.fetchall():
                 self.log.debug("WatchSubscriber added '%s (%s)' because " \
                     "of rule: watched"%(sid,authenticated and \
