@@ -63,6 +63,11 @@ class AllTicketSubscriber(Component):
         return "prefs_announcer_ticket_all.html", dict(data=vars)
 
     def subscriptions(self, event):
+        if event.realm != 'ticket':
+            return
+        if event.category not in ('changed', 'created', 'attachment added'):
+            return
+
         db = self.env.get_db_cnx()
         cursor = db.cursor()
         cursor.execute("""
