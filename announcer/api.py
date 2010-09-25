@@ -32,14 +32,16 @@
 # ----------------------------------------------------------------------------
 
 import pkg_resources
-
 import time
 
+from operator import itemgetter
+
 from trac.core import *
-from trac.util.compat import set
+from trac.config import ExtensionOption
 from trac.db import Table, Column, Index
 from trac.db import DatabaseManager
 from trac.env import IEnvironmentSetupParticipant
+from trac.util.compat import set
 
 class IAnnouncementProducer(Interface):
     """blah."""
@@ -48,6 +50,14 @@ class IAnnouncementProducer(Interface):
         """Returns an iterable that lists all the realms that this producer
         is capable of producing events for.
         """
+
+class INewAnnouncementSubscriber(Interface):
+    # new subscriptions come back as (dist, sid, auth, address, format, priority, adverb)
+    def new_subscriptions(event):
+        pass
+
+    def description():
+        pass
 
 class IAnnouncementSubscriber(Interface):
     """IAnnouncementSubscriber provides an interface where a Plug-In can
@@ -256,6 +266,76 @@ class AnnouncementEvent(object):
     def get_session_terms(self, session_id):
         return tuple()
 
+class IAnnouncementSubscriptionResolver(Interface):
+    """Supports new and old style of subscription resolution until new code
+    is complete."""
+    def subscriptions(event):
+        """Return all subscriptions as (dist, sid, auth, address, format)
+        priority 1 is highest.  adverb is 'always' or 'never'.
+        """
+
+class NewSubscriptionResolver(Component):
+    implements(IAnnouncementSubscriptionResolver)
+
+    subscribers = ExtensionPoint(INewAnnouncementSubscriber)
+
+    def subscriptions(self, event):
+        subscriptions = []
+        # new subscriptions come back as (dist, sid, auth, address, format, priority, adverb)
+        for sp in self.subscribers:
+            subscriptions.extend(
+                [x for x in sp.new_subscriptions(event) if x]
+            )
+
+        """
+        This logic is meant to generate a list of subscriptions for each distirbution
+        method.  The important thing is that we pick the rule with the highest
+        priority for each (sid, distribution) pair.  If it is "never", then the user
+        is dropped from the list.  If it is always, then the user is kept.  Only the
+        users highest priority rule is used and all others are skipped.
+        """
+        # sort by dist, sid, priority
+        ordered_subs = sorted(subscriptions, key=itemgetter(1,2,6))
+
+        resolved_subs = []
+
+        # collect highest priority for each (sid, dist) pair
+        state = {
+            'last': None
+        }
+        for s in ordered_subs:
+            if (s[1], s[2]) == state['last']:
+                continue
+            if s[-1] == 'always':
+                self.log.debug("Adding (%s) for 'always' on rule (%s)"%(s[2], s[0]))
+                resolved_subs.append(s[1:6])
+            else:
+                self.log.debug("Ignoring (%s) for 'never' on rule (%s)"%(s[2], s[0]))
+
+            state['last'] = (s[1], s[2])
+
+        return resolved_subs
+
+class OldSubscriptionResolver(Component):
+    implements(IAnnouncementSubscriptionResolver)
+
+    subscribers = ExtensionPoint(IAnnouncementSubscriber)
+    subscription_filters = ExtensionPoint(IAnnouncementSubscriptionFilter)
+
+    def subscriptions(self, event):
+        subscriptions = set()
+        for sp in self.subscribers:
+            subscriptions.update(
+                x for x in sp.subscriptions(event) if x
+            )
+        for sf in self.subscription_filters:
+            subscriptions = set(
+                sf.filter_subscriptions(event, subscriptions)
+            )
+
+        return subscriptions
+
+
 _TRUE_VALUES = ('yes', 'true', 'enabled', 'on', 'aye', '1', 1, True)
 
 def istrue(value, otherwise=False):
@@ -308,7 +388,16 @@ class AnnouncementSystem(Component):
 
     subscribers = ExtensionPoint(IAnnouncementSubscriber)
     subscription_filters = ExtensionPoint(IAnnouncementSubscriptionFilter)
+    subscription_resolvers = ExtensionPoint(IAnnouncementSubscriptionResolver)
     distributors = ExtensionPoint(IAnnouncementDistributor)
+
+    resolver = ExtensionOption('announcer', 'subscription_resolvers',
+        IAnnouncementSubscriptionResolver, 'OldSubscriptionResolver',
+        """Comma seperated list of subscription resolver components in the order
+        they will be called.
+        """)
+
+
 
     # IEnvironmentSetupParticipant implementation
     SCHEMA = [
@@ -323,6 +412,25 @@ class AnnouncementSystem(Component):
             Column('transport'),
             Index(['id']),
             Index(['realm', 'category', 'enabled']),
+        ],
+        Table('subscription', key='id')[
+            Column('id', auto_increment=True),
+            Column('time', type='int64'),
+            Column('changetime', type='int64'),
+            Column('class'),
+            Column('sid'),
+            Column('authenticated', type='int'),
+            Column('distributor'),
+            Column('format'),
+            Column('priority'),
+            Column('adverb')
+        ],
+        Table('subscription_attribute', key='id')[
+            Column('id', auto_increment=True),
+            Column('sid'),
+            Column('class'),
+            Column('name'),
+            Column('value')
         ]
     ]
 
@@ -336,13 +444,14 @@ class AnnouncementSystem(Component):
 
     def environment_needs_upgrade(self, db):
         cursor = db.cursor()
-        try:
-            cursor.execute("select count(*) from subscriptions")
-            cursor.fetchone()
-            return False
-        except:
-            db.rollback()
-            return True
+        for table in self.SCHEMA:
+            try:
+                cursor.execute("select count(*) from %s"%table.name)
+                cursor.fetchone()
+            except:
+                db.rollback()
+                return True
+        return False
 
     def upgrade_environment(self, db):
         self._upgrade_db(db)
@@ -350,12 +459,18 @@ class AnnouncementSystem(Component):
     def _upgrade_db(self, db):
         try:
             db_backend, _ = DatabaseManager(self.env)._get_connector()
-            cursor = db.cursor()
             for table in self.SCHEMA:
-                for stmt in db_backend.to_sql(table):
-                    self.log.debug(stmt)
-                    cursor.execute(stmt)
-                    db.commit()
+                try:
+                    cursor = db.cursor()
+                    cursor.execute("select count(*) from %s"%table.name)
+                    cursor.fetchone()
+                except:
+                    db.rollback()
+                    cursor = db.cursor()
+                    for stmt in db_backend.to_sql(table):
+                        self.log.debug(stmt)
+                        cursor.execute(stmt)
+                        db.commit()
         except Exception, e:
             db.rollback()
             self.log.error(e, exc_info=True)
@@ -378,15 +493,7 @@ class AnnouncementSystem(Component):
         the debug logs.
         """
         try:
-            subscriptions = set()
-            for sp in self.subscribers:
-                subscriptions.update(
-                    x for x in sp.subscriptions(evt) if x
-                )
-            for sf in self.subscription_filters:
-                subscriptions = set(
-                    sf.filter_subscriptions(evt, subscriptions)
-                )
+            subscriptions = self.resolver.subscriptions(evt)
 
             self.log.debug(
                 "AnnouncementSystem has found the following subscriptions: " \
@@ -397,7 +504,7 @@ class AnnouncementSystem(Component):
                 )
             )
             packages = {}
-            for transport, sid, authenticated, address in subscriptions:
+            for transport, sid, authenticated, address, subs_format in subscriptions:
                 if transport not in packages:
                     packages[transport] = set()
                 packages[transport].add((sid,authenticated,address))

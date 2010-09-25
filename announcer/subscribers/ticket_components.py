@@ -57,7 +57,7 @@ class TicketComponentSubscriber(Component):
                 self.log.debug("TicketComponentSubscriber added '%s " \
                         "(%s)' for component '%s'"%(
                         result[1], result[2], event.target['component']))
-                yield result
+                yield result + (None,)
 
     def get_announcement_preference_boxes(self, req):
         if req.authname == "anonymous" and 'email' not in req.session:

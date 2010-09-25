@@ -82,5 +82,5 @@ class AllTicketSubscriber(Component):
             if value:
                 self.log.debug(_("AllTicketSubscriber added '%s" \
                     "'."%sid))
-                yield (dist, sid, authed, None)
+                yield (dist, sid, authed, None, None)
 

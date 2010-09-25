@@ -74,7 +74,7 @@ class JoinableGroupSubscriber(Component):
                         "because of opt-in to group: %s"%(member[1], \
                         member[2] and 'authenticated' or \
                         'not authenticated', grp))
-                    yield member
+                    yield member + (None,)
                 if member is None:
                     self.log.debug("JoinableGroupSubscriber found " \
                             "no members for group: %s."%grp)

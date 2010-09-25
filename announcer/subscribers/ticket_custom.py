@@ -50,7 +50,7 @@ class TicketCustomFieldSubscriber(Component):
             ticket = event.target
             if event.category in ('changed', 'created', 'attachment added'):
                 for sub in self._get_membership(event.target):
-                    yield sub
+                    yield sub + (None,)
 
     def _get_membership(self, ticket):
         for field in self.custom_cc_fields:

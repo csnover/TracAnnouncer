@@ -270,8 +270,8 @@ class WatchSubscriber(Component):
                 self.log.debug("WatchSubscriber added '%s (%s)' because " \
                     "of rule: watched"%(sid,authenticated and \
                     'authenticated' or 'not authenticated'))
-                yield (transport, sid, authenticated, None)
-                    
+                yield (transport, sid, authenticated, None, None)
+
     def _get_target_identifier(self, realm, target):
         if realm == "wiki":
             return target.name

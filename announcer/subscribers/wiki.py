@@ -63,7 +63,7 @@ class GeneralWikiSubscriber(Component):
         for result in setting.get_subscriptions(match):
             self.log.debug("GeneralWikiSubscriber added '%s (%s)'"%(
                     result[1], result[2]))
-            yield result
+            yield result + (None,)
 
     def get_announcement_preference_boxes(self, req):
         if req.perm.has_permission('WIKI_VIEW'):

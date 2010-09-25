@@ -101,7 +101,7 @@ class LegacyTicketSubscriber(Component):
                     getter = self.__getattribute__('_get_%s'%attr)
                     subscription = getter(event, ticket, setting)
                     if subscription:
-                        yield subscription
+                        yield subscription + (None,)
                     
     # A group of helpers for getting each type of subscriber
     def _get_component_owner(self, event, ticket, setting):
@@ -180,5 +180,5 @@ class CarbonCopySubscriber(Component):
                         self.log.debug(_("CarbonCopySubscriber added '%s " \
                             "<%s>' because of rule: carbon copied" \
                             %(name,address)))
-                        yield ('email', name, name and True or False, address)
+                        yield ('email', name, name and True or False, address, None)
         

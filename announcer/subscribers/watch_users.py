@@ -55,7 +55,7 @@ class UserChangeSubscriber(Component):
                             return True
                 for sub in self._setting().get_subscriptions(match):
                     self.log.debug("UserChangeSubscriber added '%s'"%sub[1])
-                    yield sub
+                    yield sub + (None,)
 
     def get_announcement_preference_boxes(self, req):
         if req.authname == "anonymouse" and 'email' not in req.session:
