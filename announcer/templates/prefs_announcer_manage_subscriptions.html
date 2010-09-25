@@ -1,0 +1,56 @@
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:xi="http://www.w3.org/2001/XInclude" 
+      xmlns:py="http://genshi.edgewall.org/"
+      xmlns:i18n="http://genshi.edgewall.org/i18n"
+      i18n:domain="announcer">
+  <xi:include href="prefs.html" />
+  <head>
+    <title>Announcements</title>
+  </head>
+  <body>
+    <p>
+      Announcements serve as a method for Trac to communicate events to you; 
+      the creation of a ticket, the change of a Wiki page, and so on. Under
+      the Announcement system, you will only receive notifications to those
+      topics that you subscribe to.
+    </p>
+    <div class="announcer_preference_box">
+      <div py:for="distributor, rules in data['rules'].iteritems()" class="ruleset">
+          <div class="announcer_preference_title">
+              ${distributor} rules
+          </div>
+          <div class="announcer_preference_options">
+              <div>
+                  Format:
+                  <select name="format-${distributor}">
+                      <option py:for="f in data['formatters']" value="${f}" selected="${(f == data['selected_format']) or None}">${f}</option>
+                  </select>
+              </div>
+              <div>
+                  <ul>
+                      <li class="rules_header"><input type="checkbox" name="select_all"/></li>
+                      <li py:for="rule in rules" class="rule"><input type="checkbox" name="select_all"/>
+                      ${rule['adverb']} ${rule['description']}<button type="submit" name="method" value="delete-rule_${rule['id']}">Delete</button></li>
+                      <li class="rules_footer"><input type="checkbox" name="select_all"/></li>
+                  </ul>
+              </div>
+              <div class="add_rule">
+                  <div>
+                      <select name="new-adverb-${distributor}">
+                          <option py:for="a in data['adverbs']" value="${a}">${a}</option>
+                      </select>
+                      <select name="new-rule-${distributor}">
+                          <option py:for="s in data['subscribers']" value="${s['class']}">${s['description']}</option>
+                      </select><button type="submit" name="method" value="add-rule_${distributor}">Add</button>
+                  </div>
+              </div>
+          </div>
+      </div>
+    </div>
+  </body>
+</html>
+
+
