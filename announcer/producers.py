@@ -30,11 +30,49 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # ----------------------------------------------------------------------------
 
-from trac.core import *
+from trac.attachment import IAttachmentChangeListener
 from trac.config import BoolOption
+from trac.core import *
 from trac.ticket.api import ITicketChangeListener
-from announcer.api import AnnouncementSystem, AnnouncementEvent, \
-        IAnnouncementProducer
+from trac.ticket.model import Ticket
+from trac.wiki.api import IWikiChangeListener
+from trac.wiki.model import WikiPage
+
+from announcer.api import AnnouncementSystem, AnnouncementEvent, IAnnouncementProducer
+from announcer.producers.ticket import TicketChangeEvent
+from announcer.producers.wiki import WikiChangeEvent
+
+class AttachmentChangeProducer(Component):
+    implements(IAttachmentChangeListener, IAnnouncementProducer)
+
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def realms(self):
+        yield 'ticket'
+        yield 'wiki'
+
+    def attachment_added(self, attachment):
+        parent = attachment.resource.parent
+        if parent.realm == "ticket":
+            ticket = Ticket(self.env, parent.id)
+            announcer = AnnouncementSystem(ticket.env)
+            announcer.send(
+                TicketChangeEvent("ticket", "attachment added", ticket,
+                    attachment=attachment, author=attachment.author,
+                )
+            )
+        elif parent.realm == "wiki":
+            page = WikiPage(self.env, parent.id)
+            announcer = AnnouncementSystem(page.env)
+            announcer.send(
+                WikiChangeEvent("wiki", "attachment added", page,
+                    attachment=attachment, author=attachment.author,
+                )
+            )
+
+    def attachment_deleted(self, attachment):
+        pass
 
 class TicketChangeEvent(AnnouncementEvent):
     def __init__(self, realm, category, target,
@@ -60,7 +98,6 @@ class TicketChangeEvent(AnnouncementEvent):
             yield "owner"
         if session_id == ticket['reporter']:
             yield "reporter"
-
 
 class TicketChangeProducer(Component):
     implements(ITicketChangeListener, IAnnouncementProducer)
@@ -99,3 +136,51 @@ class TicketChangeProducer(Component):
     def ticket_deleted(self, ticket):
         pass
 
+class WikiChangeEvent(AnnouncementEvent):
+    def __init__(self, realm, category, target,
+                 comment=None, author=None, version=None,
+                 timestamp=None, remote_addr=None,
+                 attachment=None):
+        AnnouncementEvent.__init__(self, realm, category, target)
+        self.author = author
+        self.comment = comment
+        self.version = version
+        self.timestamp = timestamp
+        self.remote_addr = remote_addr
+        self.attachment = attachment
+
+class WikiChangeProducer(Component):
+    implements(IWikiChangeListener, IAnnouncementProducer)
+
+    def realms(self):
+        yield 'wiki'
+
+    def wiki_page_added(self, page):
+        history = list(page.get_history())[0]
+        announcer = AnnouncementSystem(page.env)
+        announcer.send(
+            WikiChangeEvent("wiki", "created", page,
+                author=history[2], version=history[0]
+            )
+        )
+
+    def wiki_page_changed(self, page, version, t, comment, author, ipnr):
+        announcer = AnnouncementSystem(page.env)
+        announcer.send(
+            WikiChangeEvent("wiki", "changed", page,
+                comment=comment, author=author, version=version,
+                timestamp=t, remote_addr=ipnr
+            )
+        )
+
+    def wiki_page_deleted(self, page):
+        announcer = AnnouncementSystem(page.env)
+        announcer.send(
+            WikiChangeEvent("wiki", "deleted", page)
+        )
+
+    def wiki_page_version_deleted(self, page):
+        announcer = AnnouncementSystem(page.env)
+        announcer.send(
+            WikiChangeEvent("wiki", "version deleted", page)
+        )
