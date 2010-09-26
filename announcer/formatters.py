@@ -2,13 +2,13 @@
 #
 # Copyright (c) 2008, Stephen Hansen
 # Copyright (c) 2009, Robert Corsaro
-# 
+#
 # All rights reserved.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
-# 
-#     * Redistributions of source code must retain the above copyright 
+#
+#     * Redistributions of source code must retain the above copyright
 #       notice, this list of conditions and the following disclaimer.
 #     * Redistributions in binary form must reproduce the above copyright
 #       notice, this list of conditions and the following disclaimer in the
@@ -16,7 +16,7 @@
 #     * Neither the name of the <ORGANIZATION> nor the names of its
 #       contributors may be used to endorse or promote products derived from
 #       this software without specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 # "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 # LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -30,11 +30,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # ----------------------------------------------------------------------------
 
-from announcer.api import IAnnouncementFormatter
-
-from genshi import HTML
-from genshi.template import NewTextTemplate, MarkupTemplate
-from genshi.template import TemplateLoader
+import difflib
 
 from trac.config import Option, IntOption, ListOption, BoolOption
 from trac.core import *
@@ -42,12 +38,16 @@ from trac.mimeview import Context
 from trac.test import Mock, MockPerm
 from trac.ticket.api import TicketSystem
 from trac.util.text import wrap, to_unicode, exception_to_unicode
-from trac.versioncontrol.diff import diff_blocks
+from trac.versioncontrol.diff import diff_blocks, unified_diff
 from trac.web.chrome import Chrome
 from trac.web.href import Href
 from trac.wiki.formatter import HtmlFormatter
+from trac.wiki.model import WikiPage
 
-import difflib
+from genshi import HTML
+from genshi.template import NewTextTemplate, MarkupTemplate, TemplateLoader
+
+from announcer.api import IAnnouncementFormatter
 
 def diff_cleanup(gen):
     for value in gen:
@@ -64,29 +64,35 @@ def lineup(gen):
     for value in gen:
         yield ' ' + value
 
+diff_header = """Index: %(name)s
+==============================================================================
+--- %(name)s (version: %(oldversion)s)
++++ %(name)s (version: %(version)s)
+"""
+
 class TicketFormatter(Component):
     implements(IAnnouncementFormatter)
-        
-    ticket_email_header_fields = ListOption('announcer', 
-            'ticket_email_header_fields', 
+
+    ticket_email_header_fields = ListOption('announcer',
+            'ticket_email_header_fields',
             'owner, reporter, milestone, priority, severity',
-            doc="""Comma seperated list of fields to appear in tickets.  
+            doc="""Comma seperated list of fields to appear in tickets.
             Use * to include all headers.""")
 
     ticket_link_with_comment = BoolOption('announcer',
             'ticket_link_with_comment',
             'false',
             """Include last change anchor to the ticket URL.""")
-    
+
     def styles(self, transport, realm):
         if realm == "ticket":
             yield "text/plain"
             yield "text/html"
-        
+
     def alternative_style_for(self, transport, realm, style):
         if realm == "ticket" and style != 'text/plain':
             return "text/plain"
-        
+
     def format(self, transport, realm, style, event):
         if realm == "ticket":
             if style == "text/plain":
@@ -155,12 +161,12 @@ class TicketFormatter(Component):
             short_changes = short_changes,
             attachment= event.attachment
         )
-        chrome = Chrome(self.env)        
+        chrome = Chrome(self.env)
         dirs = []
         for provider in chrome.template_providers:
             dirs += provider.get_templates_dirs()
         templates = TemplateLoader(dirs, variable_lookup='lenient')
-        template = templates.load('ticket_email_plaintext.txt', 
+        template = templates.load('ticket_email_plaintext.txt',
                 cls=NewTextTemplate)
         if template:
             stream = template.generate(**data)
@@ -175,12 +181,12 @@ class TicketFormatter(Component):
                 return i['name'] in headers
             fields = filter(_filter, fields)
         return fields
- 
+
     def _format_html(self, event):
         ticket = event.target
         short_changes = {}
         long_changes = {}
-        chrome = Chrome(self.env)        
+        chrome = Chrome(self.env)
         for field, old_value in event.changes.items():
             new_value = ticket[field]
             if (new_value and '\n' in new_value) or \
@@ -190,7 +196,7 @@ class TicketFormatter(Component):
                         '\n'.join(
                             diff_cleanup(
                                 difflib.unified_diff(
-                                    wrap(old_value, cols=60).split('\n'), 
+                                    wrap(old_value, cols=60).split('\n'),
                                     wrap(new_value, cols=60).split('\n'),
                                     lineterm='', n=3
                                 )
@@ -209,7 +215,7 @@ class TicketFormatter(Component):
                 req = Mock(
                     href=Href(self.env.abs_href()),
                     abs_href=self.env.abs_href,
-                    authname=event.author, 
+                    authname=event.author,
                     perm=MockPerm(),
                     chrome=dict(
                         warnings=[],
@@ -228,7 +234,7 @@ class TicketFormatter(Component):
 
         description = render_wiki_to_html_without_req(event, ticket['description'])
         temp        = render_wiki_to_html_without_req(event, event.comment)
-                
+
         data = dict(
             ticket = ticket,
             description = description,
@@ -251,10 +257,69 @@ class TicketFormatter(Component):
         for provider in chrome.template_providers:
             dirs += provider.get_templates_dirs()
         templates = TemplateLoader(dirs, variable_lookup='lenient')
-        template = templates.load('ticket_email_mimic.html', 
+        template = templates.load('ticket_email_mimic.html',
                 cls=MarkupTemplate)
         if template:
             stream = template.generate(**data)
             output = stream.render()
         return output
 
+class WikiFormatter(Component):
+    implements(IAnnouncementFormatter)
+
+    wiki_email_diff = BoolOption('announcer', 'wiki_email_diff',
+            "true",
+            """Should a wiki diff be sent with emails?""")
+
+    def styles(self, transport, realm):
+        if realm == "wiki":
+            yield "text/plain"
+
+    def alternative_style_for(self, transport, realm, style):
+        if realm == "wiki" and style != "text/plain":
+            return "text/plain"
+
+    def format(self, transport, realm, style, event):
+        if realm == "wiki" and style == "text/plain":
+            return self._format_plaintext(event)
+
+    def _format_plaintext(self, event):
+        page = event.target
+        data = dict(
+            action = event.category,
+            attachment = event.attachment,
+            page = page,
+            author = event.author,
+            comment = event.comment,
+            category = event.category,
+            page_link = self.env.abs_href('wiki', page.name),
+            project_name = self.env.project_name,
+            project_desc = self.env.project_description,
+            project_link = self.env.project_url or self.env.abs_href(),
+        )
+        old_page = WikiPage(self.env, page.name, page.version - 1)
+        if page.version:
+            data["changed"] = True
+            data["diff_link"] = self.env.abs_href('wiki', page.name,
+                    action="diff", version=page.version)
+            if self.wiki_email_diff:
+                diff = "\n"
+                diff += diff_header % { 'name': page.name,
+                                       'version': page.version,
+                                       'oldversion': page.version - 1
+                                     }
+                for line in unified_diff(old_page.text.splitlines(),
+                                         page.text.splitlines(), context=3):
+                    diff += "%s\n" % line
+                data["diff"] = diff
+        chrome = Chrome(self.env)
+        dirs = []
+        for provider in chrome.template_providers:
+            dirs += provider.get_templates_dirs()
+        templates = TemplateLoader(dirs, variable_lookup='lenient')
+        template = templates.load('wiki_email_plaintext.txt',
+                cls=NewTextTemplate)
+        if template:
+            stream = template.generate(**data)
+            output = stream.render('text')
+        return output
