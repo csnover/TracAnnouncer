@@ -270,7 +270,7 @@ class CarbonCopySubscriber(Component):
         return "notify me when I'm listed in the CC field of a ticket"
 
 class LegacyTicketSubscriber(Component):
-    """Mimics Trac notification settings with added bonus of letting users
+    """DEPRECATED: Mimics Trac notification settings with added bonus of letting users
     override their settings.
     """
     implements(IAnnouncementSubscriber)
