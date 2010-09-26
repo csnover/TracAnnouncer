@@ -657,7 +657,6 @@ class SendmailEmailSender(Component):
         cmdline = [self.sendmail_path, "-i", "-f", from_addr]
         cmdline.extend(recipients)
         self.log.debug("Sendmail command line: %s" % ' '.join(cmdline))
-        self.log.error(message)
         child = Popen(cmdline, bufsize=-1, stdin=PIPE, stdout=PIPE,
                       stderr=PIPE)
         (out, err) = child.communicate(message)
@@ -668,7 +667,6 @@ class SendmailEmailSender(Component):
 
 class DeliveryThread(threading.Thread):
     def __init__(self, queue, sender):
-        print "STARTING THREAD *****************************************************************************"
         threading.Thread.__init__(self)
         self._sender = sender
         self._queue = queue
