@@ -42,7 +42,7 @@ from announcer.api import _, tag_, N_
 from announcer.api import IAnnouncementDistributor
 from announcer.api import IAnnouncementFormatter
 from announcer.api import IAnnouncementPreferenceProvider
-from announcer.api import INewAnnouncementSubscriber
+from announcer.api import IAnnouncementSubscriber
 from announcer.model import Subscription
 
 def truth(v):
@@ -92,7 +92,7 @@ class SubscriptionManagementPanel(Component):
     implements(IPreferencePanelProvider)
     implements(ITemplateProvider)
 
-    subscribers = ExtensionPoint(INewAnnouncementSubscriber)
+    subscribers = ExtensionPoint(IAnnouncementSubscriber)
     distributors = ExtensionPoint(IAnnouncementDistributor)
     formatters = ExtensionPoint(IAnnouncementFormatter)
 

@@ -36,7 +36,7 @@ from trac.web.chrome import Chrome
 from genshi.template import NewTextTemplate, TemplateLoader
 
 from announcer.api import AnnouncementSystem, AnnouncementEvent
-from announcer.api import IAnnouncementFormatter, IAnnouncementSubscriber
+from announcer.api import IAnnouncementFormatter, IAnnouncementSubscriberDeprecated
 from announcer.api import IAnnouncementPreferenceProvider, istrue
 from announcer.api import _
 from announcer.distributors.mail import IAnnouncementEmailDecorator
@@ -74,7 +74,7 @@ class FullBlogAnnouncement(Component):
 
     implements(
         IBlogChangeListener,
-        IAnnouncementSubscriber, 
+        IAnnouncementSubscriberDeprecated, 
         IAnnouncementFormatter,
         IAnnouncementEmailDecorator,
         IAnnouncementPreferenceProvider

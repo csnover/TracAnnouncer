@@ -51,15 +51,15 @@ class IAnnouncementProducer(Interface):
         is capable of producing events for.
         """
 
-class INewAnnouncementSubscriber(Interface):
-    # new subscriptions come back as (dist, sid, auth, address, format, priority, adverb)
-    def new_subscriptions(event):
+class IAnnouncementSubscriber(Interface):
+    # new subscriptions come back as yield (dist, sid, auth, address, format, priority, adverb)
+    def matches(event):
         pass
 
     def description():
         pass
 
-class IAnnouncementSubscriber(Interface):
+class IAnnouncementSubscriberDeprecated(Interface):
     """IAnnouncementSubscriber provides an interface where a Plug-In can
     register realms and categories of subscriptions it is able to provide.
 
@@ -274,17 +274,17 @@ class IAnnouncementSubscriptionResolver(Interface):
         priority 1 is highest.  adverb is 'always' or 'never'.
         """
 
-class NewSubscriptionResolver(Component):
+class SubscriptionResolver(Component):
     implements(IAnnouncementSubscriptionResolver)
 
-    subscribers = ExtensionPoint(INewAnnouncementSubscriber)
+    subscribers = ExtensionPoint(IAnnouncementSubscriber)
 
     def subscriptions(self, event):
         subscriptions = []
         # new subscriptions come back as (dist, sid, auth, address, format, priority, adverb)
         for sp in self.subscribers:
             subscriptions.extend(
-                [x for x in sp.new_subscriptions(event) if x]
+                [x for x in sp.matches(event) if x]
             )
 
         """
@@ -400,6 +400,9 @@ class AnnouncementSystem(Component):
 
 
     # IEnvironmentSetupParticipant implementation
+    """Subscriptions table will is deprecated in favor of the new
+    subscriber interface.
+    """
     SCHEMA = [
         Table('subscriptions', key='id')[
             Column('id', auto_increment=True),

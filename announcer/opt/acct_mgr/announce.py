@@ -35,7 +35,7 @@ from trac.web.chrome import Chrome
 from genshi.template import NewTextTemplate, TemplateLoader
 
 from announcer.api import AnnouncementSystem, AnnouncementEvent
-from announcer.api import IAnnouncementFormatter, IAnnouncementSubscriber
+from announcer.api import IAnnouncementFormatter, IAnnouncementSubscriberDeprecated
 from announcer.api import IAnnouncementPreferenceProvider
 from announcer.api import _
 from announcer.distributors.mail import IAnnouncementEmailDecorator
@@ -56,7 +56,7 @@ class AccountManagerAnnouncement(Component):
 
     implements(
         IAccountChangeListener,
-        IAnnouncementSubscriber, 
+        IAnnouncementSubscriberDeprecated,
         IAnnouncementFormatter,
         IAnnouncementEmailDecorator,
         IAnnouncementPreferenceProvider

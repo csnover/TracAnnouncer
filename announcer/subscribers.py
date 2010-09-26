@@ -50,99 +50,17 @@ from genshi.builder import tag
 
 from announcer.api import IAnnouncementPreferenceProvider
 from announcer.api import IAnnouncementSubscriber
-from announcer.api import INewAnnouncementSubscriber
+from announcer.api import IAnnouncementSubscriberDeprecated
 from announcer.api import _, istrue
 from announcer.model import Subscription
 from announcer.query import *
 from announcer.util.settings import BoolSubscriptionSetting
 from announcer.util.settings import SubscriptionSetting
 
-class RuleBasedTicketSubscriber(Component):
-
-    implements(IAnnouncementSubscriber, IAnnouncementPreferenceProvider)
-
-    # IAnnouncementSubscriber
-    def subscriptions(self, event):
-        terms = self._get_basic_terms(event)
-        db = self.env.get_db_ctx()
-        cursor = db.cursor()
-        cursor.execute("""
-            SELECT id, sid, authenticated, rule
-              FROM subscriptions
-             WHERE enabled=1 AND managed=''
-               AND realm=%s
-               AND category=%s
-        """, (event.realm, event.category))
-        for rule_id, session_id, authenticated, rule in cursor.fetchall():
-            query = Query(rule)
-            print "For", session_id, "Rule:", rule
-            if query(terms + self._get_session_terms(session_id, event)):
-                print True
-            else:
-                print False
-
-    def _get_basic_terms(self, event):
-        terms = [event.realm, event.category]
-        try:
-            terms.extend(event.get_basic_terms())
-        except:
-            pass
-        print "Basic terms", terms
-        return terms
-
-    def _get_session_terms(self, session_id, event):
-        terms = []
-        try:
-            terms.extend(event.get_session_terms(session_id))
-        except:
-            pass
-        print "Session terms", terms
-        return terms
-
-    # IAnnouncementPreferenceProvider
-    def get_announcement_preference_boxes(self, req):
-        yield ('rules', _('Rule-based subscriptions'))
-
-    def render_announcement_preference_box(self, req, box):
-        add_stylesheet(req, 'announcer/css/rulediv.css')
-        categories = {
-            'ticket': ('created', 'changed', 'attachment added', 'deleted'),
-            'wiki': ('created', 'changed', 'attachment added', 'deleted')
-        }
-        rules = [
-            dict(
-                id=1,
-                enabled=True,
-                realm="ticket",
-                category="changed",
-                value="this or that",
-            ),
-            dict(
-                id=3,
-                enabled=False,
-                realm="wiki",
-                category="created",
-                value="this or that",
-            ),
-            dict(
-                id=5,
-                enabled=True,
-                realm="ticket",
-                category="changed",
-                value="this or that",
-            ),
-        ]
-        data = dict(
-            categories=categories,
-            rules=rules,
-        )
-        return "prefs_announcer_rules.html", data
-
-
 class AllTicketSubscriber(Component):
     """Subscriber for all ticket changes."""
     implements(IAnnouncementSubscriber)
-    implements(INewAnnouncementSubscriber)
+    implements(IAnnouncementSubscriberDeprecated)
     implements(IAnnouncementPreferenceProvider)
 
     def get_announcement_preference_boxes(self, req):
@@ -182,14 +100,14 @@ class AllTicketSubscriber(Component):
                     "'."%sid))
                 yield (dist, sid, authed, None, None)
 
-    def new_subscriptions(self, event):
+    def matches(self, event):
         klass = self.__class__.__name__
         for i in Subscription.find_by_class(self.env, klass):
             yield i.subscription_tuple()
 
 
 class TicketOwnerSubscriber(Component):
-    implements(INewAnnouncementSubscriber)
+    implements(IAnnouncementSubscriber)
 
     owner = BoolOption("announcer", "always_notify_owner", 'true',
         """The always_notify_owner option mimics the option of the same name
@@ -197,7 +115,7 @@ class TicketOwnerSubscriber(Component):
         preferences.
         """)
 
-    def new_subscriptions(self, event):
+    def matches(self, event):
         if event.realm != "ticket":
             return
         if event.category not in ('created', 'changed', 'attachment added'):
@@ -215,7 +133,7 @@ class TicketOwnerSubscriber(Component):
         return "notify me when a ticket that I own is created or modified"
 
 class TicketComponentOwnerSubscriber(Component):
-    implements(INewAnnouncementSubscriber)
+    implements(IAnnouncementSubscriber)
 
     component_owner = BoolOption("announcer", "always_notify_component_owner",
         'true',
@@ -223,7 +141,7 @@ class TicketComponentOwnerSubscriber(Component):
         user can override this setting in their preferences.
         """)
 
-    def new_subscriptions(self, event):
+    def matches(self, event):
         if event.realm != "ticket":
             return
         if event.category not in ('created', 'changed', 'attachment added'):
@@ -246,7 +164,7 @@ class TicketComponentOwnerSubscriber(Component):
         return "notify me when a ticket that belongs to a component that I own is created or modified"
 
 class TicketUpdaterSubscriber(Component):
-    implements(INewAnnouncementSubscriber)
+    implements(IAnnouncementSubscriber)
 
     updater = BoolOption("announcer", "always_notify_updater", 'true',
         """The always_notify_updater option mimics the option of the
@@ -254,7 +172,7 @@ class TicketUpdaterSubscriber(Component):
         their preferences.
         """)
 
-    def new_subscriptions(self, event):
+    def matches(self, event):
         if event.realm != "ticket":
             return
         if event.category not in ('created', 'changed', 'attachment added'):
@@ -270,7 +188,7 @@ class TicketUpdaterSubscriber(Component):
         return "notify me when I update a ticket"
 
 class TicketReporterSubscriber(Component):
-    implements(INewAnnouncementSubscriber)
+    implements(IAnnouncementSubscriber)
 
     reporter = BoolOption("announcer", "always_notify_reporter", 'true',
         """The always_notify_reporter option mimics the option of the
@@ -278,7 +196,7 @@ class TicketReporterSubscriber(Component):
         their preferences.
         """)
 
-    def new_subscriptions(self, event):
+    def matches(self, event):
         if event.realm != "ticket":
             return
         if event.category not in ('created', 'changed', 'attachment added'):
@@ -301,7 +219,7 @@ class TicketReporterSubscriber(Component):
 class CarbonCopySubscriber(Component):
     """Carbon copy subscriber for cc ticket field."""
     implements(IAnnouncementSubscriber)
-    implements(INewAnnouncementSubscriber)
+    implements(IAnnouncementSubscriber)
 
     def subscriptions(self, event):
         if event.realm == 'ticket':
@@ -323,7 +241,7 @@ class CarbonCopySubscriber(Component):
                             %(name,address)))
                         yield ('email', name, name and True or False, address, None)
 
-    def new_subscriptions(self, event):
+    def matches(self, event):
         if event.realm != 'ticket':
             return
         if event.category not in ('created', 'changed', 'attachment added'):
@@ -467,7 +385,7 @@ class LegacyTicketSubscriber(Component):
 
 class TicketComponentSubscriber(Component):
     implements(IAnnouncementSubscriber)
-    implements(INewAnnouncementSubscriber)
+    implements(IAnnouncementSubscriberDeprecated)
     implements(IAnnouncementPreferenceProvider)
 
     def subscriptions(self, event):
@@ -484,7 +402,7 @@ class TicketComponentSubscriber(Component):
                         result[1], result[2], event.target['component']))
                 yield result + (None,)
 
-    def new_subscriptions(self, event):
+    def matches(self, event):
         if event.realm != 'ticket':
             return
         if event.category not in ('changed', 'created', 'attachment added'):
@@ -559,7 +477,7 @@ class TicketComponentSubscriber(Component):
 
 class TicketCustomFieldSubscriber(Component):
     implements(IAnnouncementSubscriber)
-    implements(INewAnnouncementSubscriber)
+    implements(IAnnouncementSubscriberDeprecated)
 
     custom_cc_fields = ListOption('announcer', 'custom_cc_fields',
             doc="Field names that contain users that should be notified on "
@@ -572,7 +490,7 @@ class TicketCustomFieldSubscriber(Component):
                 for sub in self._get_membership(event.target):
                     yield sub + (None,)
 
-    def new_subscriptions(self, event):
+    def matches(self, event):
         yield
 
     def description(self):
@@ -599,7 +517,7 @@ class TicketCustomFieldSubscriber(Component):
 
 class JoinableGroupSubscriber(Component):
     implements(IAnnouncementSubscriber)
-    implements(INewAnnouncementSubscriber)
+    implements(IAnnouncementSubscriberDeprecated)
     implements(IAnnouncementPreferenceProvider)
 
     joinable_groups = ListOption('announcer', 'joinable_groups', [],
@@ -613,7 +531,7 @@ class JoinableGroupSubscriber(Component):
         ticket is changed.
         """)
 
-    def new_subscriptions(self, event):
+    def matches(self, event):
         yield
 
     def description(self):
@@ -672,10 +590,10 @@ class UserChangeSubscriber(Component):
     """Allows users to get notified anytime a particular user change or
     modifies a ticket or wiki page."""
     implements(IAnnouncementSubscriber)
-    implements(INewAnnouncementSubscriber)
+    implements(IAnnouncementSubscriberDeprecated)
     implements(IAnnouncementPreferenceProvider)
 
-    def new_subscriptions(self, event):
+    def matches(self, event):
         yield
 
     def description(self):
@@ -713,7 +631,7 @@ class WatchSubscriber(Component):
     implements(IRequestFilter)
     implements(IRequestHandler)
     implements(IAnnouncementSubscriber)
-    implements(INewAnnouncementSubscriber)
+    implements(IAnnouncementSubscriberDeprecated)
     implements(ITicketChangeListener)
     implements(IWikiChangeListener)
 
@@ -917,7 +835,7 @@ class WatchSubscriber(Component):
         """, ('watcher', 'ticket', to_unicode(ticket.id)))
         db.commit()
 
-    def new_subscriptions(self, event):
+    def matches(self, event):
         yield
 
     def description(self):
@@ -953,10 +871,10 @@ class WatchSubscriber(Component):
 
 class GeneralWikiSubscriber(Component):
     implements(IAnnouncementSubscriber)
-    implements(INewAnnouncementSubscriber)
+    implements(IAnnouncementSubscriberDeprecated)
     implements(IAnnouncementPreferenceProvider)
 
-    def new_subscriptions(self, event):
+    def matches(self, event):
         yield
 
     def description(self):
