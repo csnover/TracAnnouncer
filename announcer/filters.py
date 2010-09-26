@@ -29,6 +29,10 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # ----------------------------------------------------------------------------
+
+"""-*- Deprecated -*-
+New subscriber interface will elliminate the need for filters
+"""
 import re
 
 from trac.core import *
