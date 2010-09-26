@@ -2,13 +2,13 @@
 #
 # Copyright (c) 2009, Robert Corsaro
 # Copyright (c) 2010, Steffen Hoffmann
-# 
+#
 # All rights reserved.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
-# 
-#     * Redistributions of source code must retain the above copyright 
+#
+#     * Redistributions of source code must retain the above copyright
 #       notice, this list of conditions and the following disclaimer.
 #     * Redistributions in binary form must reproduce the above copyright
 #       notice, this list of conditions and the following disclaimer in the
@@ -16,7 +16,7 @@
 #     * Neither the name of the <ORGANIZATION> nor the names of its
 #       contributors may be used to endorse or promote products derived from
 #       this software without specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 # "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 # LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -40,6 +40,50 @@ from announcer.api import _
 
 from announcer.util.settings import BoolSubscriptionSetting
 
+class ChangeAuthorFilter(Component):
+    implements(IAnnouncementSubscriptionFilter)
+    implements(IAnnouncementPreferenceProvider)
+
+    never_notify_author = BoolOption('announcer', 'never_notify_author', 'true',
+            """User overridable default value.  Stop author from receiving
+            an announcement, even if some other rule says they should receive
+            one.
+            """)
+
+    def filter_subscriptions(self, event, subscriptions):
+        for subscription in subscriptions:
+            setting = self._setting()
+            if event.author == subscription[1] and \
+                    setting.get_user_setting(event.author)[1]:
+                self.log.debug(
+                    "Filtering %s because of rule: ChangeAuthorFilter"\
+                    %event.author
+                )
+                pass
+            else:
+                yield subscription
+
+    def get_announcement_preference_boxes(self, req):
+        if req.authname == 'anonymous' and 'email' not in req.session:
+            return
+        yield 'author_filter', _('Author Filter')
+
+    def render_announcement_preference_box(self, req, panel):
+        setting = self._setting()
+        if req.method == "POST":
+            setting.set_user_setting(req.session,
+                value=req.args.get('author_filter'))
+        value = setting.get_user_setting(req.session.sid)[1]
+        return 'prefs_announcer_author_filter.html', \
+                dict(data=dict(author_filter=value))
+
+    def _setting(self):
+        return BoolSubscriptionSetting(
+            self.env,
+            'author_filter',
+            self.never_notify_author
+        )
+
 class UnsubscribeFilter(Component):
     implements(IAnnouncementSubscriptionFilter, IAnnouncementPreferenceProvider)
 
@@ -49,7 +93,7 @@ class UnsubscribeFilter(Component):
             This setting stops any announcements from ever being sent to the
             user.
             """)
-    
+
     def filter_subscriptions(self, event, subscriptions):
         setting = self._setting()
         for subscription in subscriptions:
@@ -70,7 +114,7 @@ class UnsubscribeFilter(Component):
     def render_announcement_preference_box(self, req, panel):
         setting = self._setting()
         if req.method == "POST":
-            setting.set_user_setting(req.session, 
+            setting.set_user_setting(req.session,
                     value=req.args.get('unsubscribe_all'))
         value = setting.get_user_setting(req.session.sid)[1]
         return "prefs_announcer_unsubscribe_all.html", \
