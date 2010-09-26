@@ -53,7 +53,6 @@ from announcer.api import IAnnouncementSubscriber
 from announcer.api import IAnnouncementSubscriberDeprecated
 from announcer.api import _, istrue
 from announcer.model import Subscription
-from announcer.query import *
 from announcer.util.settings import BoolSubscriptionSetting
 from announcer.util.settings import SubscriptionSetting
 

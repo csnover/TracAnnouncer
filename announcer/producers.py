@@ -39,8 +39,6 @@ from trac.wiki.api import IWikiChangeListener
 from trac.wiki.model import WikiPage
 
 from announcer.api import AnnouncementSystem, AnnouncementEvent, IAnnouncementProducer
-from announcer.producers.ticket import TicketChangeEvent
-from announcer.producers.wiki import WikiChangeEvent
 
 class AttachmentChangeProducer(Component):
     implements(IAttachmentChangeListener, IAnnouncementProducer)
