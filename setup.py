@@ -91,9 +91,7 @@ setup(
         'trac.plugins': [
             'announcer.api = announcer.api',
             'announcer.distributors.mail = announcer.distributors.mail',
-            'announcer.email_decorators.generic = announcer.email_decorators.generic',
-            'announcer.email_decorators.ticket = announcer.email_decorators.ticket',
-            'announcer.email_decorators.wiki = announcer.email_decorators.wiki',
+            'announcer.email_decorators = announcer.email_decorators',
             'announcer.filters = announcer.filters',
             'announcer.formatters = announcer.formatters',
             'announcer.model = announcer.model',

@@ -24,15 +24,19 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # ----------------------------------------------------------------------------
-import re
-from email.utils import parseaddr
-
-import trac
-from trac.core import *
-from trac.config import ListOption, Option
-from trac.util.text import to_unicode
 
 import announcer
+import re
+import trac
+
+from email.utils import parseaddr
+
+from trac.config import ListOption, Option
+from trac.core import *
+from trac.util.text import to_unicode
+
+from genshi.template import NewTextTemplate
+
 from announcer.distributors.mail import IAnnouncementEmailDecorator
 from announcer.util.mail import set_header, msgid, next_decorator, uid_encode
 
@@ -137,3 +141,81 @@ class AnnouncerEmailDecorator(Component):
 
         return next_decorator(event, message, decorators)
 
+
+class TicketSubjectEmailDecorator(Component):
+
+    implements(IAnnouncementEmailDecorator)
+
+    ticket_email_subject = Option('announcer', 'ticket_email_subject',
+            "Ticket #${ticket.id}: ${ticket['summary']} " \
+                    "{% if action %}[${action}]{% end %}",
+            """Format string for ticket email subject.  This is
+               a mini genshi template that is passed the ticket
+               event and action objects.""")
+
+    def decorate_message(self, event, message, decorates=None):
+        if event.realm == 'ticket':
+            if event.changes:
+                if 'status' in event.changes:
+                    action = 'Status -> %s' % (event.target['status'])
+            template = NewTextTemplate(self.ticket_email_subject.encode('utf8'))
+            subject = template.generate(
+                ticket=event.target,
+                event=event,
+                action=event.category
+            ).render('text', encoding=None)
+
+            prefix = self.config.get('announcer', 'email_subject_prefix')
+            if prefix == '__default__':
+                prefix = '[%s] ' % self.env.project_name
+            if prefix:
+                subject = "%s%s"%(prefix, subject)
+            if event.category != 'created':
+                subject = 'Re: %s'%subject
+            set_header(message, 'Subject', subject)
+
+        return next_decorator(event, message, decorates)
+
+
+class TicketAddlHeaderEmailDecorator(Component):
+
+    implements(IAnnouncementEmailDecorator)
+
+    def decorate_message(self, event, message, decorates=None):
+        if event.realm == 'ticket':
+            for k in ('id', 'priority', 'severity'):
+                name = 'X-Announcement-%s'%k.capitalize()
+                set_header(message, name, event.target[k])
+
+        return next_decorator(event, message, decorates)
+
+
+class WikiSubjectEmailDecorator(Component):
+
+    implements(IAnnouncementEmailDecorator)
+
+    wiki_email_subject = Option('announcer', 'wiki_email_subject',
+            "Page: ${page.name} ${action}",
+            """Format string for the wiki email subject.  This is a
+               mini genshi template and it is passed the page, event
+               and action objects.""")
+
+    def decorate_message(self, event, message, decorates=None):
+        if event.realm == 'wiki':
+            template = NewTextTemplate(self.wiki_email_subject.encode('utf8'))
+            subject = template.generate(
+                page=event.target,
+                event=event,
+                action=event.category
+            ).render('text', encoding=None)
+
+            prefix = self.config.get('announcer', 'email_subject_prefix')
+            if prefix == '__default__':
+                prefix = '[%s] ' % self.env.project_name
+            if prefix:
+                subject = "%s%s"%(prefix, subject)
+            if event.category != 'created':
+                subject = 'Re: %s'%subject
+            set_header(message, 'Subject', subject)
+
+        return next_decorator(event, message, decorates)
