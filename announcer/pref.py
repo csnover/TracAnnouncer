@@ -151,7 +151,7 @@ class SubscriptionManagementPanel(Component):
                     data['rules'][j].append({
                         'id': r['id'],
                         'adverb': r['adverb'],
-                        'description': desc_map[r['class']],
+                        'description': desc_map.get(r['class'], 'oh noes!'),
                         'priority': r['priority']
                     })
 
