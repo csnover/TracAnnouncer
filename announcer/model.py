@@ -120,10 +120,11 @@ class Subscription(object):
         def do_select(db):
             cursor = db.cursor()
             cursor.execute("""
-            SELECT id, sid, authenticated, distributor,
-                   format, priority, adverb, class
-              FROM subscription
-             WHERE sid=%s
+              SELECT id, sid, authenticated, distributor,
+                     format, priority, adverb, class
+                FROM subscription
+               WHERE sid=%s
+            ORDER BY priority
             """, (sid,))
             for i in cursor.fetchall():
                 sub = Subscription(env)
