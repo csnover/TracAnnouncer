@@ -31,6 +31,14 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # ----------------------------------------------------------------------------
 
+# TODO: Get announcement prefs from subscription_attribute instead of
+#       session_attribute for all subscribers.
+# TODO: Convert watch subscriber to use subscription_attribute.
+# TODO: Test all anonymous subsribers
+# TODO: Subscriptions admin page
+# TODO: Remove deprecated code.  subscriptions() and SubscriptionSettings and
+#       many of the preference panels.
+
 import re, urllib
 
 from fnmatch import fnmatch
