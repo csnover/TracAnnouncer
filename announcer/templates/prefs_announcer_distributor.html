@@ -1,0 +1,10 @@
+<span xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:py="http://genshi.edgewall.org/"
+     xmlns:xi="http://www.w3.org/2001/XInclude">
+     I prefer to recieve announcements via <label for="preferred_distributor">
+       <select id="preferred_distributor" name="preferred_distributor">
+           <option py:for="distributor in distributors" value="${distributor}"
+           selected="${(preferred_distributor == distributor) or None}">${distributor}</option>
+       </select>
+     </label>
+</span>

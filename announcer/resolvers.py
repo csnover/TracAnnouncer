@@ -36,6 +36,7 @@ from trac.util.compat import sorted
 
 from announcer.api import IAnnouncementAddressResolver
 from announcer.api import IAnnouncementPreferenceProvider
+from announcer.util.settings import SubscriptionSetting
 from announcer.api import _
 
 class DefaultDomainEmailResolver(Component):
@@ -99,3 +100,25 @@ class SpecifiedEmailResolver(Component):
         specified = sess.get('announcer_specified_email', '')
         data = dict(specified_email = specified,)
         return "prefs_announcer_emailaddress.html", data
+
+class SpecifiedXmppResolver(Component):
+    implements(IAnnouncementAddressResolver, IAnnouncementPreferenceProvider)
+
+    def __init__(self):
+        self.setting = SubscriptionSetting(self.env, 'specified_xmpp')
+
+    def get_address_for_name(self, name, authed):
+        return self.setting.get_user_setting(name)[1]
+
+    # IAnnouncementDistributor
+    def get_announcement_preference_boxes(self, req):
+        if req.authname != "anonymous":
+            yield "xmppaddress", "Announcement XMPP Address"
+
+    def render_announcement_preference_box(self, req, panel):
+        if req.method == "POST":
+            self.setting.set_user_setting(req.session,
+                    req.args.get('specified_xmpp'))
+        specified = self.setting.get_user_setting(req.session.sid)[1] or ''
+        data = dict(specified_xmpp = specified,)
+        return "prefs_announcer_xmppaddress.html", data

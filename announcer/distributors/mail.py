@@ -506,6 +506,8 @@ class EmailDistributor(Component):
                                   "Please change encoding setting"))
 
         rootMessage = MIMEMultipart("related")
+        # TODO: is this good? (from jabber branch)
+        #rootMessage.set_charset(self._charset)
 
         headers = dict()
         headers['Message-ID'] = self._message_id(event.realm)

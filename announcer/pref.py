@@ -5,11 +5,11 @@
 # Copyright (c) 2010, Robert Corsaro
 #
 # All rights reserved.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
-# 
-#     * Redistributions of source code must retain the above copyright 
+#
+#     * Redistributions of source code must retain the above copyright
 #       notice, this list of conditions and the following disclaimer.
 #     * Redistributions in binary form must reproduce the above copyright
 #       notice, this list of conditions and the following disclaimer in the
@@ -17,7 +17,7 @@
 #     * Neither the name of the <ORGANIZATION> nor the names of its
 #       contributors may be used to endorse or promote products derived from
 #       this software without specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 # "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 # LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -44,6 +44,7 @@ from announcer.api import IAnnouncementFormatter
 from announcer.api import IAnnouncementPreferenceProvider
 from announcer.api import IAnnouncementSubscriber
 from announcer.model import Subscription
+from announcer.util.settings import SubscriptionSetting, encode, decode
 
 def truth(v):
     if v in (False, 'False', 'false', 0, '0', ''):
@@ -151,7 +152,7 @@ class SubscriptionManagementPanel(Component):
         for i in self.distributors:
             for j in i.transports():
                 data['rules'][j] = []
-                for r in Subscription.find_by_sid(self.env, req.session.sid):
+                for r in Subscription.find_by_sid_and_distributor(self.env, req.session.sid, j):
                     data['rules'][j].append({
                         'id': r['id'],
                         'adverb': r['adverb'],

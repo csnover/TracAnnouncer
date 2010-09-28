@@ -58,7 +58,7 @@ class Subscription(object):
         @env.with_transaction(db)
         def do_insert(db):
             cursor = db.cursor()
-            priority = len(cls.find_by_sid(env, subscription['sid'], db))+1
+            priority = len(cls.find_by_sid_and_distributor(env, subscription['sid'], subscription['distributor'], db))+1
             cursor.execute("""
             INSERT INTO subscription
                         (time, changetime, sid, authenticated, distributor,
@@ -113,7 +113,7 @@ class Subscription(object):
                 sub._insert(db)
 
     @classmethod
-    def find_by_sid(cls, env, sid, db=None):
+    def find_by_sid_and_distributor(cls, env, sid, distributor, db=None):
         subs = []
 
         @env.with_transaction(db)
@@ -124,8 +124,9 @@ class Subscription(object):
                      format, priority, adverb, class
                 FROM subscription
                WHERE sid=%s
+                 AND distributor=%s
             ORDER BY priority
-            """, (sid,))
+            """, (sid,distributor))
             for i in cursor.fetchall():
                 sub = Subscription(env)
                 sub['id'] = i[0]

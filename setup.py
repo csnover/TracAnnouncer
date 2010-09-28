@@ -86,11 +86,13 @@ setup(
         'acct_mgr': 'TracAccountManager',
         'bitten': 'Bitten',
         'fullblog': 'TracFullBlogPlugin',
+        'xmpp': 'xmpppy',
     },
     entry_points = {
         'trac.plugins': [
             'announcer.api = announcer.api',
             'announcer.distributors.mail = announcer.distributors.mail',
+            'announcer.distributors.xmppd = announcer.distributors.xmppd[xmpp]',
             'announcer.email_decorators = announcer.email_decorators',
             'announcer.filters = announcer.filters',
             'announcer.formatters = announcer.formatters',
