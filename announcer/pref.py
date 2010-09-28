@@ -163,6 +163,7 @@ class SubscriptionManagementPanel(Component):
         return "prefs_announcer_manage_subscriptions.html", dict(data=data)
 
     def _add_rule(self, arg, req):
+        # TODO: Don't do that with format.  Make it change globally on change.
         rule = Subscription(self.env)
         rule['sid'] = req.session.sid
         rule['authenticated'] = True
