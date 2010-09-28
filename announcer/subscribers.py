@@ -287,7 +287,9 @@ class CarbonCopySubscriber(Component):
         if event.category not in ('created', 'changed', 'attachment added'):
             return
 
+        klass = self.__class__.__name__
         cc = event.target['cc'] or ''
+        sids = set()
         for chunk in re.split('\s|,', cc):
             chunk = chunk.strip()
             if not chunk or chunk.startswith('@'):
@@ -300,12 +302,11 @@ class CarbonCopySubscriber(Component):
                 address = None
             if sid or address:
                 if not sid:
-                    yield (self.__class__.__name__, 'email', None, False, address, None, 1, 'always')
+                    yield (klass, 'email', None, False, address, None, 1, 'always')
                 else:
-                    subs = Subscription.find_by_sids_and_class(
-                            self.env, (sid,), self.__class__.__name__)
-                    for s in subs:
-                        yield s.subscription_tuple()
+                    sids.add(sid)
+        for s in Subscription.find_by_sids_and_class(self.env, sids, klass):
+            yield s.subscription_tuple()
 
     def description(self):
         return "notify me when I'm listed in the CC field of a ticket"
