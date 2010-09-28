@@ -1028,11 +1028,44 @@ class WatchSubscriber(Component):
             return target.id
 
 class GeneralWikiSubscriber(Component):
+    """Allows users to subscribe to wiki announcements based on a pattern
+    that they define.  Any wiki announcements whose page name matches the
+    pattern will be recieved by the user.
+    """
+
     implements(IAnnouncementSubscriber)
     implements(IAnnouncementPreferenceProvider)
 
     def matches(self, event):
-        yield
+        if event.realm != 'wiki':
+            return
+        if event.category not in ('changed', 'created', 'attachment added',
+                'deleted', 'version deleted'):
+            return
+
+        klass = self.__class__.__name__
+
+        db = self.env.get_db_cnx()
+        cursor = db.cursor()
+        cursor.execute("""
+            SELECT sid, value
+              FROM subscription_attribute
+             WHERE class=%s
+        """, (self.__class__.__name__,))
+        patterns = map(lambda x: {'sid': x[0], 'value': x[1]}, cursor.fetchall())
+
+        def match(pattern):
+            for raw in pattern['value'].split(' '):
+                if raw != '':
+                    pat = urllib.unquote(raw).replace('*', '.*')
+                    if re.match(pat, event.target.name):
+                        return True
+
+        sids = set(map(lambda x: x['sid'], filter(match, patterns)))
+
+        for i in Subscription.find_by_sids_and_class(self.env, sids, klass):
+            yield i.subscription_tuple()
+
 
     def description(self):
         return "notify me when a wiki that matches my wiki watch pattern is created, or updated"
@@ -1067,6 +1100,21 @@ class GeneralWikiSubscriber(Component):
             if req.method == "POST":
                 setting.set_user_setting(req.session,
                         value=req.args.get('wiki_interests'))
+
+                klass = self.__class__.__name__
+                @self.env.with_transaction()
+                def do_update(db):
+                    cursor = db.cursor()
+                    cursor.execute("""
+                    DELETE FROM subscription_attribute
+                          WHERE class=%s
+                            AND sid=%s
+                    """, (klass, req.session.sid))
+                    cursor.execute("""
+                    INSERT INTO subscription_attribute
+                                (sid, class, value)
+                         VALUES (%s, %s, %s)
+                     """, (req.session.sid, klass, req.args.get('wiki_interests')))
             interests = setting.get_user_setting(req.session.sid)[1] or ''
             return "prefs_announcer_wiki.html", dict(
                 wiki_interests = '\n'.join(
