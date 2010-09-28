@@ -63,9 +63,33 @@ from announcer.model import Subscription
 from announcer.util.settings import BoolSubscriptionSetting
 from announcer.util.settings import SubscriptionSetting
 
-class AllTicketSubscriber(Component):
-    """Subscriber for all ticket changes."""
-    implements(IAnnouncementSubscriber)
+"""Subscribers should return a list of subscribers based on event rules.
+The subscriber interface is very simple and flexible.  Subscription have
+an 'adverb' attached, always or never.  A subscription can also stop a
+subscriber from recieving a notification if it's adverb is 'never' and it
+is the highest priority matching subscription.
+
+One thing that remains to be done is to allow admin to control defaults for
+users that never login and set their subscriptions up.  Some of these
+should look to see if the user has any subscriptions in the subscription
+table, and if it doesn't, then use the default setting from trac.ini.
+
+There should also be a screen in the admin section of the site that let's the
+admin setup rules for users.  It should be possible to copy rules from one
+user to another.
+
+We must also support unauthenticated users in the form of email addresses.  An email address can be used in place of an sid in many places in Trac.  Here's what I can think of:
+
+ * Component owner
+ * CC field
+ * Custom cc field
+ * Ticket owner
+ * Ticket reporter
+
+"""
+
+class AllTicketSubscriberPrefs(Component):
+    """Deprecated: Preference panel for all ticket changes."""
     implements(IAnnouncementPreferenceProvider)
 
     def get_announcement_preference_boxes(self, req):
@@ -79,6 +103,11 @@ class AllTicketSubscriber(Component):
         vars = {}
         vars['ticket_all'] = setting.get_user_setting(req.session.sid)[1]
         return "prefs_announcer_ticket_all.html", dict(data=vars)
+
+
+class AllTicketSubscriber(Component):
+    """Subscriber for all ticket changes."""
+    implements(IAnnouncementSubscriber)
 
     def description(self):
         return "notify me when any ticket changes"
@@ -112,6 +141,7 @@ class AllTicketSubscriber(Component):
 
 
 class TicketOwnerSubscriber(Component):
+    """Allows ticket owners to subscribe to their tickets."""
     implements(IAnnouncementSubscriber)
 
     owner = BoolOption("announcer", "always_notify_owner", 'true',
@@ -138,6 +168,9 @@ class TicketOwnerSubscriber(Component):
         return "notify me when a ticket that I own is created or modified"
 
 class TicketComponentOwnerSubscriber(Component):
+    """Allows component owners to subscribe to tickets assigned to their
+    components.
+    """
     implements(IAnnouncementSubscriber)
 
     component_owner = BoolOption("announcer", "always_notify_component_owner",
@@ -169,6 +202,7 @@ class TicketComponentOwnerSubscriber(Component):
         return "notify me when a ticket that belongs to a component that I own is created or modified"
 
 class TicketUpdaterSubscriber(Component):
+    """Allows updaters to subscribe to their own updates."""
     implements(IAnnouncementSubscriber)
 
     updater = BoolOption("announcer", "always_notify_updater", 'true',
@@ -193,6 +227,7 @@ class TicketUpdaterSubscriber(Component):
         return "notify me when I update a ticket"
 
 class TicketReporterSubscriber(Component):
+    """Allows the users to subscribe to tickets that they report."""
     implements(IAnnouncementSubscriber)
 
     reporter = BoolOption("announcer", "always_notify_reporter", 'true',
@@ -389,6 +424,9 @@ class LegacyTicketSubscriber(Component):
         return ret
 
 class TicketComponentSubscriber(Component):
+    """Allows users to subscribe to ticket assigned to the components of their
+    choice.
+    """
     implements(IAnnouncementSubscriber)
     implements(IAnnouncementPreferenceProvider)
 
@@ -480,6 +518,10 @@ class TicketComponentSubscriber(Component):
 
 
 class TicketCustomFieldSubscriber(Component):
+    """Allows users to subscribe to tickets that have their sid listed in any
+    field that has a name in the custom_cc_fields list.  The custom_cc_fields
+    list must be configured by the system administrator.
+    """
     implements(IAnnouncementSubscriber)
 
     custom_cc_fields = ListOption('announcer', 'custom_cc_fields',
@@ -519,6 +561,10 @@ class TicketCustomFieldSubscriber(Component):
 
 
 class JoinableGroupSubscriber(Component):
+    """Allows users to subscribe to groups as defined by the system
+    administrator.  Any ticket with the said group listed in the cc
+    field will trigger announcements to users in the group.
+    """
     implements(IAnnouncementSubscriber)
     implements(IAnnouncementPreferenceProvider)
 
@@ -628,6 +674,10 @@ class UserChangeSubscriber(Component):
     def _setting(self):
         return SubscriptionSetting(self.env, 'watch_users')
 class WatchSubscriber(Component):
+    """Allows user to subscribe to ticket or wikinotification on a per
+    resource basis.  Watch, Unwatch links are added to wiki pages and tickets
+    that the user can select to start watching a resource.
+    """
 
     implements(IRequestFilter)
     implements(IRequestHandler)
