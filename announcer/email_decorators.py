@@ -40,6 +40,10 @@ from genshi.template import NewTextTemplate
 from announcer.distributors.mail import IAnnouncementEmailDecorator
 from announcer.util.mail import set_header, msgid, next_decorator, uid_encode
 
+"""Email decorators have the chance to modify emails or their headers before
+the email distributor sends them out.
+"""
+
 class ThreadingEmailDecorator(Component):
     """Add Message-ID, In-Reply-To and References message headers for resources.
     All message ids are derived from the properties of the ticket so that they
@@ -143,6 +147,9 @@ class AnnouncerEmailDecorator(Component):
 
 
 class TicketSubjectEmailDecorator(Component):
+    """Formats ticket announcement subject headers based on the
+    ticket_email_subject configuration.
+    """
 
     implements(IAnnouncementEmailDecorator)
 
@@ -178,6 +185,10 @@ class TicketSubjectEmailDecorator(Component):
 
 
 class TicketAddlHeaderEmailDecorator(Component):
+    """Adds X-Announcement-(id,priority and severity) headers to ticket
+    emails.  This is useful for automated handling of incoming emails or
+    customized filtering.
+    """
 
     implements(IAnnouncementEmailDecorator)
 
@@ -191,6 +202,9 @@ class TicketAddlHeaderEmailDecorator(Component):
 
 
 class WikiSubjectEmailDecorator(Component):
+    """Formats wiki announcement subject headers based on the
+    wiki_email_subject configuration.
+    """
 
     implements(IAnnouncementEmailDecorator)
 
