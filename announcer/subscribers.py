@@ -537,10 +537,40 @@ class TicketCustomFieldSubscriber(Component):
                     yield sub + (None,)
 
     def matches(self, event):
-        yield
+        if event.realm != 'ticket':
+            return
+        if event.category not in ('changed', 'created', 'attachment added'):
+            return
+
+        klass = self.__class__.__name__
+        ticket = event.target
+        sids = set()
+
+        for field in self.custom_cc_fields:
+            subs = ticket[field] or ''
+            for chunk in re.split('\s|,', subs):
+                chunk = chunk.strip()
+                if not chunk or chunk.startswith('@'):
+                    continue
+                if '@' in chunk:
+                    address = chunk
+                    sid = None
+                else:
+                    sid = chunk
+                    address = None
+                if sid or address:
+                    self.log.debug("TicketCustomFieldSubscriber " \
+                        "added '%s <%s>'"%(sid,address))
+                    if not sid:
+                        yield (klass, 'email', None, False, address, None, 1, 'always')
+                    else:
+                        sids.add(sid)
+
+        for i in Subscription.find_by_sids_and_class(self.env, sids, klass):
+            yield i.subscription_tuple()
 
     def description(self):
-        return "notify me when I'm listed in the (%s) field"%self.custom_cc_fields
+        return "notify me when I'm listed in any of the (%s) fields"%(','.join(self.custom_cc_fields),)
 
     def _get_membership(self, ticket):
         for field in self.custom_cc_fields:
