@@ -611,7 +611,34 @@ class JoinableGroupSubscriber(Component):
         """)
 
     def matches(self, event):
-        yield
+        if event.realm != 'ticket':
+            return
+        if event.category not in ('changed', 'created', 'attachment added'):
+            return
+
+        klass = self.__class__.__name__
+        ticket = event.target
+        sids = set()
+
+        cc = event.target['cc'] or ''
+        for chunk in re.split('\s|,', cc):
+            chunk = chunk.strip()
+            if chunk and chunk.startswith('@'):
+                member = None
+                grp = chunk[1:]
+
+                db = self.env.get_db_cnx()
+                cursor = db.cursor()
+                cursor.execute("""
+                    SELECT sid
+                      FROM subscription_attribute
+                     WHERE value=%s
+                       AND class=%s
+                """, (grp, self.__class__.__name__))
+                sids.update(map(lambda x: x[0], cursor.fetchall()))
+
+        for i in Subscription.find_by_sids_and_class(self.env, sids, klass):
+            yield i.subscription_tuple()
 
     def description(self):
         return "notify me on ticket changes in one of my subscribed groups"
@@ -648,10 +675,27 @@ class JoinableGroupSubscriber(Component):
     def render_announcement_preference_box(self, req, panel):
         settings = self._settings()
         if req.method == "POST":
+            klass = self.__class__.__name__
             for grp, setting in settings.items():
                 setting.set_user_setting(req.session,
                     value=req.args.get('joinable_group_%s'%grp), save=False)
             req.session.save()
+            @self.env.with_transaction()
+            def do_update(db):
+                cursor = db.cursor()
+                cursor.execute("""
+                DELETE FROM subscription_attribute
+                      WHERE class=%s
+                        AND sid=%s
+                """, (klass, req.session.sid))
+                for grp in self.joinable_groups:
+                    if req.args.get('joinable_group_%s'%grp, '0') == '1':
+                        cursor.execute("""
+                        INSERT INTO subscription_attribute
+                                    (sid, class, value)
+                             VALUES (%s, %s, %s)
+                         """, (req.session.sid, klass, grp))
+
         groups = {}
         for grp, setting in settings.items():
             groups[grp] = setting.get_user_setting(req.session.sid)[1]
