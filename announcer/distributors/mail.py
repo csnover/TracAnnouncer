@@ -30,6 +30,10 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # ----------------------------------------------------------------------------
+
+# TODO: pick format based on subscription.  For now users will use the same
+#       format for all announcements, but in the future we can make this more
+#       flexible, since it's in the subscription table.
 import Queue
 import random
 import re
