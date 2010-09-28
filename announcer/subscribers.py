@@ -716,7 +716,25 @@ class UserChangeSubscriber(Component):
     implements(IAnnouncementPreferenceProvider)
 
     def matches(self, event):
-        yield
+        if event.realm not in ('wiki', 'ticket'):
+            return
+        if event.category not in ('changed', 'created', 'attachment added'):
+            return
+
+        klass = self.__class__.__name__
+
+        db = self.env.get_db_cnx()
+        cursor = db.cursor()
+        cursor.execute("""
+            SELECT sid
+              FROM subscription_attribute
+             WHERE value=%s
+               AND class=%s
+        """, (event.author, self.__class__.__name__))
+        sids = set(map(lambda x: x[0], cursor.fetchall()))
+
+        for i in Subscription.find_by_sids_and_class(self.env, sids, klass):
+            yield i.subscription_tuple()
 
     def description(self):
         return "notify me when one of my watched users changes something"
@@ -742,6 +760,21 @@ class UserChangeSubscriber(Component):
         if req.method == "POST":
             setting.set_user_setting(req.session,
                     value=req.args.get("announcer_watch_users"))
+            klass = self.__class__.__name__
+            @self.env.with_transaction()
+            def do_update(db):
+                cursor = db.cursor()
+                cursor.execute("""
+                DELETE FROM subscription_attribute
+                      WHERE class=%s
+                        AND sid=%s
+                """, (klass, req.session.sid))
+                for user in map(lambda x: x.strip(), req.args.get("announcer_watch_users").split(',')):
+                    cursor.execute("""
+                    INSERT INTO subscription_attribute
+                                (sid, class, value)
+                         VALUES (%s, %s, %s)
+                     """, (req.session.sid, klass, user))
         return "prefs_announcer_watch_users.html", dict(data=dict(
             announcer_watch_users=setting.get_user_setting(req.session.sid)[1]
         ))
