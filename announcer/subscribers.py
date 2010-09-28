@@ -661,8 +661,8 @@ class JoinableGroupSubscriber(Component):
     def _settings(self):
         settings = {}
         for grp in self.joinable_groups:
-            settings[grp[1:]] = BoolSubscriptionSetting(
-                    self.env, 'group_%s'%grp[1:])
+            settings[grp] = BoolSubscriptionSetting(
+                    self.env, 'group_%s'%grp)
         return settings
 
 class UserChangeSubscriber(Component):
