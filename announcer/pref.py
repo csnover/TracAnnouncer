@@ -85,6 +85,10 @@ class AnnouncerPreferences(Component):
             streams.append((label, chrome.render_template(
                 req, template, data, content_type='text/html', fragment=True
             )))
+
+        if req.method == 'POST':
+            req.redirect(req.href.prefs('announcer'))
+
         add_stylesheet(req, 'announcer/css/announcer_prefs.css')
         return 'prefs_announcer.html', {"boxes": streams}
 
