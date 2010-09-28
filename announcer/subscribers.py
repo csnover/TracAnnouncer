@@ -997,7 +997,7 @@ class WatchSubscriber(Component):
         yield
 
     def description(self):
-        return "notify me when one of my watched wiki or tickets is updated"
+        return "notify me when one of my watched wiki or tickets is updated NOT IMPLEMENTED"
 
     # IAnnouncementSubscriber
     def subscriptions(self, event):
