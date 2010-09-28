@@ -50,7 +50,6 @@ from genshi.builder import tag
 
 from announcer.api import IAnnouncementPreferenceProvider
 from announcer.api import IAnnouncementSubscriber
-from announcer.api import IAnnouncementSubscriberDeprecated
 from announcer.api import _, istrue
 from announcer.model import Subscription
 from announcer.util.settings import BoolSubscriptionSetting
@@ -59,7 +58,6 @@ from announcer.util.settings import SubscriptionSetting
 class AllTicketSubscriber(Component):
     """Subscriber for all ticket changes."""
     implements(IAnnouncementSubscriber)
-    implements(IAnnouncementSubscriberDeprecated)
     implements(IAnnouncementPreferenceProvider)
 
     def get_announcement_preference_boxes(self, req):
@@ -384,7 +382,6 @@ class LegacyTicketSubscriber(Component):
 
 class TicketComponentSubscriber(Component):
     implements(IAnnouncementSubscriber)
-    implements(IAnnouncementSubscriberDeprecated)
     implements(IAnnouncementPreferenceProvider)
 
     def subscriptions(self, event):
@@ -476,7 +473,6 @@ class TicketComponentSubscriber(Component):
 
 class TicketCustomFieldSubscriber(Component):
     implements(IAnnouncementSubscriber)
-    implements(IAnnouncementSubscriberDeprecated)
 
     custom_cc_fields = ListOption('announcer', 'custom_cc_fields',
             doc="Field names that contain users that should be notified on "
@@ -516,7 +512,6 @@ class TicketCustomFieldSubscriber(Component):
 
 class JoinableGroupSubscriber(Component):
     implements(IAnnouncementSubscriber)
-    implements(IAnnouncementSubscriberDeprecated)
     implements(IAnnouncementPreferenceProvider)
 
     joinable_groups = ListOption('announcer', 'joinable_groups', [],
@@ -589,7 +584,6 @@ class UserChangeSubscriber(Component):
     """Allows users to get notified anytime a particular user change or
     modifies a ticket or wiki page."""
     implements(IAnnouncementSubscriber)
-    implements(IAnnouncementSubscriberDeprecated)
     implements(IAnnouncementPreferenceProvider)
 
     def matches(self, event):
@@ -630,7 +624,6 @@ class WatchSubscriber(Component):
     implements(IRequestFilter)
     implements(IRequestHandler)
     implements(IAnnouncementSubscriber)
-    implements(IAnnouncementSubscriberDeprecated)
     implements(ITicketChangeListener)
     implements(IWikiChangeListener)
 
@@ -870,7 +863,6 @@ class WatchSubscriber(Component):
 
 class GeneralWikiSubscriber(Component):
     implements(IAnnouncementSubscriber)
-    implements(IAnnouncementSubscriberDeprecated)
     implements(IAnnouncementPreferenceProvider)
 
     def matches(self, event):

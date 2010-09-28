@@ -52,14 +52,6 @@ class IAnnouncementProducer(Interface):
         """
 
 class IAnnouncementSubscriber(Interface):
-    # new subscriptions come back as yield (dist, sid, auth, address, format, priority, adverb)
-    def matches(event):
-        pass
-
-    def description():
-        pass
-
-class IAnnouncementSubscriberDeprecated(Interface):
     """IAnnouncementSubscriber provides an interface where a Plug-In can
     register realms and categories of subscriptions it is able to provide.
 
@@ -71,6 +63,7 @@ class IAnnouncementSubscriberDeprecated(Interface):
     in receiving a particular notice. Again, how it makes that decision is
     entirely up to a particular implementation."""
 
+    # DEPRECATED
     def subscriptions(event):
         """Returns a list of subscriptions that are interested in the
         specified event.
@@ -87,6 +80,13 @@ class IAnnouncementSubscriberDeprecated(Interface):
         actually undesirable-- in such a case resolvers will be bypassed
         entirely.
         """
+
+    # new subscriptions come back as yield (dist, sid, auth, address, format, priority, adverb)
+    def matches(event):
+        pass
+
+    def description():
+        pass
 
 class IAnnouncementSubscriptionFilter(Interface):
     """IAnnouncementSubscriptionFilter provides an interface where a component

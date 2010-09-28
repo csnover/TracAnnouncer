@@ -36,7 +36,7 @@ from trac.web.chrome import Chrome
 from genshi.template import NewTextTemplate, TemplateLoader
 
 from announcer.api import AnnouncementSystem, AnnouncementEvent
-from announcer.api import IAnnouncementFormatter, IAnnouncementSubscriberDeprecated
+from announcer.api import IAnnouncementFormatter, IAnnouncementSubscriber
 from announcer.api import IAnnouncementPreferenceProvider, istrue
 from announcer.api import _
 from announcer.distributors.mail import IAnnouncementEmailDecorator
@@ -74,7 +74,7 @@ class FullBlogAnnouncement(Component):
 
     implements(
         IBlogChangeListener,
-        IAnnouncementSubscriberDeprecated, 
+        IAnnouncementSubscriber,
         IAnnouncementFormatter,
         IAnnouncementEmailDecorator,
         IAnnouncementPreferenceProvider
@@ -184,6 +184,12 @@ class FullBlogAnnouncement(Component):
             self.log.debug("BlogSubscriber added '%s (%s)' for '%s'"%(
                     result[1], result[2], result[4]))
             yield result[:-1]
+
+    def matches(self, event):
+        yield
+
+    def description(self):
+        return 'notify me when a blog changes NOT IMPLEMENTED'
 
     # IAnnouncementEmailDecorator
     def decorate_message(self, event, message, decorates=None):

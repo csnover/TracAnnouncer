@@ -35,7 +35,7 @@ from trac.web.chrome import Chrome
 from genshi.template import NewTextTemplate, TemplateLoader
 
 from announcer.api import AnnouncementSystem, AnnouncementEvent
-from announcer.api import IAnnouncementFormatter, IAnnouncementSubscriberDeprecated
+from announcer.api import IAnnouncementFormatter, IAnnouncementSubscriber
 from announcer.api import IAnnouncementPreferenceProvider
 from announcer.api import _
 from announcer.distributors.mail import IAnnouncementEmailDecorator
@@ -56,7 +56,7 @@ class AccountManagerAnnouncement(Component):
 
     implements(
         IAccountChangeListener,
-        IAnnouncementSubscriberDeprecated,
+        IAnnouncementSubscriber,
         IAnnouncementFormatter,
         IAnnouncementEmailDecorator,
         IAnnouncementPreferenceProvider
@@ -85,6 +85,12 @@ class AccountManagerAnnouncement(Component):
                 self.log.debug("AccountManagerAnnouncement added '%s " \
                         "(%s)'", subscriber[1], subscriber[2])
                 yield subscriber
+
+    def matches(self, event):
+        yield
+
+    def description(self):
+        return 'notify me an account changes NOT IMPLEMENTED'
 
     # IAnnouncementFormatter interface
     def styles(self, transport, realm):
