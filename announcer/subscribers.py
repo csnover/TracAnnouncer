@@ -463,7 +463,7 @@ class TicketComponentSubscriber(Component):
              WHERE value=%s
                AND class=%s
         """, (component,self.__class__.__name__))
-        sids = map(lambda x: x[0], cursor.fetchall())
+        sids = set(map(lambda x: x[0], cursor.fetchall()))
 
         klass = self.__class__.__name__
         for i in Subscription.find_by_sids_and_class(self.env, sids, klass):
