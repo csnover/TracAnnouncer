@@ -31,7 +31,7 @@
 
 from trac.util.datefmt import utc
 
-__all__ = ['Subscription']
+__all__ = ['Subscription', 'SubscriptionAttribute']
 
 class Subscription(object):
 
@@ -259,11 +259,181 @@ class SubscriptionAttribute(object):
         @env.with_transaction(db)
         def do_insert(db):
             cursor = db.cursor()
-            cursor.execute("""
-            INSERT INTO subscription (%s)
-                 VALUES (%s)
-            """%(','.join(self.values.names()),
-                    ','.join(['%s'] * len(self.values.keys()))
-                ), [self.values[name] for name in self.keys()]
-            )
+            for a in attributes:
+                cursor.execute("""
+                INSERT INTO subscription_attribute
+                            (sid, class, realm, target)
+                     VALUES (%s, %s, %s, %s)
+                """, (sid, klass, realm, a))
 
+    @classmethod
+    def delete(cls, env, attribute_id, db=None):
+        @env.with_transaction(db)
+        def do_delete(db):
+            cursor = db.cursor()
+            cursor.execute("""
+            DELETE FROM subscription_attribute
+                  WHERE id = %s
+            """, (attribute_id,))
+
+    @classmethod
+    def delete_by_sid_and_class(cls, env, sid, klass, db=None):
+        @env.with_transaction(db)
+        def do_delete(db):
+            cursor = db.cursor()
+            cursor.execute("""
+            DELETE FROM subscription_attribute
+                  WHERE sid = %s
+                    AND class = %s
+            """, (sid, klass))
+
+    @classmethod
+    def delete_by_sid_class_and_target(cls, env, sid, klass, target, db=None):
+        @env.with_transaction(db)
+        def do_delete(db):
+            cursor = db.cursor()
+            cursor.execute("""
+            DELETE FROM subscription_attribute
+                  WHERE sid = %s
+                    AND class = %s
+                    AND target = %s
+            """, (sid, klass, target))
+
+    @classmethod
+    def delete_by_class_realm_and_target(cls, env, klass, realm, target, db=None):
+        @env.with_transaction(db)
+        def do_delete(db):
+            cursor = db.cursor()
+            cursor.execute("""
+            DELETE FROM subscription_attribute
+                  WHERE realm = %s
+                    AND class = %s
+                    AND target = %s
+            """, (realm, klass, target))
+
+    @classmethod
+    def find_by_sid_and_class(cls, env, sid, klass, db=None):
+        attrs = []
+
+        @env.with_transaction(db)
+        def do_select(db):
+            cursor = db.cursor()
+            cursor.execute("""
+              SELECT id, sid, class, realm, target
+                FROM subscription_attribute
+               WHERE sid=%s
+                 AND class=%s
+            ORDER BY target
+            """, (sid,klass))
+            for i in cursor.fetchall():
+                attr = SubscriptionAttribute(env)
+                attr['id'] = i[0]
+                attr['sid'] = i[1]
+                attr['class'] = i[2]
+                attr['realm'] = i[3]
+                attr['target'] = i[4]
+                attrs.append(attr)
+
+        return attrs
+
+    @classmethod
+    def find_by_sid_class_and_target(cls, env, sid, klass, target, db=None):
+        attrs = []
+
+        @env.with_transaction(db)
+        def do_select(db):
+            cursor = db.cursor()
+            cursor.execute("""
+              SELECT id, sid, class, realm, target
+                FROM subscription_attribute
+               WHERE sid=%s
+                 AND class=%s
+                 AND target=%s
+            ORDER BY target
+            """, (sid,klass,target))
+            for i in cursor.fetchall():
+                attr = SubscriptionAttribute(env)
+                attr['id'] = i[0]
+                attr['sid'] = i[1]
+                attr['class'] = i[2]
+                attr['realm'] = i[3]
+                attr['target'] = i[4]
+                attrs.append(attr)
+
+        return attrs
+
+    @classmethod
+    def find_by_sid_class_realm_and_target(cls, env, sid, klass, realm, target, db=None):
+        attrs = []
+
+        @env.with_transaction(db)
+        def do_select(db):
+            cursor = db.cursor()
+            cursor.execute("""
+              SELECT id, sid, class, realm, target
+                FROM subscription_attribute
+               WHERE sid=%s
+                 AND class=%s
+                 AND realm=%s
+                 AND target=%s
+            ORDER BY target
+            """, (sid,klass,realm,target))
+            for i in cursor.fetchall():
+                attr = SubscriptionAttribute(env)
+                attr['id'] = i[0]
+                attr['sid'] = i[1]
+                attr['class'] = i[2]
+                attr['realm'] = i[3]
+                attr['target'] = i[4]
+                attrs.append(attr)
+
+        return attrs
+
+    @classmethod
+    def find_by_class_realm_and_target(cls, env, klass, realm, target, db=None):
+        attrs = []
+
+        @env.with_transaction(db)
+        def do_select(db):
+            cursor = db.cursor()
+            cursor.execute("""
+                SELECT id, sid, class, realm, target
+                  FROM subscription_attribute
+                 WHERE class=%s
+                   AND realm=%s
+                   AND target=%s
+            """, (klass, realm, target))
+            for i in cursor.fetchall():
+                attr = SubscriptionAttribute(env)
+                attr['id'] = i[0]
+                attr['sid'] = i[1]
+                attr['class'] = i[2]
+                attr['realm'] = i[3]
+                attr['target'] = i[4]
+                attrs.append(attr)
+
+        return attrs
+
+    @classmethod
+    def find_by_class_and_realm(cls, env, klass, realm, db=None):
+        attrs = []
+
+        @env.with_transaction(db)
+        def do_select(db):
+            cursor = db.cursor()
+            cursor.execute("""
+                SELECT id, sid, class, realm, target
+                  FROM subscription_attribute
+                 WHERE class=%s
+                   AND realm=%s
+            """, (klass, realm))
+            for i in cursor.fetchall():
+                attr = SubscriptionAttribute(env)
+                attr['id'] = i[0]
+                attr['sid'] = i[1]
+                attr['class'] = i[2]
+                attr['realm'] = i[3]
+                attr['target'] = i[4]
+                attrs.append(attr)
+
+        return attrs
