@@ -307,10 +307,10 @@ class SubscriptionResolver(Component):
             if (s[1], s[2]) == state['last']:
                 continue
             if s[-1] == 'always':
-                self.log.debug("Adding (%s) for 'always' on rule (%s)"%(s[2], s[0]))
+                self.log.debug("Adding (%s) for 'always' on rule (%s) for (%s)"%(s[2], s[0], s[1]))
                 resolved_subs.append(s[1:6])
             else:
-                self.log.debug("Ignoring (%s) for 'never' on rule (%s)"%(s[2], s[0]))
+                self.log.debug("Ignoring (%s) for 'never' on rule (%s) for (%s)"%(s[2], s[0], s[1]))
 
             # if s[1] is None, then the subscription is for an anonymous email
             # address that has been set in some field and we shouldn't skip
