@@ -422,15 +422,15 @@ class AnnouncementSystem(Component):
             Column('authenticated', type='int'),
             Column('distributor'),
             Column('format'),
-            Column('priority'),
+            Column('priority', type='int'),
             Column('adverb')
         ],
         Table('subscription_attribute', key='id')[
             Column('id', auto_increment=True),
             Column('sid'),
             Column('class'),
-            Column('name'),
-            Column('value')
+            Column('realm'),
+            Column('target')
         ]
     ]
 
