@@ -167,8 +167,8 @@ class TicketComponentOwnerSubscriber(Component):
             self.log.debug("Component for ticket (%s) not found"%ticket['id'])
 
     def description(self):
-        return _("notify me when a ticket that belongs to a component
-                that I own is created or modified")
+        return _("notify me when a ticket that belongs to a component"
+                "that I own is created or modified")
 
 class TicketUpdaterSubscriber(Component):
     """Allows updaters to subscribe to their own updates."""
