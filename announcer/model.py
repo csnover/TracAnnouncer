@@ -66,7 +66,7 @@ class Subscription(object):
                  VALUES (datetime(), datetime(), %s, %s, %s, %s, %s, %s, %s)
             """, (subscription['sid'], subscription['authenticated'],
             subscription['distributor'], subscription['format'],
-            priority, subscription['adverb'],
+            int(priority), subscription['adverb'],
             subscription['class']))
 
     @classmethod
@@ -75,42 +75,55 @@ class Subscription(object):
         def do_delete(db):
             cursor = db.cursor()
             cursor.execute("""
+            SELECT sid, distributor
+              FROM subscription
+             WHERE id=%s
+            """, (rule_id,))
+            sid, distributor = cursor.fetchone()
+            cursor.execute("""
             DELETE FROM subscription
                   WHERE id = %s
             """, (rule_id,))
-
+            i = 1
+            for s in cls.find_by_sid_and_distributor(env, sid, distributor, db):
+                s['priority'] = i
+                s._update_priority(db)
+                i += 1
 
     @classmethod
-    def update_by_sid(cls, env, subscriptions, db=None):
-        sid = None
-        subs = []
-        for i in subscriptions:
-            if sid:
-                if i[0] != sid:
-                    raise Error('you crazy?!')
-            else:
-                sid = i[0]
-
-            sub = Subscription(env)
-            sub['sid'] = i[0]
-            sub['authenticated'] = i[1]
-            sub['distributor'] = i[2]
-            sub['format'] = i[3]
-            sub['priority'] = i[4]
-            sub['adverb'] = i[5]
-            sub['class'] = i[6]
-            subs.append(sub)
-
+    def move(cls, env, rule_id, priority, db=None):
+        env.log.debug('moving %s to %s'%(rule_id, priority))
         @env.with_transaction(db)
-        def do_update(db):
+        def do_delete(db):
             cursor = db.cursor()
             cursor.execute("""
-            DELETE FROM subscription
-                  WHERE sid=%s
-            """, (sid,))
-
-            for sub in subs:
-                sub._insert(db)
+            SELECT sid, distributor
+              FROM subscription
+             WHERE id=%s
+            """, (rule_id,))
+            sid, distributor = cursor.fetchone()
+            if priority > len(cls.find_by_sid_and_distributor(env, sid, distributor, db)):
+                return
+            i = 1
+            for s in cls.find_by_sid_and_distributor(env, sid, distributor, db):
+                env.log.error("testing rule: %s, i: %s"%(s['class'], i))
+                if int(s['id']) == int(rule_id):
+                    env.log.error("rule_id match")
+                    s['priority'] = priority
+                    s._update_priority(db)
+                    i -= 1
+                elif i == priority:
+                    env.log.error("priority match")
+                    i += 1
+                    env.log.error("rule: %s, i: %s"%(s['class'], i))
+                    s['priority'] = i
+                    s._update_priority(db)
+                else:
+                    env.log.error("no match")
+                    env.log.error("rule: %s, i: %s"%(s['class'], i))
+                    s['priority'] = i
+                    s._update_priority(db)
+                i+=1
 
     @classmethod
     def find_by_sid_and_distributor(cls, env, sid, distributor, db=None):
@@ -134,7 +147,7 @@ class Subscription(object):
                 sub['authenticated'] = i[2]
                 sub['distributor'] = i[3]
                 sub['format'] = i[4]
-                sub['priority'] = i[5]
+                sub['priority'] = int(i[5])
                 sub['adverb'] = i[6]
                 sub['class'] = i[7]
                 subs.append(sub)
@@ -165,7 +178,7 @@ class Subscription(object):
                 sub['authenticated'] = i[2]
                 sub['distributor'] = i[3]
                 sub['format'] = i[4]
-                sub['priority'] = i[5]
+                sub['priority'] = int(i[5])
                 sub['adverb'] = i[6]
                 sub['class'] = i[7]
                 subs.append(sub)
@@ -192,7 +205,7 @@ class Subscription(object):
                 sub['authenticated'] = i[2]
                 sub['distributor'] = i[3]
                 sub['format'] = i[4]
-                sub['priority'] = i[5]
+                sub['priority'] = int(i[5])
                 sub['adverb'] = i[6]
                 sub['class'] = i[7]
                 subs.append(sub)
@@ -207,15 +220,43 @@ class Subscription(object):
             self.values['authenticated'] == 1,
             None,
             self.values['format'],
-            self.values['priority'],
+            int(self.values['priority']),
             self.values['adverb']
         )
 
-    def _insert(self, db=None):
-        self.values['time'] = datetime.now(utc)
-        self.values['changetime'] = datetime.now(utc)
-
+    def _update_priority(self, db=None):
         @self.env.with_transaction(db)
+        def do_update(db):
+            cursor = db.cursor()
+            cursor.execute("""
+            UPDATE subscription
+               SET changetime=datetime(),
+                   priority=%s
+             WHERE id=%s
+            """, (int(self.values['priority']), self.values['id']))
+
+class SubscriptionAttribute(object):
+
+    fields = ('id', 'sid', 'class', 'realm', 'target')
+
+    def __init__(self, env):
+        self.env = env
+        self.values = {}
+
+    def __getitem__(self, name):
+        if name not in self.fields:
+            raise KeyError(name)
+        return self.values.get(name)
+
+    def __setitem__(self, name, value):
+        if name not in self.fields:
+            raise KeyError(name)
+        self.values[name] = value
+
+    @classmethod
+    def add(cls, env, sid, klass, realm, attributes, db=None):
+        """id and priority overwritten."""
+        @env.with_transaction(db)
         def do_insert(db):
             cursor = db.cursor()
             cursor.execute("""
