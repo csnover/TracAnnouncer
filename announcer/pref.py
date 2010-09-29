@@ -105,6 +105,7 @@ class SubscriptionManagementPanel(Component):
         self.post_handlers = {
             'add-rule': self._add_rule,
             'delete-rule': self._delete_rule,
+            'move-rule': self._move_rule
         }
 
     def get_htdocs_dirs(self):
@@ -176,3 +177,8 @@ class SubscriptionManagementPanel(Component):
 
     def _delete_rule(self, arg, req):
         Subscription.delete(self.env, arg)
+
+    def _move_rule(self, arg, req):
+        (rule_id, new_priority) = arg.split('-')
+        if int(new_priority) >= 1:
+            Subscription.move(self.env, rule_id, int(new_priority))
