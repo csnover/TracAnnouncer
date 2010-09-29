@@ -407,20 +407,12 @@ class AnnouncementSystem(Component):
     # IEnvironmentSetupParticipant implementation
     """Subscriptions table will is deprecated in favor of the new
     subscriber interface.
+
+    TODO: We still need to create an upgrade script that will port
+    subscriptions from the subscription table and the session_attribute
+    table to the subscription_attribute table.
     """
     SCHEMA = [
-        Table('subscriptions', key='id')[
-            Column('id', auto_increment=True),
-            Column('sid'), Column('authenticated', type='int'),
-            Column('enabled', type='int'),
-            Column('managed'),
-            Column('realm'),
-            Column('category'),
-            Column('rule'),
-            Column('transport'),
-            Index(['id']),
-            Index(['realm', 'category', 'enabled']),
-        ],
         Table('subscription', key='id')[
             Column('id', auto_increment=True),
             Column('time', type='int64'),
