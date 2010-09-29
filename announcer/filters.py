@@ -58,10 +58,11 @@ class DefaultPermissionFilter(Component):
         permsys = PermissionSystem(self.env)
         permitted_users = permsys.get_users_with_permission('%s_VIEW'%event.realm.upper())
         for subscription in subscriptions:
-            if subscription[1] not in permitted_users:
+            sid = subscription[1]
+            if sid not in permitted_users:
                 self.log.debug(
                     "Filtering %s because of rule: DefaultPermissionFilter"\
-                    %subscription[1]
+                    %sid
                 )
                 pass
             else:
