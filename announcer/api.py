@@ -333,10 +333,6 @@ class OldSubscriptionResolver(Component):
             subscriptions.update(
                 x for x in sp.subscriptions(event) if x
             )
-        for sf in self.subscription_filters:
-            subscriptions = set(
-                sf.filter_subscriptions(event, subscriptions)
-            )
 
         return subscriptions
 
@@ -494,6 +490,10 @@ class AnnouncementSystem(Component):
         """
         try:
             subscriptions = self.resolver.subscriptions(evt)
+            for sf in self.subscription_filters:
+                subscriptions = set(
+                    sf.filter_subscriptions(evt, subscriptions)
+            )
 
             self.log.debug(
                 "AnnouncementSystem has found the following subscriptions: " \

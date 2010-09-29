@@ -36,97 +36,33 @@ New subscriber interface will elliminate the need for filters
 import re
 
 from trac.core import *
-from trac.config import BoolOption
+from trac.config import ListOption
+from trac.perm import PermissionSystem
 
 from announcer.api import IAnnouncementSubscriptionFilter
-from announcer.api import IAnnouncementPreferenceProvider
 from announcer.api import _
 
-from announcer.util.settings import BoolSubscriptionSetting
-
-class ChangeAuthorFilter(Component):
+class DefaultPermissionFilter(Component):
     implements(IAnnouncementSubscriptionFilter)
-    implements(IAnnouncementPreferenceProvider)
 
-    never_notify_author = BoolOption('announcer', 'never_notify_author', 'true',
-            """User overridable default value.  Stop author from receiving
-            an announcement, even if some other rule says they should receive
-            one.
+    exception_realms = ListOption('announcer', 'filter_exception_realms', '',
+            """The PermissionFilter will filter an announcements for with the
+            user doesn't have ${REALM}_VIEW permission.  If there is some
+            realm that doesn't use a permission called ${REALM}_VIEW then
+            you should add it to this list and create a custom filter to
+            enforce it's permissions.  Be careful because permissions can be
+            bypassed using the AnnouncerPlugin.
             """)
 
     def filter_subscriptions(self, event, subscriptions):
+        permsys = PermissionSystem(self.env)
+        permitted_users = permsys.get_users_with_permission('%s_VIEW'%event.realm.upper())
         for subscription in subscriptions:
-            setting = self._setting()
-            if event.author == subscription[1] and \
-                    setting.get_user_setting(event.author)[1]:
+            if subscription[1] not in permitted_users:
                 self.log.debug(
-                    "Filtering %s because of rule: ChangeAuthorFilter"\
-                    %event.author
-                )
-                pass
-            else:
-                yield subscription
-
-    def get_announcement_preference_boxes(self, req):
-        if req.authname == 'anonymous' and 'email' not in req.session:
-            return
-        yield 'author_filter', _('Author Filter')
-
-    def render_announcement_preference_box(self, req, panel):
-        setting = self._setting()
-        if req.method == "POST":
-            setting.set_user_setting(req.session,
-                value=req.args.get('author_filter'))
-        value = setting.get_user_setting(req.session.sid)[1]
-        return 'prefs_announcer_author_filter.html', \
-                dict(data=dict(author_filter=value))
-
-    def _setting(self):
-        return BoolSubscriptionSetting(
-            self.env,
-            'author_filter',
-            self.never_notify_author
-        )
-
-class UnsubscribeFilter(Component):
-    implements(IAnnouncementSubscriptionFilter, IAnnouncementPreferenceProvider)
-
-    never_announce = BoolOption('announcer', 'never_announce', 'false',
-            """Default value for user overridable never_announce setting.
-
-            This setting stops any announcements from ever being sent to the
-            user.
-            """)
-
-    def filter_subscriptions(self, event, subscriptions):
-        setting = self._setting()
-        for subscription in subscriptions:
-            if setting.get_user_setting(subscription[1])[1]:
-                self.log.debug(
-                    "Filtering %s because of rule: UnsubscribeFilter"\
+                    "Filtering %s because of rule: DefaultPermissionFilter"\
                     %subscription[1]
                 )
                 pass
             else:
                 yield subscription
-
-    def get_announcement_preference_boxes(self, req):
-        if req.authname == "anonymous" and "email" not in req.session:
-            return
-        yield "unsubscribe_all", _("Unsubscribe From All Announcements")
-
-    def render_announcement_preference_box(self, req, panel):
-        setting = self._setting()
-        if req.method == "POST":
-            setting.set_user_setting(req.session,
-                    value=req.args.get('unsubscribe_all'))
-        value = setting.get_user_setting(req.session.sid)[1]
-        return "prefs_announcer_unsubscribe_all.html", \
-            dict(data=dict(unsubscribe_all = value))
-
-    def _setting(self):
-        return BoolSubscriptionSetting(
-            self.env,
-            'never_announce',
-            self.never_announce
-        )
