@@ -218,12 +218,18 @@ class TicketComponentOwnerSubscriber(Component):
 
 class TicketUpdaterSubscriber(Component):
     """Allows updaters to subscribe to their own updates."""
+    implements(IAnnouncementDefaultSubscriber)
     implements(IAnnouncementSubscriber)
 
-    updater = BoolOption("announcer", "always_notify_updater", 'true',
-        """The always_notify_updater option mimics the option of the
-        same name in the notification section, except users can override in
-        their preferences.
+    default_on = BoolOption("announcer", "never_notify_updater", 'true',
+        """The never_notify_updater stops users from recieving announcements
+        when they update tickets.
+        """)
+
+    default_distributor = ListOption("announcer",
+        "never_notify_updater_distributor", "email, xmpp",
+        doc="""Comma seperated list of distributors to send the message to
+        by default.  ex. email, xmpp
         """)
 
     def matches(self, event):
@@ -238,8 +244,22 @@ class TicketUpdaterSubscriber(Component):
             for s in subs:
                 yield s.subscription_tuple()
 
+            # Default subscription
+            for s in self.default_subscriptions():
+                if re.match(r'^[^@]+@.+', event.author):
+                    sid, auth, addr = None, None, event.author
+                else:
+                    sid, auth, addr = event.author, True, None
+                yield (s[0], s[1], event.author, sid, auth, addr, None,
+                        s[3], s[4])
+
     def description(self):
         return _("notify me when I update a ticket")
+
+    def default_subscriptions(self):
+        if self.default_on:
+            for d in self.default_distributor:
+                yield (self.__class__.__name__, d, 100, 'never')
 
 class TicketReporterSubscriber(Component):
     """Allows the users to subscribe to tickets that they report."""
