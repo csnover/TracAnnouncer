@@ -32,6 +32,7 @@
 # ----------------------------------------------------------------------------
 
 import re
+from operator import itemgetter
 from pkg_resources import resource_filename
 
 from trac.core import Component, implements, ExtensionPoint
@@ -39,6 +40,7 @@ from trac.prefs.api import IPreferencePanelProvider
 from trac.web.chrome import ITemplateProvider, add_stylesheet, Chrome
 
 from announcer.api import _, tag_, N_
+from announcer.api import IAnnouncementDefaultSubscriber
 from announcer.api import IAnnouncementDistributor
 from announcer.api import IAnnouncementFormatter
 from announcer.api import IAnnouncementPreferenceProvider
@@ -98,6 +100,7 @@ class SubscriptionManagementPanel(Component):
     implements(ITemplateProvider)
 
     subscribers = ExtensionPoint(IAnnouncementSubscriber)
+    default_subscribers = ExtensionPoint(IAnnouncementDefaultSubscriber)
     distributors = ExtensionPoint(IAnnouncementDistributor)
     formatters = ExtensionPoint(IAnnouncementFormatter)
 
@@ -150,6 +153,7 @@ class SubscriptionManagementPanel(Component):
             })
             desc_map[i.__class__.__name__] = i.description()
 
+
         for i in self.distributors:
             for j in i.transports():
                 data['rules'][j] = []
@@ -160,6 +164,20 @@ class SubscriptionManagementPanel(Component):
                         'description': desc_map.get(r['class'], 'oh noes!'),
                         'priority': r['priority']
                     })
+
+        data['default_rules'] = {}
+        defaults = []
+        for i in self.default_subscribers:
+            defaults.extend(i.default_subscriptions())
+
+        for r in sorted(defaults, key=itemgetter(2)):
+            klass, dist, _, adverb = r
+            if not data['default_rules'].get(dist):
+                data['default_rules'][dist] = []
+            data['default_rules'][dist].append({
+                'adverb': adverb,
+                'description': desc_map[klass]
+            })
 
         add_stylesheet(req, 'announcer/css/announcer_prefs.css')
         return "prefs_announcer_manage_subscriptions.html", dict(data=data)

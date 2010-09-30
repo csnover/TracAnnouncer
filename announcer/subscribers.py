@@ -51,6 +51,7 @@ from trac.wiki.api import IWikiChangeListener
 
 from genshi.builder import tag
 
+from announcer.api import IAnnouncementDefaultSubscriber
 from announcer.api import IAnnouncementPreferenceProvider
 from announcer.api import IAnnouncementSubscriber
 from announcer.api import _, istrue

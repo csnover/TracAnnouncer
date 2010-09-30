@@ -70,6 +70,11 @@ class IAnnouncementSubscriber(Interface):
     def description():
         pass
 
+class IAnnouncementDefaultSubscriber(Interface):
+
+    def default_subscriptions():
+        pass
+
 class IAnnouncementSubscriptionFilter(Interface):
     """IAnnouncementSubscriptionFilter provides an interface where a component
     can filter subscribers from the final distribution list.

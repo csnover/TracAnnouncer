@@ -23,20 +23,21 @@
               ${distributor} rules
           </div>
           <div class="announcer_preference_options">
-              <div>
-                  Format:
-                  <select name="format-${distributor}">
-                      <option py:for="f in data['formatters']" value="${f}" selected="${(f == data['selected_format']) or None}">${f}</option>
-                  </select>
-              </div>
-              <div>
-                  <ul>
-                      <li class="rules_header"><input type="checkbox" name="select_all"/></li>
-                      <li py:for="rule in rules" class="rule"><input type="checkbox" name="select_all"/>
-                      ${rule['adverb']} ${rule['description']} <button type="submit" name="method" value="delete-rule_${rule['id']}">Delete</button><button type="submit" name="method" value="move-rule_${rule['id']}-${rule['priority']+1}">down</button><button type="submit" name="method" value="move-rule_${rule['id']}-${rule['priority']-1}">up</button></li>
-                      <li class="rules_footer"><input type="checkbox" name="select_all"/></li>
-                  </ul>
-              </div>
+              <py:if test="rules">
+                  <div>
+                      Format:
+                      <select name="format-${distributor}">
+                          <option py:for="f in data['formatters']" value="${f}" selected="${(f == data['selected_format']) or None}">${f}</option>
+                      </select>
+                  </div>
+                  <div>
+                      Rules:
+                      <ul>
+                          <li py:for="rule in rules" class="rule">
+                          ${rule['adverb']} ${rule['description']} <button type="submit" name="method" value="delete-rule_${rule['id']}">Delete</button><button type="submit" name="method" value="move-rule_${rule['id']}-${rule['priority']+1}">down</button><button type="submit" name="method" value="move-rule_${rule['id']}-${rule['priority']-1}">up</button></li>
+                      </ul>
+                  </div>
+              </py:if>
               <div class="add_rule">
                   <div>
                       <select name="new-adverb-${distributor}">
@@ -47,6 +48,16 @@
                       </select><button type="submit" name="method" value="add-rule_${distributor}">Add</button>
                   </div>
               </div>
+              <hr/>
+              <py:if test="data['default_rules'][distributor]">
+                  <div>
+                      Default Rules:
+                      <ul>
+                          <li py:for="rule in data['default_rules'][distributor]" class="default_rule">
+                          ${rule['adverb']} ${rule['description']}</li>
+                      </ul>
+                  </div>
+              </py:if>
           </div>
       </div>
     </div>
