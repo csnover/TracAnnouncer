@@ -63,24 +63,6 @@ class IAnnouncementSubscriber(Interface):
     in receiving a particular notice. Again, how it makes that decision is
     entirely up to a particular implementation."""
 
-    # DEPRECATED
-    def subscriptions(event):
-        """Returns a list of subscriptions that are interested in the
-        specified event.
-
-        Each subscription that is returned is in the form of:
-            ('transport', 'name', authenticated, 'address')
-
-        The transport should be one that a distributor (and formatter) can
-        handle, but if not? The events will be dropped later at the
-        appropriate stage.
-
-        A subscriber must return at least the name or the address, but it
-        doesn't have to return both. In many cases returning both is
-        actually undesirable-- in such a case resolvers will be bypassed
-        entirely.
-        """
-
     # new subscriptions come back as yield (dist, sid, auth, address, format, priority, adverb)
     def matches(event):
         pass
@@ -320,21 +302,6 @@ class SubscriptionResolver(Component):
                 state['last'] = (s[1], s[2])
 
         return resolved_subs
-
-class OldSubscriptionResolver(Component):
-    implements(IAnnouncementSubscriptionResolver)
-
-    subscribers = ExtensionPoint(IAnnouncementSubscriber)
-    subscription_filters = ExtensionPoint(IAnnouncementSubscriptionFilter)
-
-    def subscriptions(self, event):
-        subscriptions = set()
-        for sp in self.subscribers:
-            subscriptions.update(
-                x for x in sp.subscriptions(event) if x
-            )
-
-        return subscriptions
 
 
 _TRUE_VALUES = ('yes', 'true', 'enabled', 'on', 'aye', '1', 1, True)

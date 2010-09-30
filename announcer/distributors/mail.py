@@ -88,44 +88,6 @@ class IAnnouncementEmailDecorator(Interface):
         popped decorator.  If decorators is empty, don't worry about it.
         """
 
-class EmailPreferencePanel(Component):
-    """Deprecated:  Allow user to select format."""
-
-    implements(IAnnouncementPreferenceProvider)
-
-    formatters = ExtensionPoint(IAnnouncementFormatter)
-    producers = ExtensionPoint(IAnnouncementProducer)
-    distributors = ExtensionPoint(IAnnouncementDistributor)
-
-    # IAnnouncementDistributor
-    def get_announcement_preference_boxes(self, req):
-        yield "email", _("E-Mail Format")
-
-    def render_announcement_preference_box(self, req, panel):
-        supported_realms = {}
-        for producer in self.producers:
-            for realm in producer.realms():
-                for distributor in self.distributors:
-                    for transport in distributor.transports():
-                        for fmtr in self.formatters:
-                            for style in fmtr.styles(transport, realm):
-                                if realm not in supported_realms:
-                                    supported_realms[realm] = set()
-                                supported_realms[realm].add(style)
-
-        if req.method == "POST":
-            for realm in supported_realms:
-                opt = req.args.get('email_format_%s'%realm, False)
-                if opt:
-                    req.session['announcer_email_format_%s'%realm] = opt
-        prefs = {}
-        for realm in supported_realms:
-            prefs[realm] = req.session.get('announcer_email_format_%s'%realm, None)
-        data = dict(
-            realms = supported_realms,
-            preferences = prefs,
-        )
-        return "prefs_announcer_email.html", data
 
 class EmailDistributor(Component):
 
