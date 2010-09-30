@@ -163,12 +163,19 @@ class TicketComponentOwnerSubscriber(Component):
     """Allows component owners to subscribe to tickets assigned to their
     components.
     """
+    implements(IAnnouncementDefaultSubscriber)
     implements(IAnnouncementSubscriber)
 
-    component_owner = BoolOption("announcer", "always_notify_component_owner",
+    default_on = BoolOption("announcer", "always_notify_component_owner",
         'true',
         """Whether or not to notify the owner of the ticket's component.  The
         user can override this setting in their preferences.
+        """)
+
+    default_distributor = ListOption("announcer",
+        "always_notify_component_owner_distributor", "email",
+        doc="""Comma seperated list of distributors to send the message to
+        by default.  ex. email, xmpp
         """)
 
     def matches(self, event):
@@ -188,12 +195,26 @@ class TicketComponentOwnerSubscriber(Component):
                             self.env, (component.owner,), self.__class__.__name__)
                     for s in subs:
                         yield s.subscription_tuple()
+
+                # Default subscription
+                for s in self.default_subscriptions():
+                    if re.match(r'^[^@]+@.+', component.owner):
+                        sid, auth, addr = None, None, component.owner
+                    else:
+                        sid, auth, addr = component.owner, True, None
+                    yield (s[0], s[1], component.owner, sid, auth, addr, None,
+                            s[3], s[4])
         except:
             self.log.debug("Component for ticket (%s) not found"%ticket['id'])
 
     def description(self):
-        return _("notify me when a ticket that belongs to a component"
+        return _("notify me when a ticket that belongs to a component "
                 "that I own is created or modified")
+
+    def default_subscriptions(self):
+        if self.default_on:
+            for d in self.default_distributor:
+                yield (self.__class__.__name__, d, 101, 'always')
 
 class TicketUpdaterSubscriber(Component):
     """Allows updaters to subscribe to their own updates."""
