@@ -111,11 +111,18 @@ class AllTicketSubscriber(Component):
 class TicketOwnerSubscriber(Component):
     """Allows ticket owners to subscribe to their tickets."""
     implements(IAnnouncementSubscriber)
+    implements(IAnnouncementDefaultSubscriber)
 
-    owner = BoolOption("announcer", "always_notify_owner", 'true',
+    default_on = BoolOption("announcer", "always_notify_owner", 'true',
         """The always_notify_owner option mimics the option of the same name
         in the notification section, except users can override in their
         preferences.
+        """)
+
+    default_distributor = ListOption("announcer",
+        "always_notify_owner_distributor", "email",
+        doc="""Comma seperated list of distributors to send the message to
+        by default.  ex. email, xmpp
         """)
 
     def matches(self, event):
@@ -127,13 +134,30 @@ class TicketOwnerSubscriber(Component):
         if not ticket['owner']:
             return
 
+        klass = self.__class__.__name__
+
         subs = Subscription.find_by_sids_and_class(
-                self.env, (ticket['owner'],), self.__class__.__name__)
+                self.env, (ticket['owner'],), klass)
         for s in subs:
             yield s.subscription_tuple()
 
+        # Default subscription
+        for s in self.default_subscriptions():
+            if re.match(r'^[^@]+@.+', ticket['owner']):
+                sid, auth, addr = None, None, ticket['owner']
+            else:
+                sid, auth, addr = ticket['owner'], True, None
+            yield (s[0], s[1], ticket['owner'], sid, auth, addr, None, s[3],
+                    s[4])
+
     def description(self):
         return _("notify me when a ticket that I own is created or modified")
+
+    def default_subscriptions(self):
+        if self.default_on:
+            for d in self.default_distributor:
+                yield (self.__class__.__name__, d, 101, 'always')
+
 
 class TicketComponentOwnerSubscriber(Component):
     """Allows component owners to subscribe to tickets assigned to their
