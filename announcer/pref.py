@@ -66,7 +66,8 @@ class AnnouncerPreferences(Component):
         return [resource_dir]
 
     def get_preference_panels(self, req):
-        yield ('announcer', _('Announcements'))
+        if self.preference_boxes:
+            yield ('announcer', _('Announcements'))
 
     def _get_boxes(self, req):
         for pr in self.preference_boxes:
