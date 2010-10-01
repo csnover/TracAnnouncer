@@ -235,13 +235,13 @@ class TicketUpdaterSubscriber(Component):
     implements(IAnnouncementDefaultSubscriber)
     implements(IAnnouncementSubscriber)
 
-    default_on = BoolOption("announcer", "never_notify_updater", 'true',
+    default_on = BoolOption("announcer", "never_notify_updater", 'false',
         """The never_notify_updater stops users from recieving announcements
         when they update tickets.
         """)
 
     default_distributor = ListOption("announcer",
-        "never_notify_updater_distributor", "email, xmpp",
+        "never_notify_updater_distributor", "email",
         doc="""Comma seperated list of distributors to send the message to
         by default.  ex. email, xmpp
         """)
