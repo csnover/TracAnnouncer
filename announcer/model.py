@@ -128,6 +128,19 @@ class Subscription(object):
                 i+=1
 
     @classmethod
+    def update_format_by_distributor_and_sid(cls, env, distributor, sid, authenticated, format, db=None):
+        @env.with_transaction(db)
+        def do_update(db):
+            cursor = db.cursor()
+            cursor.execute("""
+            UPDATE subscription
+               SET format=%s
+             WHERE distributor=%s
+               AND sid=%s
+               AND authenticated=%s
+            """, (format, distributor, sid, authenticated))
+
+    @classmethod
     def find_by_sid_and_distributor(cls, env, sid, authenticated, distributor, db=None):
         subs = []
 

@@ -28,8 +28,8 @@
                   <div>
                       Format:
                       <select name="format-${distributor}">
-                          <option py:for="f in data['formatters']" value="${f}" selected="${(f == data['selected_format']) or None}">${f}</option>
-                      </select>
+                          <option py:for="f in data['formatters']" value="${f}" selected="${(f == data['selected_format'][distributor]) or None}">${f}</option>
+                      </select><button type="submit" name="method" value="set-format_${distributor}">Save</button>
                   </div>
                   <div>
                       <ul>

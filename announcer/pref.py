@@ -108,7 +108,8 @@ class SubscriptionManagementPanel(Component):
         self.post_handlers = {
             'add-rule': self._add_rule,
             'delete-rule': self._delete_rule,
-            'move-rule': self._move_rule
+            'move-rule': self._move_rule,
+            'set-format': self._set_format
         }
 
     def get_htdocs_dirs(self):
@@ -141,7 +142,7 @@ class SubscriptionManagementPanel(Component):
         desc_map = {}
 
         data['formatters'] = ('text/plain', 'text/html')
-        data['selected_format'] = 'text/plain'
+        data['selected_format'] = {}
         data['adverbs'] = ('always', 'never')
 
         for i in self.subscribers:
@@ -168,6 +169,7 @@ class SubscriptionManagementPanel(Component):
                             'description': desc_map[r['class']],
                             'priority': r['priority']
                         })
+                        data['selected_format'][j] = r['format']
 
         data['default_rules'] = {}
         defaults = []
@@ -205,3 +207,8 @@ class SubscriptionManagementPanel(Component):
         (rule_id, new_priority) = arg.split('-')
         if int(new_priority) >= 1:
             Subscription.move(self.env, rule_id, int(new_priority))
+
+    def _set_format(self, arg, req):
+        Subscription.update_format_by_distributor_and_sid(self.env, arg,
+                req.session.sid, req.session.authenticated,
+                req.args['format-%s'%arg])
