@@ -30,6 +30,29 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # ----------------------------------------------------------------------------
+"""
+TracAnnouncer is a flexible trac notifications drop in replacement that is
+very flexible and customizable.  There is a focus on users being able to
+configure what notifications they would like and relieving the sysadmin
+from having to manage notifications.
+
+HACKING NOTES:
+
+The most confusing part of announce is that subscriptions have three
+related fields, that are not intuitive.  (sid, authenticated, address).
+There is a very good reason for this.  First, Trac users are identified
+throughout the system with the sid, authenticated pair.  Anonymous user
+are allowed to set their sid to anything that they would like via the
+advanced preferences in the preferences section of the site.  The can
+set their sid to the same sid as some authenticated user.  The way we
+tell the difference between the two identical sids is the authenticated
+flag.  There is a third type of user when we are talking about announcements.
+Users can enter any email address in some ticket fields, like CC.  These
+subscriptions are not associated with any sid.  So the sid and authenticated
+in the subscription would be None, None.  These users should be treated
+with all default configuration and permissions checked against anonymous.
+I hope this helps, because it took me a while to wrap my head around :P
+"""
 
 import pkg_resources
 import time
@@ -44,12 +67,15 @@ from trac.env import IEnvironmentSetupParticipant
 from trac.util.compat import set
 
 class IAnnouncementProducer(Interface):
-    """blah."""
+    """Producer converts Trac events from different subsystems, into
+    AnnouncerEvents.
+    """
 
     def realms():
         """Returns an iterable that lists all the realms that this producer
         is capable of producing events for.
         """
+
 
 class IAnnouncementSubscriber(Interface):
     """IAnnouncementSubscriber provides an interface where a Plug-In can
@@ -63,17 +89,40 @@ class IAnnouncementSubscriber(Interface):
     in receiving a particular notice. Again, how it makes that decision is
     entirely up to a particular implementation."""
 
-    # new subscriptions come back as yield (dist, sid, auth, address, format, priority, adverb)
     def matches(event):
-        pass
+        """Returns a list of subscriptions that match the given event.
+        Responses should be yielded as 7 part tuples as follows:
+        (distributor, sid, authenticated, address, format, priority, adverb)
+        The default installation includes email and xmpp distributors.  The
+        default installation includes formats for text/plain and text/html.
+        If an unknown format is return, it will be replaced by a default known
+        format.  Priority is used to resolve conflicting subscriptions for the
+        same user/distribution pair.  adverb is either always or never.
+        """
 
     def description():
-        pass
+        """A description of the subscription that shows up in the users
+        preferences.
+        """
+
 
 class IAnnouncementDefaultSubscriber(Interface):
+    """Default subscriptions that the module will automatically generate.
+    This should only be used in reasonable situations, where users can be
+    determined by the event itself.  For instance, ticket author has a
+    default subscription that is controlled via trac.ini.  This is because
+    we can lookup the ticket author during the event and create a
+    subscription for them.  Default subscriptions should be low priority
+    so that the user can easily override them.
+    """
 
     def default_subscriptions():
-        pass
+        """Yields 5 part tuple containing (class, distributor, priority,
+        adverb).  This is used to display default subscriptions in the
+        user UI and can also be used by matches to figure out what
+        default subscriptions it should yield.
+        """
+
 
 class IAnnouncementSubscriptionFilter(Interface):
     """IAnnouncementSubscriptionFilter provides an interface where a component
@@ -86,6 +135,7 @@ class IAnnouncementSubscriptionFilter(Interface):
         components to remove addresses from the distribution list.  This can
         be used for things like "never notify updater" functionality.
         """
+
 
 class IAnnouncementFormatter(Interface):
     """Formatters are responsible for converting an event into a message
@@ -133,6 +183,7 @@ class IAnnouncementFormatter(Interface):
         expects.
         """
 
+
 class IAnnouncementDistributor(Interface):
     """The Distributor is responsible for actually delivering an event to the
     desired subscriptions.
@@ -176,6 +227,7 @@ class IAnnouncementDistributor(Interface):
         user preference would be a dandy idea.
         """
 
+
 class IAnnouncementPreferenceProvider(Interface):
     """Represents a single 'box' in the Announcements preference panel.
 
@@ -211,6 +263,7 @@ class IAnnouncementPreferenceProvider(Interface):
         with the data member.
         """
 
+
 class IAnnouncementAddressResolver(Interface):
     """Handles mapping Trac usernames to addresses for distributors to use."""
 
@@ -229,6 +282,7 @@ class IAnnouncementAddressResolver(Interface):
         If no address for the specified name can be found, None should be
         returned. The next resolver will be attempted in the chain.
         """
+
 
 class AnnouncementEvent(object):
     """AnnouncementEvent
@@ -253,33 +307,40 @@ class AnnouncementEvent(object):
     def get_session_terms(self, session_id):
         return tuple()
 
+
 class IAnnouncementSubscriptionResolver(Interface):
     """Supports new and old style of subscription resolution until new code
     is complete."""
+
     def subscriptions(event):
         """Return all subscriptions as (dist, sid, auth, address, format)
         priority 1 is highest.  adverb is 'always' or 'never'.
         """
 
+
 class SubscriptionResolver(Component):
+    """Collect, and resolve subscriptions."""
+
     implements(IAnnouncementSubscriptionResolver)
 
     subscribers = ExtensionPoint(IAnnouncementSubscriber)
 
     def subscriptions(self, event):
+        """Yields all subscriptions for a given event."""
+
         subscriptions = []
-        # new subscriptions come back as (dist, sid, auth, address, format, priority, adverb)
         for sp in self.subscribers:
             subscriptions.extend(
                 [x for x in sp.matches(event) if x]
             )
 
         """
-        This logic is meant to generate a list of subscriptions for each distirbution
-        method.  The important thing is that we pick the rule with the highest
-        priority for each (sid, distribution) pair.  If it is "never", then the user
-        is dropped from the list.  If it is always, then the user is kept.  Only the
-        users highest priority rule is used and all others are skipped.
+        This logic is meant to generate a list of subscriptions for each
+        distirbution method.  The important thing is that we pick the rule with
+        the highest priority for each (sid, distribution) pair.  If it is
+        "never", then the user is dropped from the list.  If it is always, then
+        the user is kept.  Only the users highest priority rule is used and all
+        others are skipped.
         """
         # sort by dist, sid, priority
         ordered_subs = sorted(subscriptions, key=itemgetter(1,2,6))
@@ -366,8 +427,8 @@ class AnnouncementSystem(Component):
 
     resolver = ExtensionOption('announcer', 'subscription_resolvers',
         IAnnouncementSubscriptionResolver, 'OldSubscriptionResolver',
-        """Comma seperated list of subscription resolver components in the order
-        they will be called.
+        """Comma seperated list of subscription resolver components in the
+        order they will be called.
         """)
 
 
@@ -476,13 +537,15 @@ class AnnouncementSystem(Component):
                 )
             )
             packages = {}
-            for transport, sid, authenticated, address, subs_format in subscriptions:
+            for transport, sid, authenticated, address, subs_format \
+                    in subscriptions:
                 if transport not in packages:
                     packages[transport] = set()
                 packages[transport].add((sid,authenticated,address))
             for distributor in self.distributors:
                 for transport in distributor.transports():
                     if transport in packages:
-                        distributor.distribute(transport, packages[transport], evt)
+                        distributor.distribute(transport, packages[transport],
+                                evt)
         except:
             self.log.error("AnnouncementSystem failed.", exc_info=True)

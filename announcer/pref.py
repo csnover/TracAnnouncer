@@ -131,10 +131,8 @@ class SubscriptionManagementPanel(Component):
                 if method_func:
                     method_func(arg, req)
                 else:
-                    #error
                     pass
             else:
-                #default save
                 pass
             req.redirect(req.href.prefs('subscriptions'))
 

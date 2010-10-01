@@ -29,6 +29,13 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # ----------------------------------------------------------------------------
 
+# NOTE: users are uniquely identified by (sid, authenticated).  An anonymous
+# user is allowed to use an sid that they desire, even one that is already
+# used by an authenticated user.  When a user enters an sid into a field, like
+# ticket owner, they are refering to an authenticated user.  All permission
+# checking for unauthenticated users should be done against the 'anonymous'
+# user.
+
 from trac.util.datefmt import utc
 
 __all__ = ['Subscription', 'SubscriptionAttribute']

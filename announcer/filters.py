@@ -30,8 +30,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # ----------------------------------------------------------------------------
 
-"""-*- Deprecated -*-
-New subscriber interface will elliminate the need for filters
+"""Filters can remove subscriptions after they are collected.
 """
 import re
 
@@ -43,6 +42,10 @@ from announcer.api import IAnnouncementSubscriptionFilter
 from announcer.api import _
 
 class DefaultPermissionFilter(Component):
+    """DefaultPermissionFilter simply checks that each subscription
+    has ${REALM}_VIEW permissions before allow the subscription notice
+    to be sent.
+    """
     implements(IAnnouncementSubscriptionFilter)
 
     exception_realms = ListOption('announcer', 'filter_exception_realms', '',
