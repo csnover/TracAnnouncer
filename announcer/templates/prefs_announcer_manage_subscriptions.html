@@ -48,10 +48,11 @@
                       </select><button type="submit" name="method" value="add-rule_${distributor}">Add</button>
                   </div>
               </div>
-              <hr/>
               <py:if test="data['default_rules'][distributor]">
+                  <hr/>
                   <div>
                       Default Rules:
+                      <p><em>The following rules have been configured by the system admistrator as the default rules.  Any rules defined by you will take higher priority then these rules.  This can be confusing if you don't understand how the system works.  Only the first matching rule is applied when system events occur.  For example, if you have a rule like "always notify me of any ticket changes" in your custom rules, and there is a default rule "never notify me when I update a ticket", then the always rule will take precedent and you will still recieve announcements on ticket changes, even when you are the updater.  In the preceding case, you would need to add your own "never notify me.." rule above the "always notify me.." to get the proper behavior.</em></p>
                       <ul>
                           <li py:for="rule in data['default_rules'][distributor]" class="default_rule">
                           ${rule['adverb']} ${rule['description']}</li>
