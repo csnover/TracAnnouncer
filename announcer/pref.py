@@ -37,7 +37,10 @@ from pkg_resources import resource_filename
 
 from trac.core import Component, implements, ExtensionPoint
 from trac.prefs.api import IPreferencePanelProvider
+from trac.web.api import ITemplateStreamFilter
 from trac.web.chrome import ITemplateProvider, add_stylesheet, Chrome
+
+from genshi.filters.transform import Transformer
 
 from announcer.api import _, tag_, N_
 from announcer.api import IAnnouncementDefaultSubscriber
@@ -54,7 +57,8 @@ def truth(v):
     return True
 
 class AnnouncerPreferences(Component):
-    implements(IPreferencePanelProvider, ITemplateProvider)
+    implements(IPreferencePanelProvider)
+    implements(ITemplateProvider)
 
     preference_boxes = ExtensionPoint(IAnnouncementPreferenceProvider)
 
@@ -99,6 +103,7 @@ class AnnouncerPreferences(Component):
 class SubscriptionManagementPanel(Component):
     implements(IPreferencePanelProvider)
     implements(ITemplateProvider)
+    implements(ITemplateStreamFilter)
 
     subscribers = ExtensionPoint(IAnnouncementSubscriber)
     default_subscribers = ExtensionPoint(IAnnouncementDefaultSubscriber)
@@ -190,8 +195,14 @@ class SubscriptionManagementPanel(Component):
         add_stylesheet(req, 'announcer/css/announcer_prefs.css')
         return "prefs_announcer_manage_subscriptions.html", dict(data=data)
 
+    #ITemplateStreamFilter
+    def filter_stream(self, req, method, filename, stream, data):
+        if re.match(r'/prefs/subscription', req.path_info):
+            self.log.error("MATCH!")
+            stream |= Transformer('//form[@id="userprefs"]//div[@class="buttons"]').empty()
+        return stream
+
     def _add_rule(self, arg, req):
-        # TODO: Don't do that with format.  Make it change globally on change.
         rule = Subscription(self.env)
         rule['sid'] = req.session.sid
         rule['authenticated'] = req.session.authenticated and 1 or 0
