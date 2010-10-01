@@ -147,23 +147,25 @@ class SubscriptionManagementPanel(Component):
         data['adverbs'] = ('always', 'never')
 
         for i in self.subscribers:
-            data['subscribers'].append({
-                'class': i.__class__.__name__,
-                'description': i.description()
-            })
-            desc_map[i.__class__.__name__] = i.description()
+            if i.description():
+                data['subscribers'].append({
+                    'class': i.__class__.__name__,
+                    'description': i.description()
+                })
+                desc_map[i.__class__.__name__] = i.description()
 
 
         for i in self.distributors:
             for j in i.transports():
                 data['rules'][j] = []
                 for r in Subscription.find_by_sid_and_distributor(self.env, req.session.sid, j):
-                    data['rules'][j].append({
-                        'id': r['id'],
-                        'adverb': r['adverb'],
-                        'description': desc_map.get(r['class'], 'oh noes!'),
-                        'priority': r['priority']
-                    })
+                    if desc_map.get(r['class']):
+                        data['rules'][j].append({
+                            'id': r['id'],
+                            'adverb': r['adverb'],
+                            'description': desc_map.get(r['class'], 'oh noes!'),
+                            'priority': r['priority']
+                        })
 
         data['default_rules'] = {}
         defaults = []
@@ -174,10 +176,11 @@ class SubscriptionManagementPanel(Component):
             klass, dist, _, adverb = r
             if not data['default_rules'].get(dist):
                 data['default_rules'][dist] = []
-            data['default_rules'][dist].append({
-                'adverb': adverb,
-                'description': desc_map[klass]
-            })
+            if desc_map.get(klass):
+                data['default_rules'][dist].append({
+                    'adverb': adverb,
+                    'description': desc_map.get(klass)
+                })
 
         add_stylesheet(req, 'announcer/css/announcer_prefs.css')
         return "prefs_announcer_manage_subscriptions.html", dict(data=data)
