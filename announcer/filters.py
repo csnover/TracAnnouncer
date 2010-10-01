@@ -59,14 +59,15 @@ class DefaultPermissionFilter(Component):
 
     def filter_subscriptions(self, event, subscriptions):
         permsys = PermissionSystem(self.env)
-        permitted_users = permsys.get_users_with_permission('%s_VIEW'%event.realm.upper())
+        action = '%s_VIEW'%event.realm.upper()
         for subscription in subscriptions:
-            sid = subscription[1]
-            if sid not in permitted_users:
+            sid, auth = subscription[1:3]
+            if not sid or not auth:
+                sid = 'anonymous'
+            if permsys.check_permission(action, sid):
+                yield subscription
+            else:
                 self.log.debug(
                     "Filtering %s because of rule: DefaultPermissionFilter"\
                     %sid
                 )
-                pass
-            else:
-                yield subscription

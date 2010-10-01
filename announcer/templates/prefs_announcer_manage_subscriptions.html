@@ -23,6 +23,7 @@
               ${distributor} rules
           </div>
           <div class="announcer_preference_options">
+              Custom Rules:
               <py:if test="rules">
                   <div>
                       Format:
@@ -31,7 +32,6 @@
                       </select>
                   </div>
                   <div>
-                      Rules:
                       <ul>
                           <li py:for="rule in rules" class="rule">
                           ${rule['adverb']} ${rule['description']} <button type="submit" name="method" value="delete-rule_${rule['id']}">Delete</button><button type="submit" name="method" value="move-rule_${rule['id']}-${rule['priority']+1}">down</button><button type="submit" name="method" value="move-rule_${rule['id']}-${rule['priority']-1}">up</button></li>

@@ -105,6 +105,14 @@ class IAnnouncementSubscriber(Interface):
         preferences.
         """
 
+    def requires_authentication():
+        """Returns True or False.  If the user is required to be authenticated
+        to create the subscription, then return True.  This applies to things
+        like ticket owner subscriber, since the ticket owner can never be the
+        sid of an unauthenticated user and we have no way to lookup users by
+        email address (as of yet).
+        """
+
 
 class IAnnouncementDefaultSubscriber(Interface):
     """Default subscriptions that the module will automatically generate.
@@ -342,8 +350,8 @@ class SubscriptionResolver(Component):
         the user is kept.  Only the users highest priority rule is used and all
         others are skipped.
         """
-        # sort by dist, sid, priority
-        ordered_subs = sorted(subscriptions, key=itemgetter(1,2,6))
+        # sort by dist, sid, authenticated, priority
+        ordered_subs = sorted(subscriptions, key=itemgetter(1,2,3,6))
 
         resolved_subs = []
 
@@ -352,20 +360,22 @@ class SubscriptionResolver(Component):
             'last': None
         }
         for s in ordered_subs:
-            if (s[1], s[2]) == state['last']:
+            if (s[1], s[2], s[3]) == state['last']:
                 continue
             if s[-1] == 'always':
-                self.log.debug("Adding (%s) for 'always' on rule (%s) for (%s)"%(s[2], s[0], s[1]))
+                self.log.debug("Adding (%s [%s]) for 'always' on rule (%s) "
+                    "for (%s)"%(s[2], s[3], s[0], s[1]))
                 resolved_subs.append(s[1:6])
             else:
-                self.log.debug("Ignoring (%s) for 'never' on rule (%s) for (%s)"%(s[2], s[0], s[1]))
+                self.log.debug("Ignoring (%s [%s]) for 'never' on rule (%s) "
+                    "for (%s)"%(s[2], s[3], s[0], s[1]))
 
-            # if s[1] is None, then the subscription is for an anonymous email
+            # if s[1] is None, then the subscription is for a raw email
             # address that has been set in some field and we shouldn't skip
-            # the next anonymous subscription.  In other words, all anonymous
+            # the next raw email subscription.  In other words, all raw email
             # subscriptions should be added.
             if s[2]:
-                state['last'] = (s[1], s[2])
+                state['last'] = (s[1], s[2], s[3])
 
         return resolved_subs
 
@@ -457,6 +467,7 @@ class AnnouncementSystem(Component):
         Table('subscription_attribute', key='id')[
             Column('id', auto_increment=True),
             Column('sid'),
+            Column('authenticated', type='int'),
             Column('class'),
             Column('realm'),
             Column('target')

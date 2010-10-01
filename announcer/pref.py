@@ -145,23 +145,27 @@ class SubscriptionManagementPanel(Component):
         data['adverbs'] = ('always', 'never')
 
         for i in self.subscribers:
-            if i.description():
-                data['subscribers'].append({
-                    'class': i.__class__.__name__,
-                    'description': i.description()
-                })
-                desc_map[i.__class__.__name__] = i.description()
+            if not i.description():
+                continue
+            if not req.session.authenticated and i.requires_authentication():
+                continue
+            data['subscribers'].append({
+                'class': i.__class__.__name__,
+                'description': i.description()
+            })
+            desc_map[i.__class__.__name__] = i.description()
 
 
         for i in self.distributors:
             for j in i.transports():
                 data['rules'][j] = []
-                for r in Subscription.find_by_sid_and_distributor(self.env, req.session.sid, j):
+                for r in Subscription.find_by_sid_and_distributor(self.env,
+                        req.session.sid, req.session.authenticated, j):
                     if desc_map.get(r['class']):
                         data['rules'][j].append({
                             'id': r['id'],
                             'adverb': r['adverb'],
-                            'description': desc_map.get(r['class'], 'oh noes!'),
+                            'description': desc_map[r['class']],
                             'priority': r['priority']
                         })
 
@@ -187,9 +191,9 @@ class SubscriptionManagementPanel(Component):
         # TODO: Don't do that with format.  Make it change globally on change.
         rule = Subscription(self.env)
         rule['sid'] = req.session.sid
-        rule['authenticated'] = True
+        rule['authenticated'] = req.session.authenticated and 1 or 0
         rule['distributor'] = arg
-        rule['format'] = req.args['format-%s'%arg]
+        rule['format'] = req.args.get('format-%s'%arg, '')
         rule['adverb'] = req.args['new-adverb-%s'%arg]
         rule['class'] = req.args['new-rule-%s'%arg]
         Subscription.add(self.env, rule)

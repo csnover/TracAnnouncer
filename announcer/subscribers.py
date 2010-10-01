@@ -107,6 +107,9 @@ class AllTicketSubscriber(Component):
         for i in Subscription.find_by_class(self.env, klass):
             yield i.subscription_tuple()
 
+    def requires_authentication(self):
+        return False
+
 
 class TicketOwnerSubscriber(Component):
     """Allows ticket owners to subscribe to their tickets."""
@@ -131,24 +134,26 @@ class TicketOwnerSubscriber(Component):
         if event.category not in ('created', 'changed', 'attachment added'):
             return
         ticket = event.target
-        if not ticket['owner']:
+
+        if not ticket['owner'] or ticket['owner'] == 'anonymous':
             return
 
-        klass = self.__class__.__name__
-
-        subs = Subscription.find_by_sids_and_class(
-                self.env, (ticket['owner'],), klass)
-        for s in subs:
-            yield s.subscription_tuple()
+        if re.match(r'^[^@]+@.+', ticket['owner']):
+            sid, auth, addr = None, 0, ticket['owner']
+        else:
+            sid, auth, addr = ticket['owner'], 1, None
 
         # Default subscription
         for s in self.default_subscriptions():
-            if re.match(r'^[^@]+@.+', ticket['owner']):
-                sid, auth, addr = None, None, ticket['owner']
-            else:
-                sid, auth, addr = ticket['owner'], True, None
-            yield (s[0], s[1], ticket['owner'], sid, auth, addr, None, s[3],
-                    s[4])
+            yield (s[0], s[1], sid, auth, addr, None, s[2],
+                    s[3])
+
+        if sid:
+            klass = self.__class__.__name__
+            for s in Subscription.find_by_sids_and_class(self.env,
+                    ((sid,auth),), klass):
+                yield s.subscription_tuple()
+
 
     def description(self):
         return _("notify me when a ticket that I own is created or modified")
@@ -157,6 +162,9 @@ class TicketOwnerSubscriber(Component):
         if self.default_on:
             for d in self.default_distributor:
                 yield (self.__class__.__name__, d, 101, 'always')
+
+    def requires_authentication(self):
+        return True
 
 
 class TicketComponentOwnerSubscriber(Component):
@@ -184,26 +192,28 @@ class TicketComponentOwnerSubscriber(Component):
         if event.category not in ('created', 'changed', 'attachment added'):
             return
         ticket = event.target
+
         try:
             component = model.Component(self.env, ticket['component'])
-            if component.owner:
-                if '@' in component.owner:
-                    yield (self.__class__.__name__, 'email', None, False,
-                            component.owner, None, 1, 'always')
-                else:
-                    subs = Subscription.find_by_sids_and_class(
-                            self.env, (component.owner,), self.__class__.__name__)
-                    for s in subs:
-                        yield s.subscription_tuple()
+            if not component.owner:
+                return
 
-                # Default subscription
-                for s in self.default_subscriptions():
-                    if re.match(r'^[^@]+@.+', component.owner):
-                        sid, auth, addr = None, None, component.owner
-                    else:
-                        sid, auth, addr = component.owner, True, None
-                    yield (s[0], s[1], component.owner, sid, auth, addr, None,
-                            s[3], s[4])
+            if re.match(r'^[^@]+@.+', component.owner):
+                sid, auth, addr = None, 0, component.owner
+            else:
+                sid, auth, addr = component.owner, 1, None
+
+            # Default subscription
+            for s in self.default_subscriptions():
+                yield (s[0], s[1], sid, auth, addr, None,
+                        s[2], s[3])
+
+            if sid:
+                klass = self.__class__.__name__
+                for s in Subscription.find_by_sids_and_class(self.env,
+                        ((sid,auth),), klass):
+                    yield s.subscription_tuple()
+
         except:
             self.log.debug("Component for ticket (%s) not found"%ticket['id'])
 
@@ -215,6 +225,10 @@ class TicketComponentOwnerSubscriber(Component):
         if self.default_on:
             for d in self.default_distributor:
                 yield (self.__class__.__name__, d, 101, 'always')
+
+    def requires_authentication(self):
+        return True
+
 
 class TicketUpdaterSubscriber(Component):
     """Allows updaters to subscribe to their own updates."""
@@ -237,21 +251,24 @@ class TicketUpdaterSubscriber(Component):
             return
         if event.category not in ('created', 'changed', 'attachment added'):
             return
+        if not event.author or event.author == 'anonymous':
+            return
 
-        if event.author:
-            subs = Subscription.find_by_sids_and_class(
-                    self.env, (event.author,), self.__class__.__name__)
-            for s in subs:
+        if re.match(r'^[^@]+@.+', event.author):
+            sid, auth, addr = None, 0, event.author
+        else:
+            sid, auth, addr = event.author, 1, None
+
+        # Default subscription
+        for s in self.default_subscriptions():
+            yield (s[0], s[1], sid, auth, addr, None,
+                    s[2], s[3])
+
+        if sid:
+            klass = self.__class__.__name__
+            for s in Subscription.find_by_sids_and_class(self.env,
+                    ((sid,auth),), klass):
                 yield s.subscription_tuple()
-
-            # Default subscription
-            for s in self.default_subscriptions():
-                if re.match(r'^[^@]+@.+', event.author):
-                    sid, auth, addr = None, None, event.author
-                else:
-                    sid, auth, addr = event.author, True, None
-                yield (s[0], s[1], event.author, sid, auth, addr, None,
-                        s[3], s[4])
 
     def description(self):
         return _("notify me when I update a ticket")
@@ -261,14 +278,23 @@ class TicketUpdaterSubscriber(Component):
             for d in self.default_distributor:
                 yield (self.__class__.__name__, d, 100, 'never')
 
+    def requires_authentication(self):
+        return True
+
 class TicketReporterSubscriber(Component):
     """Allows the users to subscribe to tickets that they report."""
     implements(IAnnouncementSubscriber)
+    implements(IAnnouncementDefaultSubscriber)
 
-    reporter = BoolOption("announcer", "always_notify_reporter", 'true',
-        """The always_notify_reporter option mimics the option of the
-        same name in the notification section, except users can override in
-        their preferences.
+    default_on = BoolOption("announcer", "always_notify_reporter", 'true',
+        """The always_notify_reporter will notify the ticket reporter when a
+        ticket is modified by default.
+        """)
+
+    default_distributor = ListOption("announcer",
+        "always_notify_reporter_distributor", "email",
+        doc="""Comma seperated list of distributors to send the message to
+        by default.  ex. email, xmpp
         """)
 
     def matches(self, event):
@@ -278,24 +304,52 @@ class TicketReporterSubscriber(Component):
             return
 
         ticket = event.target
-        if ticket['reporter']:
-            reporter = ticket['reporter']
-            if '@' in reporter and self.reporter:
-                yield (self.__class__.__name__, 'email', None, False,
-                        reporter, None, 1, 'always')
-            else:
-                subs = Subscription.find_by_sids_and_class(
-                        self.env, (reporter,), self.__class__.__name__)
-                for s in subs:
-                    yield s.subscription_tuple()
+        if not ticket['reporter'] or ticket['reporter'] == 'anonymous':
+            return
+
+        if re.match(r'^[^@]+@.+', ticket['reporter']):
+            sid, auth, addr = None, 0, ticket['reporter']
+        else:
+            sid, auth, addr = ticket['reporter'], 1, None
+
+        # Default subscription
+        for s in self.default_subscriptions():
+            yield (s[0], s[1], sid, auth, addr, None,
+                    s[2], s[3])
+
+        if sid:
+            klass = self.__class__.__name__
+            for s in Subscription.find_by_sids_and_class(self.env,
+                    ((sid,auth),), klass):
+                yield s.subscription_tuple()
 
     def description(self):
-        return _("notify me when a ticket that I reported is updated")
+        return _("notify me when a ticket that I reported is modified")
+
+    def default_subscriptions(self):
+        if self.default_on:
+            for d in self.default_distributor:
+                yield (self.__class__.__name__, d, 101, 'always')
+
+    def requires_authentication(self):
+        return True
+
 
 class CarbonCopySubscriber(Component):
     """Carbon copy subscriber for cc ticket field."""
+    implements(IAnnouncementDefaultSubscriber)
     implements(IAnnouncementSubscriber)
-    implements(IAnnouncementSubscriber)
+
+    default_on = BoolOption("announcer", "always_notify_cc", 'true',
+        """The always_notify_cc will notify the users in the cc field by
+        default when a ticket is modified.
+        """)
+
+    default_distributor = ListOption("announcer",
+        "always_notify_cc_distributor", "email",
+        doc="""Comma seperated list of distributors to send the message to
+        by default.  ex. email, xmpp
+        """)
 
     def matches(self, event):
         if event.realm != 'ticket':
@@ -308,24 +362,36 @@ class CarbonCopySubscriber(Component):
         sids = set()
         for chunk in re.split('\s|,', cc):
             chunk = chunk.strip()
+
             if not chunk or chunk.startswith('@'):
                 continue
-            if '@' in chunk:
-                address = chunk
-                sid = None
+
+            if re.match(r'^[^@]+@.+', chunk):
+                sid, auth, addr = None, 0, chunk
             else:
-                sid = chunk
-                address = None
-            if sid or address:
-                if not sid:
-                    yield (klass, 'email', None, False, address, None, 1, 'always')
-                else:
-                    sids.add(sid)
+                sid, auth, addr = chunk, 1, None
+
+            # Default subscription
+            for s in self.default_subscriptions():
+                yield (s[0], s[1], sid, auth, addr, None,
+                        s[2], s[3])
+            if sid:
+                sids.add((sid,auth))
+
         for s in Subscription.find_by_sids_and_class(self.env, sids, klass):
             yield s.subscription_tuple()
 
     def description(self):
-        return _("notify me when I'm listed in the CC field of a ticket")
+        return _("notify me when I'm listed in the CC field of a ticket "
+                 "that is modified")
+
+    def default_subscriptions(self):
+        if self.default_on:
+            for d in self.default_distributor:
+                yield (self.__class__.__name__, d, 101, 'always')
+
+    def requires_authentication(self):
+        return True
 
 
 class TicketComponentSubscriber(Component):
@@ -349,14 +415,17 @@ class TicketComponentSubscriber(Component):
 
         attrs = SubscriptionAttribute.find_by_class_realm_and_target(
                 self.env, klass, 'ticket', component)
-        sids = set(map(lambda x: x['sid'], attrs))
+        sids = set(map(lambda x: (x['sid'], x['authenticated']), attrs))
 
         for i in Subscription.find_by_sids_and_class(self.env, sids, klass):
             yield i.subscription_tuple()
 
     def description(self):
         return _("notify me when a ticket associated with " \
-                "a component I'm watching changes")
+                "a component I'm watching is modified")
+
+    def requires_authentication(self):
+        return False
 
     def get_announcement_preference_boxes(self, req):
         if req.authname == "anonymous" and 'email' not in req.session:
@@ -369,21 +438,21 @@ class TicketComponentSubscriber(Component):
             @self.env.with_transaction()
             def do_update(db):
                 SubscriptionAttribute.delete_by_sid_and_class(self.env,
-                        req.session.sid, klass, db)
+                        req.session.sid, req.session.authenticated, klass, db)
                 def _map(value):
                     g = re.match('^component_(.*)', value)
                     if g:
                         if istrue(req.args.get(value)):
                             return g.groups()[0]
                 components = set(filter(None, map(_map,req.args.keys())))
-                SubscriptionAttribute.add(self.env, req.session.sid, klass,
-                        'ticket', components, db)
+                SubscriptionAttribute.add(self.env, req.session.sid,
+                    req.session.authenticated, klass, 'ticket', components, db)
 
         d = {}
         attrs = filter(None, map(
             lambda x: x['target'],
             SubscriptionAttribute.find_by_sid_and_class(
-                self.env, req.session.sid, klass
+                self.env, req.session.sid, req.session.authenticated, klass
             )
         ))
         for c in model.Component.select(self.env):
@@ -400,11 +469,24 @@ class TicketCustomFieldSubscriber(Component):
     field that has a name in the custom_cc_fields list.  The custom_cc_fields
     list must be configured by the system administrator.
     """
+    implements(IAnnouncementDefaultSubscriber)
     implements(IAnnouncementSubscriber)
 
     custom_cc_fields = ListOption('announcer', 'custom_cc_fields',
             doc="Field names that contain users that should be notified on "
             "ticket changes")
+
+    default_on = BoolOption("announcer", "always_notify_custom_cc", 'true',
+        """The always_notify_custom_cc will notify the users in the custom
+        cc field by default when a ticket is modified.
+        """)
+
+    default_distributor = ListOption("announcer",
+        "always_notify_custom_cc_distributor", "email",
+        doc="""Comma seperated list of distributors to send the message to
+        by default.  ex. email, xmpp
+        """)
+
 
     def matches(self, event):
         if event.realm != 'ticket':
@@ -422,27 +504,35 @@ class TicketCustomFieldSubscriber(Component):
                 chunk = chunk.strip()
                 if not chunk or chunk.startswith('@'):
                     continue
-                if '@' in chunk:
-                    address = chunk
-                    sid = None
+
+                if re.match(r'^[^@]+@.+', chunk):
+                    sid, auth, addr = None, None, chunk
                 else:
-                    sid = chunk
-                    address = None
-                if sid or address:
-                    self.log.debug("TicketCustomFieldSubscriber " \
-                        "added '%s <%s>'"%(sid,address))
-                    if not sid:
-                        yield (klass, 'email', None, False, address, None, 1,
-                                'always')
-                    else:
-                        sids.add(sid)
+                    sid, auth, addr = chunk, True, None
+
+                # Default subscription
+                for s in self.default_subscriptions():
+                    yield (s[0], s[1], sid, auth, addr, None,
+                            s[3], s[4])
+                if sid:
+                    sids.add((sid,auth))
 
         for i in Subscription.find_by_sids_and_class(self.env, sids, klass):
             yield i.subscription_tuple()
 
     def description(self):
-        return _("notify me when I'm listed in any of the (%s) "
-                 "fields"%(','.join(self.custom_cc_fields),))
+        if self.custom_cc_fields:
+            return _("notify me when I'm listed in any of the (%s) "
+                     "fields"%(','.join(self.custom_cc_fields),))
+
+    def default_subscriptions(self):
+        if self.custom_cc_fields:
+            if self.default_on:
+                for d in self.default_distributor:
+                    yield (self.__class__.__name__, d, 101, 'always')
+
+    def requires_authentication(self):
+        return True
 
 
 class JoinableGroupSubscriber(Component):
@@ -483,13 +573,17 @@ class JoinableGroupSubscriber(Component):
 
                 attrs = SubscriptionAttribute.find_by_class_realm_and_target(
                         self.env, klass, 'ticket', grp)
-                sids.update(set(map(lambda x: x['sid'], attrs)))
+                sids.update(set(map(
+                    lambda x: (x['sid'],x['authenticated']), attrs)))
 
         for i in Subscription.find_by_sids_and_class(self.env, sids, klass):
             yield i.subscription_tuple()
 
     def description(self):
         return _("notify me on ticket changes in one of my subscribed groups")
+
+    def requires_authentication(self):
+        return False
 
     def get_announcement_preference_boxes(self, req):
         if req.authname == "anonymous" and 'email' not in req.session:
@@ -504,20 +598,20 @@ class JoinableGroupSubscriber(Component):
             @self.env.with_transaction()
             def do_update(db):
                 SubscriptionAttribute.delete_by_sid_and_class(self.env,
-                        req.session.sid, klass, db)
+                        req.session.sid, req.session.authenticated, klass, db)
                 def _map(value):
                     g = re.match('^joinable_group_(.*)', value)
                     if g:
                         if istrue(req.args.get(value)):
                             return g.groups()[0]
                 groups = set(filter(None, map(_map,req.args.keys())))
-                SubscriptionAttribute.add(self.env, req.session.sid, klass,
-                        'ticket', groups, db)
+                SubscriptionAttribute.add(self.env, req.session.sid,
+                    req.session.authenticated, klass, 'ticket', groups, db)
 
         attrs = filter(None, map(
             lambda x: x['target'],
             SubscriptionAttribute.find_by_sid_and_class(
-                self.env, req.session.sid, klass
+                self.env, req.session.sid, req.session.authenticated, klass
             )
         ))
         data = dict(joinable_groups = {})
@@ -538,13 +632,16 @@ class UserChangeSubscriber(Component):
 
         attrs = SubscriptionAttribute.find_by_class_realm_and_target(
                 self.env, klass, 'user', event.author)
-        sids = set(map(lambda x: x['sid'], attrs))
+        sids = set(map(lambda x: (x['sid'],x['authenticated']), attrs))
 
         for i in Subscription.find_by_sids_and_class(self.env, sids, klass):
             yield i.subscription_tuple()
 
     def description(self):
         return _("notify me when one of my watched users changes something")
+
+    def requires_authentication(self):
+        return False
 
     def get_announcement_preference_boxes(self, req):
         if req.authname == "anonymous" and 'email' not in req.session:
@@ -558,16 +655,16 @@ class UserChangeSubscriber(Component):
             @self.env.with_transaction()
             def do_update(db):
                 SubscriptionAttribute.delete_by_sid_and_class(self.env,
-                        req.session.sid, klass, db)
+                        req.session.sid, req.session.authenticated, klass, db)
                 users = map(lambda x: x.strip(),
                         req.args.get("announcer_watch_users").split(','))
-                SubscriptionAttribute.add(self.env, req.session.sid, klass,
-                        'user', users, db)
+                SubscriptionAttribute.add(self.env, req.session.sid,
+                        req.session.authenticated, klass, 'user', users, db)
 
         attrs = filter(None, map(
             lambda x: x['target'],
             SubscriptionAttribute.find_by_sid_and_class(
-                self.env, req.session.sid, klass
+                self.env, req.session.sid, req.session.authenticated, klass
             )
         ))
         return "prefs_announcer_watch_users.html", dict(data=dict(
@@ -613,17 +710,18 @@ class WatchSubscriber(Component):
         realm, target = self.path_info_to_realm_target(path_info)
 
         req.perm.require('%s_VIEW' % realm.upper())
-        self.toggle_watched(req.session.sid, realm, target, req)
+        self.toggle_watched(req.session.sid, req.session.authenticated,
+                realm, target, req)
 
         req.redirect(req.href(realm, target))
 
-    def toggle_watched(self, sid, realm, target, req=None):
-        if self.is_watching(sid, realm, target):
-            self.set_unwatch(sid, realm, target)
+    def toggle_watched(self, sid, authenticated, realm, target, req=None):
+        if self.is_watching(sid, authenticated, realm, target):
+            self.set_unwatch(sid, authenticated, realm, target)
             self._schedule_notice(req, _('You are no longer receiving ' \
                     'change notifications about this resource.'))
         else:
-            self.set_watch(sid, realm, target)
+            self.set_watch(sid, authenticated, realm, target)
             self._schedule_notice(req, _('You are now receiving ' \
                     'change notifications about this resource.'))
 
@@ -635,23 +733,24 @@ class WatchSubscriber(Component):
             add_notice(req, req.session['_announcer_watch_message_'])
             del req.session['_announcer_watch_message_']
 
-    def is_watching(self, sid, realm, target):
+    def is_watching(self, sid, authenticated, realm, target):
         klass = self.__class__.__name__
         attrs = SubscriptionAttribute.find_by_sid_class_realm_and_target(
-                self.env, sid, klass, realm, target)
+                self.env, sid, authenticated, klass, realm, target)
         if attrs:
             return True
         else:
             return False
 
-    def set_watch(self, sid, realm, target):
+    def set_watch(self, sid, authenticated, realm, target):
         klass = self.__class__.__name__
-        SubscriptionAttribute.add(self.env, sid, klass, realm, (target,))
+        SubscriptionAttribute.add(self.env, sid, authenticated, klass,
+                realm, (target,))
 
-    def set_unwatch(self, sid, realm, target):
+    def set_unwatch(self, sid, authenticated, realm, target):
         klass = self.__class__.__name__
         (attr,) = SubscriptionAttribute.find_by_sid_class_realm_and_target(
-                self.env, sid, klass, realm, target)
+                self.env, sid, authenticated, klass, realm, target)
         if attr:
             SubscriptionAttribute.delete(self.env, attr['id'])
 
@@ -662,7 +761,7 @@ class WatchSubscriber(Component):
     def post_process_request(self, req, template, data, content_type):
         self._add_notice(req)
 
-        if req.authname != "anonymous":
+        if req.authname != "anonymous" or 'email' in req.session:
             for pattern in self.watchable_paths:
                 realm, target = self.path_info_to_realm_target(req.path_info)
                 if fnmatch('%s/%s'%(realm,target), pattern):
@@ -677,7 +776,8 @@ class WatchSubscriber(Component):
         if not self.ctxtnav_names:
           return
         realm, target = self.path_info_to_realm_target(req.path_info)
-        if self.is_watching(req.session.sid, realm, target):
+        if self.is_watching(req.session.sid, req.session.authenticated,
+                realm, target):
             action_name = len(self.ctxtnav_names) >= 2 and \
                     self.ctxtnav_names[1] or 'Unwatch This'
         else:
@@ -738,13 +838,16 @@ class WatchSubscriber(Component):
 
         attrs = SubscriptionAttribute.find_by_class_realm_and_target(self.env,
                 klass, event.realm, self._get_target_id(event.target))
-        sids = set(map(lambda x: x['sid'], attrs))
+        sids = set(map(lambda x: (x['sid'],x['authenticated']), attrs))
 
         for i in Subscription.find_by_sids_and_class(self.env, sids, klass):
             yield i.subscription_tuple()
 
     def description(self):
         return _("notify me when one of my watched wiki or tickets is updated")
+
+    def requires_authentication(self):
+        return False
 
     def _get_target_id(self, target):
         if hasattr(target, 'id'):
@@ -783,7 +886,7 @@ class GeneralWikiSubscriber(Component):
                     if re.match(pat, event.target.name):
                         return True
 
-        sids = set(map(lambda x: x['sid'], filter(match, attrs)))
+        sids = set(map(lambda x: (x['sid'],x['authenticated']), filter(match, attrs)))
 
         for i in Subscription.find_by_sids_and_class(self.env, sids, klass):
             yield i.subscription_tuple()
@@ -792,6 +895,9 @@ class GeneralWikiSubscriber(Component):
     def description(self):
         return _("notify me when a wiki that matches my wiki watch pattern "
                  "is created, or updated")
+
+    def requires_authentication(self):
+        return False
 
     def get_announcement_preference_boxes(self, req):
         if req.perm.has_permission('WIKI_VIEW'):
@@ -804,12 +910,14 @@ class GeneralWikiSubscriber(Component):
             @self.env.with_transaction()
             def do_update(db):
                 SubscriptionAttribute.delete_by_sid_and_class(self.env,
-                        req.session.sid, klass, db)
-                SubscriptionAttribute.add(self.env, req.session.sid, klass,
+                        req.session.sid, req.session.authenticated, klass, db)
+                SubscriptionAttribute.add(self.env, req.session.sid,
+                    req.session.authenticated, klass,
                     'wiki', req.args.get('wiki_interests', db))
 
         (interests,) = SubscriptionAttribute.find_by_sid_and_class(
-            self.env, req.session.sid, klass) or ({'target':''},)
+            self.env, req.session.sid, req.session.authenticated, klass
+        ) or ({'target':''},)
 
         return "prefs_announcer_wiki.html", dict(
             wiki_interests = '\n'.join(

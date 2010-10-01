@@ -136,7 +136,7 @@ class FullBlogMyPostSubscriber(Component):
                                   'comment deleted'):
             return
 
-        sids = (event.blog_post.author,)
+        sids = ((event.blog_post.author,1),)
         klass = self.__class__.__name__
         for i in Subscription.find_by_sids_and_class(self.env, sids, klass):
             yield i.subscription_tuple()
@@ -168,7 +168,7 @@ class FullBlogWatchSubscriber(Component):
 
         attrs = SubscriptionAttribute.find_by_class_realm_and_target(self.env,
                 klass, 'blog', event.blog_post.name)
-        sids = set(map(lambda x: x['sid'], attrs))
+        sids = set(map(lambda x: (x['sid'],x['authenticated']), attrs))
 
         for i in Subscription.find_by_sids_and_class(self.env, sids, klass):
             yield i.subscription_tuple()
@@ -199,7 +199,7 @@ class FullBlogWatchSubscriber(Component):
         klass = self.__class__.__name__
 
         attrs = SubscriptionAttribute.find_by_sid_class_and_target(
-                self.env, req.session.sid, klass, name)
+            self.env, req.session.sid, req.session.authenticated, klass, name)
         if attrs:
             add_ctxtnav(req, tag.a(_('Unwatch This'),
                 href=req.href.blog_watch(name)))
@@ -222,15 +222,18 @@ class FullBlogWatchSubscriber(Component):
         @self.env.with_transaction()
         def do_update(db):
             attrs = SubscriptionAttribute.find_by_sid_class_and_target(
-                    self.env, req.session.sid, klass, name)
+                self.env, req.session.sid, req.session.authenticated,
+                klass, name)
             if attrs:
                 SubscriptionAttribute.delete_by_sid_class_and_target(
-                        self.env, req.session.sid, klass, name)
+                    self.env, req.session.sid, req.session.authenticated,
+                    klass, name)
                 req.session['_blog_watch_message_'] = \
                     _('You are no longer watching this blog post.')
             else:
                 SubscriptionAttribute.add(
-                        self.env, req.session.sid, klass, 'blog', (name,))
+                    self.env, req.session.sid, req.session.authenticated,
+                    klass, 'blog', (name,))
                 req.session['_blog_watch_message_'] = \
                         _('You are now watching this blog post.')
         req.redirect(req.href.blog(name))
@@ -255,7 +258,7 @@ class FullBlogBloggerSubscriber(Component):
 
         klass = self.__class__.__name__
 
-        sids = set(map(lambda x: x['sid'],
+        sids = set(map(lambda x: (x['sid'], x['authenticated']),
             SubscriptionAttribute.find_by_class_realm_and_target(
                 self.env, klass, 'blog', event.blog_post.author)))
 
@@ -278,15 +281,15 @@ class FullBlogBloggerSubscriber(Component):
             @self.env.with_transaction()
             def do_update(db):
                 SubscriptionAttribute.delete_by_sid_and_class(
-                        self.env, req.session.sid, klass)
+                    self.env, req.session.sid, req.session.authenticated, klass)
                 blogs = set(map(lambda x: x.strip(),
                     req.args.get('announcer_watch_bloggers').split(',')))
                 SubscriptionAttribute.add(self.env, req.session.sid,
-                        klass, 'blog', blogs)
+                        req.session.authenticated, klass, 'blog', blogs)
 
         attrs = SubscriptionAttribute.find_by_sid_and_class(self.env,
-                req.session.sid, klass)
-        data = {'sids': ','.join(set(map(lambda x: x['sid'], attrs)))}
+                req.session.sid, req.session.authenticated, klass)
+        data = {'sids': ','.join(set(map(lambda x: x['target'], attrs)))}
         return "prefs_announcer_watch_bloggers.html", dict(data=data)
 
 
