@@ -436,7 +436,7 @@ class AnnouncementSystem(Component):
     distributors = ExtensionPoint(IAnnouncementDistributor)
 
     resolver = ExtensionOption('announcer', 'subscription_resolvers',
-        IAnnouncementSubscriptionResolver, 'OldSubscriptionResolver',
+        IAnnouncementSubscriptionResolver, 'SubscriptionResolver',
         """Comma seperated list of subscription resolver components in the
         order they will be called.
         """)
