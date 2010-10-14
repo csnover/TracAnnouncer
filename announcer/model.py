@@ -72,7 +72,7 @@ class Subscription(object):
             INSERT INTO subscription
                         (time, changetime, sid, authenticated, distributor,
                         format, priority, adverb, class)
-                 VALUES (datetime(), datetime(), %s, %s, %s, %s, %s, %s, %s)
+                 VALUES (CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, %s, %s, %s, %s, %s, %s, %s)
             """, (subscription['sid'], subscription['authenticated'],
             subscription['distributor'], subscription['format'],
             int(priority), subscription['adverb'],
@@ -249,7 +249,7 @@ class Subscription(object):
             cursor = db.cursor()
             cursor.execute("""
             UPDATE subscription
-               SET changetime=datetime(),
+               SET changetime=CURRENT_TIMESTAMP,
                    priority=%s
              WHERE id=%s
             """, (int(self.values['priority']), self.values['id']))
