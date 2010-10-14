@@ -198,7 +198,6 @@ class SubscriptionManagementPanel(Component):
     #ITemplateStreamFilter
     def filter_stream(self, req, method, filename, stream, data):
         if re.match(r'/prefs/subscription', req.path_info):
-            self.log.error("MATCH!")
             stream |= Transformer('//form[@id="userprefs"]//div[@class="buttons"]').empty()
         return stream
 
