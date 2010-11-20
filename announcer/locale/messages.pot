@@ -1,15 +1,15 @@
-# Translations template for AnnouncerPlugin.
+# Translations template for TracAnnouncer.
 # Copyright (C) 2010 ORGANIZATION
-# This file is distributed under the same license as the AnnouncerPlugin
+# This file is distributed under the same license as the TracAnnouncer
 # project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2010.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: AnnouncerPlugin 0.12-p2\n"
+"Project-Id-Version: TracAnnouncer 0.12.1\n"
 "Report-Msgid-Bugs-To: hoff.st@web.de\n"
-"POT-Creation-Date: 2010-08-23 01:26+0200\n"
+"POT-Creation-Date: 2010-11-20 15:54+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,44 +18,120 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.0dev-r482\n"
 
-#: announcer/pref.py:62 announcer/templates/prefs_announcer.html:11
+#: announcer/pref.py:74 announcer/templates/prefs_announcer.html:11
+#: announcer/templates/prefs_announcer_manage_subscriptions.html:11
 msgid "Announcements"
 msgstr ""
 
-#: announcer/distributors/mail.py:406
+#: announcer/pref.py:129
+msgid "Subscriptions"
+msgstr ""
+
+#: announcer/resolvers.py:92
+msgid "Announcement Email Address"
+msgstr ""
+
+#: announcer/subscribers.py:98
+msgid "notify me when any ticket changes"
+msgstr ""
+
+#: announcer/subscribers.py:159
+msgid "notify me when a ticket that I own is created or modified"
+msgstr ""
+
+#: announcer/subscribers.py:221
+msgid ""
+"notify me when a ticket that belongs to a component that I own is "
+"created or modified"
+msgstr ""
+
+#: announcer/subscribers.py:274
+msgid "notify me when I update a ticket"
+msgstr ""
+
+#: announcer/subscribers.py:327
+msgid "notify me when a ticket that I reported is modified"
+msgstr ""
+
+#: announcer/subscribers.py:385
+msgid "notify me when I'm listed in the CC field of a ticket that is modified"
+msgstr ""
+
+#: announcer/subscribers.py:424
+msgid ""
+"notify me when a ticket associated with a component I'm watching is "
+"modified"
+msgstr ""
+
+#: announcer/subscribers.py:433
+msgid "Ticket Component Subscriptions"
+msgstr ""
+
+#: announcer/subscribers.py:526
+#, python-format
+msgid "notify me when I'm listed in any of the (%s) fields"
+msgstr ""
+
+#: announcer/subscribers.py:583
+msgid "notify me on ticket changes in one of my subscribed groups"
+msgstr ""
+
+#: announcer/subscribers.py:592
+msgid "Group Subscriptions"
+msgstr ""
+
+#: announcer/subscribers.py:641
+msgid "notify me when one of my watched users changes something"
+msgstr ""
+
+#: announcer/subscribers.py:649
+msgid "Watch Users"
+msgstr ""
+
+#: announcer/subscribers.py:721
+msgid "You are no longer receiving change notifications about this resource."
+msgstr ""
+
+#: announcer/subscribers.py:725
+msgid "You are now receiving change notifications about this resource."
+msgstr ""
+
+#: announcer/subscribers.py:847
+msgid "notify me when one of my watched wiki or tickets is updated"
+msgstr ""
+
+#: announcer/subscribers.py:896
+msgid ""
+"notify me when a wiki that matches my wiki watch pattern is created, "
+"or updated"
+msgstr ""
+
+#: announcer/subscribers.py:904
+msgid "General Wiki Announcements"
+msgstr ""
+
+#: announcer/distributors/mail.py:411
 #, python-format
 msgid "Invalid email encoding setting: %s"
 msgstr ""
 
-#: announcer/distributors/mail.py:439
+#: announcer/distributors/mail.py:444
 msgid "EmailDistributor crypto operaton successful."
 msgstr ""
 
-#: announcer/distributors/mail.py:462
+#: announcer/distributors/mail.py:467
 msgid "Ticket contains non-ASCII chars. Please change encoding setting"
 msgstr ""
 
-#: announcer/distributors/mail.py:513
+#: announcer/distributors/mail.py:519
 msgid "undisclosed-recipients: ;"
 msgstr ""
 
-#: announcer/distributors/mail.py:541
-msgid "E-Mail Format"
-msgstr ""
-
-#: announcer/distributors/mail.py:620
+#: announcer/distributors/mail.py:597
 msgid "TLS enabled but server does not support TLS"
 msgstr ""
 
-#: announcer/filters/change_author.py:69
-msgid "Author Filter"
-msgstr ""
-
-#: announcer/filters/unsubscribe.py:68
-msgid "Unsubscribe From All Announcements"
-msgstr ""
-
-#: announcer/opt/acct_mgr/announce.py:114
+#: announcer/opt/acct_mgr/announce.py:120
 msgid "Account Manager Subscription"
 msgstr ""
 
@@ -67,90 +143,40 @@ msgstr ""
 msgid "Failed"
 msgstr ""
 
-#: announcer/opt/bitten/announce.py:128
+#: announcer/opt/bitten/announce.py:134
 msgid "Bitten Subscription"
 msgstr ""
 
-#: announcer/opt/fullblog/announce.py:90
-msgid "Blog: ${blog.name} ${action}"
+#: announcer/opt/fullblog/announce.py:95
+msgid "notify me when any blog is modified, changed, deleted or commented on."
 msgstr ""
 
-#: announcer/opt/fullblog/announce.py:216
-msgid "Blog Subscriptions"
+#: announcer/opt/fullblog/announce.py:145
+msgid "notify me when any blog that I posted is modified or commented on."
 msgstr ""
 
-#: announcer/opt/fullblog/announce.py:258
-msgid "My Post"
-msgstr ""
-
-#: announcer/opt/fullblog/announce.py:263
-msgid "New Post"
-msgstr ""
-
-#: announcer/opt/fullblog/announce.py:272
-msgid "Author Post"
-msgstr ""
-
-#: announcer/opt/fullblog/announce.py:276
-msgid "All Blog Events"
-msgstr ""
-
-#: announcer/resolvers/specified.py:62
-msgid "Announcement Email Address"
-msgstr ""
-
-#: announcer/subscribers/rulefilters.py:86
-msgid "Rule-based subscriptions"
-msgstr ""
-
-#: announcer/subscribers/ticket_compat.py:80
-msgid "Ticket Subscriptions"
-msgstr ""
-
-#: announcer/subscribers/ticket_compat.py:117
-#, python-format
-msgid ""
-"LegacyTicketSubscriber couldn't add component owner because component"
-" was not found, message: '%s'"
-msgstr ""
-
-#: announcer/subscribers/ticket_compat.py:182
-#, python-format
-msgid "CarbonCopySubscriber added '%s <%s>' because of rule: carbon copied"
-msgstr ""
-
-#: announcer/subscribers/ticket_components.py:65
-msgid "Ticket Component Subscriptions"
-msgstr ""
-
-#: announcer/subscribers/ticket_groups.py:85
-msgid "Group Subscriptions"
-msgstr ""
-
-#: announcer/subscribers/watch_users.py:63
-msgid "Watch Users"
-msgstr ""
-
-#: announcer/subscribers/watchers.py:57
-#: announcer/subscribers/watchers.py:194
-msgid "Watch This"
-msgstr ""
-
-#: announcer/subscribers/watchers.py:57
-#: announcer/subscribers/watchers.py:191
+#: announcer/opt/fullblog/announce.py:204
 msgid "Unwatch This"
 msgstr ""
 
-#: announcer/subscribers/watchers.py:83
-msgid "You are no longer receiving change notifications about this resource."
+#: announcer/opt/fullblog/announce.py:207
+msgid "Watch This"
 msgstr ""
 
-#: announcer/subscribers/watchers.py:87
-msgid "You are now receiving change notifications about this resource."
+#: announcer/opt/fullblog/announce.py:232
+msgid "You are no longer watching this blog post."
 msgstr ""
 
-#: announcer/subscribers/wiki.py:68
-msgid "General Wiki Announcements"
+#: announcer/opt/fullblog/announce.py:238
+msgid "You are now watching this blog post."
+msgstr ""
+
+#: announcer/opt/fullblog/announce.py:275
+msgid "Followed Bloggers"
+msgstr ""
+
+#: announcer/opt/fullblog/announce.py:304
+msgid "Blog: ${blog.name} ${action}"
 msgstr ""
 
 #: announcer/templates/acct_mgr_reset_password_plaintext.txt:1
@@ -356,6 +382,7 @@ msgid "{% end %}"
 msgstr ""
 
 #: announcer/templates/prefs_announcer.html:14
+#: announcer/templates/prefs_announcer_manage_subscriptions.html:14
 msgid ""
 "Announcements serve as a method for Trac to communicate events to "
 "you; \n"
@@ -406,23 +433,12 @@ msgstr ""
 msgid "Subscribe me to build completed announcements."
 msgstr ""
 
-#: announcer/templates/prefs_announcer_blog.html:8
-msgid "Notify me of any changes to my blog posts."
-msgstr ""
-
-#: announcer/templates/prefs_announcer_blog.html:11
-msgid "Notify me of any new blog posts."
-msgstr ""
-
-#: announcer/templates/prefs_announcer_blog.html:14
-msgid "Notify me of any blog changes."
-msgstr ""
-
-#: announcer/templates/prefs_announcer_blog.html:17
-msgid "Comma seperated list of blog authors to follow:"
+#: announcer/templates/prefs_announcer_distributor.html:3
+msgid "I prefer to recieve announcements via"
 msgstr ""
 
 #: announcer/templates/prefs_announcer_email.html:5
+#: announcer/templates/prefs_announcer_xmpp.html:3
 msgid ""
 "By default, the Announcer will deliver all notices to you in a "
 "plaintext format. You\n"
@@ -430,6 +446,7 @@ msgid ""
 msgstr ""
 
 #: announcer/templates/prefs_announcer_email.html:9
+#: announcer/templates/prefs_announcer_xmpp.html:7
 msgid "announcements:"
 msgstr ""
 
@@ -476,6 +493,58 @@ msgstr ""
 msgid "Notify me when I update a ticket."
 msgstr ""
 
+#: announcer/templates/prefs_announcer_manage_subscriptions.html:23
+msgid "rules"
+msgstr ""
+
+#: announcer/templates/prefs_announcer_manage_subscriptions.html:25
+msgid "Custom Rules:"
+msgstr ""
+
+#: announcer/templates/prefs_announcer_manage_subscriptions.html:28
+msgid "Format:"
+msgstr ""
+
+#: announcer/templates/prefs_announcer_manage_subscriptions.html:32
+msgid "Save"
+msgstr ""
+
+#: announcer/templates/prefs_announcer_manage_subscriptions.html:37
+msgid "Delete"
+msgstr ""
+
+#: announcer/templates/prefs_announcer_manage_subscriptions.html:37
+msgid "down"
+msgstr ""
+
+#: announcer/templates/prefs_announcer_manage_subscriptions.html:37
+msgid "up"
+msgstr ""
+
+#: announcer/templates/prefs_announcer_manage_subscriptions.html:48
+msgid "Add"
+msgstr ""
+
+#: announcer/templates/prefs_announcer_manage_subscriptions.html:53
+msgid "Default Rules:"
+msgstr ""
+
+#: announcer/templates/prefs_announcer_manage_subscriptions.html:55
+msgid ""
+"The following rules have been configured by the system admistrator as"
+" the default rules.  Any rules defined by you will take higher "
+"priority then these rules.  This can be confusing if you don't "
+"understand how the system works.  Only the first matching rule is "
+"applied when system events occur.  For example, if you have a rule "
+"like \"always notify me of any ticket changes\" in your custom rules,"
+" and there is a default rule \"never notify me when I update a "
+"ticket\", then the always rule will take precedent and you will still"
+" recieve announcements on ticket changes, even when you are the "
+"updater.  In the preceding case, you would need to add your own "
+"\"never notify me..\" rule above the \"always notify me..\" to get "
+"the proper behavior."
+msgstr ""
+
 #: announcer/templates/prefs_announcer_rules.html:6
 msgid ""
 "The rule-based subscription module is for advanced users, and allows "
@@ -489,12 +558,20 @@ msgid ""
 "      [1:[2:realm], [3:category]: [4:query rule]]"
 msgstr ""
 
+#: announcer/templates/prefs_announcer_ticket_all.html:8
+msgid "Notify me when any ticket changes."
+msgstr ""
+
 #: announcer/templates/prefs_announcer_unsubscribe_all.html:5
 msgid "Opt-out of all announcements."
 msgstr ""
 
 #: announcer/templates/prefs_announcer_unsubscribe_all.html:8
 msgid "Never notify me of any changes."
+msgstr ""
+
+#: announcer/templates/prefs_announcer_watch_bloggers.html:8
+msgid "Comma seperated list of blog authors to follow:"
 msgstr ""
 
 #: announcer/templates/prefs_announcer_watch_users.html:5
@@ -528,6 +605,16 @@ msgstr ""
 msgid ""
 "To receive a notice about all wiki changes, simply include a [1:*] by"
 " itself."
+msgstr ""
+
+#: announcer/templates/prefs_announcer_xmppaddress.html:3
+msgid ""
+"Specify your XMPP(jabber) address where you would like jabber "
+"announcements delivered."
+msgstr ""
+
+#: announcer/templates/prefs_announcer_xmppaddress.html:6
+msgid "XMPP address:"
 msgstr ""
 
 #: announcer/templates/ticket_email_mimic.html:114
@@ -691,7 +778,6 @@ msgid ""
 msgstr ""
 
 #: announcer/templates/ticket_email_plaintext.txt:43
-#: announcer/templates/wiki_email_plaintext.txt:11
 msgid "<URL:"
 msgstr ""
 
@@ -758,7 +844,11 @@ msgid ""
 "' has been deleted. {% end %}\\\n"
 "{% end %}\\\n"
 "--\n"
-"Page URL: <URL:"
+"Page URL: <"
+msgstr ""
+
+#: announcer/templates/wiki_email_plaintext.txt:11
+msgid "URL: <"
 msgstr ""
 
 #: announcer/util/mail_crypto.py:57

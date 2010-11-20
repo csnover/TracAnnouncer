@@ -1,4 +1,4 @@
-# German (Germany) translations for AnnouncerPlugin.
+# German (Germany) translations for TracAnnouncer.
 # Copyright (C) 2010
 # This file is distributed under the same license as the AnnouncerPlugin
 # project.
@@ -6,9 +6,9 @@
 # Steffen Hoffmann <hoff.st@web.de>, 2010.
 msgid ""
 msgstr ""
-"Project-Id-Version: AnnouncerPlugin 0.12\n"
+"Project-Id-Version: TracAnnouncer 0.12.1\n"
 "Report-Msgid-Bugs-To: hoff.st@web.de\n"
-"POT-Creation-Date: 2010-08-23 01:26+0200\n"
+"POT-Creation-Date: 2010-11-20 15:54+0100\n"
 "PO-Revision-Date: 2010-07-23 11:39+0200\n"
 "Last-Translator: Steffen Hoffmann <hoff.st@web.de>\n"
 "Language-Team: German de_DE <trac-dev@googlegroups.com>\n"
@@ -18,145 +18,188 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.0dev-r482\n"
 
-#: announcer/pref.py:62 announcer/templates/prefs_announcer.html:11
+#: announcer/pref.py:74 announcer/templates/prefs_announcer.html:11
+#: announcer/templates/prefs_announcer_manage_subscriptions.html:11
 msgid "Announcements"
 msgstr "Benachrichtigungen"
 
-#: announcer/distributors/mail.py:406
+#: announcer/pref.py:129
+msgid "Subscriptions"
+msgstr "Abonnements"
+
+#: announcer/resolvers.py:92
+msgid "Announcement Email Address"
+msgstr "E-mail-Adresse für Benachrichtigungen"
+
+#: announcer/subscribers.py:98
+msgid "notify me when any ticket changes"
+msgstr "Benachrichtigung an mich bei Ticketänderung"
+
+#: announcer/subscribers.py:159
+msgid "notify me when a ticket that I own is created or modified"
+msgstr ""
+"Benachrichtigung an mich bei Erstellung oder Änderung eines Tickets, für "
+"das ich verantwortlich bin"
+
+#: announcer/subscribers.py:221
+msgid ""
+"notify me when a ticket that belongs to a component that I own is created"
+" or modified"
+msgstr ""
+"Benachrichtigung an mich bei Erstellung oder Änderung eines Tickets, das "
+"zu einer Komponente gehört, für die ich verantwortlich bin"
+
+#: announcer/subscribers.py:274
+msgid "notify me when I update a ticket"
+msgstr "Benachrichtigung an mich, wenn ich selbst ein Ticket aktualisiere"
+
+#: announcer/subscribers.py:327
+msgid "notify me when a ticket that I reported is modified"
+msgstr "Benachrichtigung an mich bei Änderung eines Tickets, das ich erstellt habe"
+
+#: announcer/subscribers.py:385
+msgid "notify me when I'm listed in the CC field of a ticket that is modified"
+msgstr ""
+"Benachrichtigung an mich bei Änderung eines Tickets, wenn ich in dessen "
+"Kopie-Feld eingetragen bin"
+
+#: announcer/subscribers.py:424
+msgid ""
+"notify me when a ticket associated with a component I'm watching is "
+"modified"
+msgstr ""
+"Benachrichtigung an mich bei Änderung eines Tickets, das einer von mir "
+"beobachteten Komponente zugeordnet ist"
+
+#: announcer/subscribers.py:433
+msgid "Ticket Component Subscriptions"
+msgstr "Ticket-Abonnement basierend auf Komponenten"
+
+#: announcer/subscribers.py:526
+#, python-format
+msgid "notify me when I'm listed in any of the (%s) fields"
+msgstr ""
+"Benachrichtigung an mich, wenn ich in einem der (%s) Felder eingetragen "
+"bin"
+
+#: announcer/subscribers.py:583
+msgid "notify me on ticket changes in one of my subscribed groups"
+msgstr ""
+"Benachrichtigung an mich bei Ticketänderungen in einem meiner Gruppen-"
+"Abonnements"
+
+#: announcer/subscribers.py:592
+msgid "Group Subscriptions"
+msgstr "Gruppen-Abonnements"
+
+#: announcer/subscribers.py:641
+msgid "notify me when one of my watched users changes something"
+msgstr ""
+"Benachrichtigung an mich bei Änderungen durch einen von mir beobachteten "
+"Nutzer"
+
+#: announcer/subscribers.py:649
+msgid "Watch Users"
+msgstr "Beobachtung von Nutzern"
+
+#: announcer/subscribers.py:721
+msgid "You are no longer receiving change notifications about this resource."
+msgstr ""
+"Sie erhalten zu diesem Dokument keine weiteren "
+"Änderungsbenachrichtigungen."
+
+#: announcer/subscribers.py:725
+msgid "You are now receiving change notifications about this resource."
+msgstr "Sie erhalten nun Änderungsbenachrichtigungen zu diesem Dokument."
+
+#: announcer/subscribers.py:847
+msgid "notify me when one of my watched wiki or tickets is updated"
+msgstr ""
+"Benachrichtigung an mich bei Aktualisierung einer von mir beobachteten "
+"Wikiseite oder eines Tickets"
+
+#: announcer/subscribers.py:896
+msgid ""
+"notify me when a wiki that matches my wiki watch pattern is created, or "
+"updated"
+msgstr ""
+"Benachrichtigung an mich bei Erstellung oder Änderung einer Wikiseite, "
+"die zu meinem Beobachtungsraster passt"
+
+#: announcer/subscribers.py:904
+msgid "General Wiki Announcements"
+msgstr "Allgemeine Wiki-Abonnements"
+
+#: announcer/distributors/mail.py:411
 #, python-format
 msgid "Invalid email encoding setting: %s"
-msgstr "Ungültige Einstellung der E-mail-Codierung: %s"
+msgstr "Ungültige Einstellung der E-Mail-Codierung: %s"
 
-#: announcer/distributors/mail.py:439
+#: announcer/distributors/mail.py:444
 msgid "EmailDistributor crypto operaton successful."
-msgstr ""
+msgstr "Erfolgreiche kryptographische Behandlung bei der E-Mail-Verteilung."
 
-#: announcer/distributors/mail.py:462
+#: announcer/distributors/mail.py:467
 msgid "Ticket contains non-ASCII chars. Please change encoding setting"
 msgstr ""
 "Das Ticket enthält Nicht-ASCII-Zeichen. Bitte ändern Sie die "
 "Codierungseinstellung"
 
-#: announcer/distributors/mail.py:513
+#: announcer/distributors/mail.py:519
 msgid "undisclosed-recipients: ;"
-msgstr "Verborgene_Empfaenger:;"
+msgstr "Verborgene_Empfaenger: ;"
 
-#: announcer/distributors/mail.py:541
-msgid "E-Mail Format"
-msgstr "E-mail-Format"
-
-#: announcer/distributors/mail.py:620
+#: announcer/distributors/mail.py:597
 msgid "TLS enabled but server does not support TLS"
 msgstr "TLS aktiviert, wird vom Server aber nicht unterstützt"
 
-#: announcer/filters/change_author.py:69
-msgid "Author Filter"
-msgstr "Autoren-Filter"
-
-#: announcer/filters/unsubscribe.py:68
-msgid "Unsubscribe From All Announcements"
-msgstr "Alle Abonnements stornieren"
-
-#: announcer/opt/acct_mgr/announce.py:114
+#: announcer/opt/acct_mgr/announce.py:120
 msgid "Account Manager Subscription"
-msgstr "Abonnement für Nutzerkontenverwaltung (Account Manager)"
+msgstr "Abonnement für Nutzerkontenverwaltung («Account Manager»)"
 
 #: announcer/opt/bitten/announce.py:65
 msgid "Successful"
-msgstr ""
+msgstr "Erfolgreich"
 
 #: announcer/opt/bitten/announce.py:66
 msgid "Failed"
-msgstr ""
+msgstr "Fehlgeschlagen"
 
-#: announcer/opt/bitten/announce.py:128
+#: announcer/opt/bitten/announce.py:134
 msgid "Bitten Subscription"
 msgstr "Bitten-Abonnement"
 
-#: announcer/opt/fullblog/announce.py:90
-msgid "Blog: ${blog.name} ${action}"
+#: announcer/opt/fullblog/announce.py:95
+msgid "notify me when any blog is modified, changed, deleted or commented on."
 msgstr ""
 
-#: announcer/opt/fullblog/announce.py:216
-msgid "Blog Subscriptions"
-msgstr "Blog-Abonnement"
-
-#: announcer/opt/fullblog/announce.py:258
-msgid "My Post"
+#: announcer/opt/fullblog/announce.py:145
+msgid "notify me when any blog that I posted is modified or commented on."
 msgstr ""
 
-#: announcer/opt/fullblog/announce.py:263
-msgid "New Post"
-msgstr ""
-
-#: announcer/opt/fullblog/announce.py:272
-msgid "Author Post"
-msgstr ""
-
-#: announcer/opt/fullblog/announce.py:276
-msgid "All Blog Events"
-msgstr ""
-
-#: announcer/resolvers/specified.py:62
-msgid "Announcement Email Address"
-msgstr "E-mail-Adresse für Benachrichtigungen"
-
-#: announcer/subscribers/rulefilters.py:86
-msgid "Rule-based subscriptions"
-msgstr "Regelgestützte Abonnements"
-
-#: announcer/subscribers/ticket_compat.py:80
-msgid "Ticket Subscriptions"
-msgstr "Abonnement für Tickets"
-
-#: announcer/subscribers/ticket_compat.py:117
-#, python-format
-msgid ""
-"LegacyTicketSubscriber couldn't add component owner because component was"
-" not found, message: '%s'"
-msgstr ""
-"LegacyTicketSubscriber (generisches Ticket-Abonnement) konnte den "
-"Verantwortlichen für die Komponente nicht hinzufügen, weil die Komponente"
-" nicht gefunden wurde; Meldung: '%s'"
-
-#: announcer/subscribers/ticket_compat.py:182
-#, python-format
-msgid "CarbonCopySubscriber added '%s <%s>' because of rule: carbon copied"
-msgstr ""
-"CarbonCopySubscriber (Kopie-Abonnement) fügte '%s <%s>' hinzu wegen "
-"folgender Regel: carbon copied (Ticket-Cc)"
-
-#: announcer/subscribers/ticket_components.py:65
-msgid "Ticket Component Subscriptions"
-msgstr "Abonnement für Komponenten"
-
-#: announcer/subscribers/ticket_groups.py:85
-msgid "Group Subscriptions"
-msgstr "Gruppen-Abonnements"
-
-#: announcer/subscribers/watch_users.py:63
-msgid "Watch Users"
-msgstr "Beobachtung von Nutzern"
-
-#: announcer/subscribers/watchers.py:57 announcer/subscribers/watchers.py:194
-msgid "Watch This"
-msgstr ""
-
-#: announcer/subscribers/watchers.py:57 announcer/subscribers/watchers.py:191
+#: announcer/opt/fullblog/announce.py:204
 msgid "Unwatch This"
 msgstr ""
 
-#: announcer/subscribers/watchers.py:83
-msgid "You are no longer receiving change notifications about this resource."
+#: announcer/opt/fullblog/announce.py:207
+msgid "Watch This"
 msgstr ""
 
-#: announcer/subscribers/watchers.py:87
-msgid "You are now receiving change notifications about this resource."
+#: announcer/opt/fullblog/announce.py:232
+msgid "You are no longer watching this blog post."
 msgstr ""
 
-#: announcer/subscribers/wiki.py:68
-msgid "General Wiki Announcements"
-msgstr "Allgemeine Wiki-Abonnements"
+#: announcer/opt/fullblog/announce.py:238
+msgid "You are now watching this blog post."
+msgstr ""
+
+#: announcer/opt/fullblog/announce.py:275
+msgid "Followed Bloggers"
+msgstr ""
+
+#: announcer/opt/fullblog/announce.py:304
+msgid "Blog: ${blog.name} ${action}"
+msgstr ""
 
 #: announcer/templates/acct_mgr_reset_password_plaintext.txt:1
 msgid ""
@@ -247,11 +290,11 @@ msgstr ""
 
 #: announcer/templates/bitten_plaintext.txt:14
 msgid "Errors:"
-msgstr ""
+msgstr "Fehler:"
 
 #: announcer/templates/bitten_plaintext.txt:15
 msgid "Log:"
-msgstr ""
+msgstr "Protokoll:"
 
 #: announcer/templates/bitten_plaintext.txt:20
 #, python-format
@@ -277,7 +320,7 @@ msgstr ""
 #: announcer/templates/fullblog_plaintext.txt:29
 #: announcer/templates/fullblog_plaintext.txt:33
 msgid "\" by"
-msgstr ""
+msgstr "\" von"
 
 #: announcer/templates/fullblog_plaintext.txt:4
 #: announcer/templates/fullblog_plaintext.txt:7
@@ -285,7 +328,7 @@ msgstr ""
 #: announcer/templates/fullblog_plaintext.txt:29
 #: announcer/templates/fullblog_plaintext.txt:33
 msgid "at"
-msgstr ""
+msgstr "in"
 
 #: announcer/templates/fullblog_plaintext.txt:4
 #, python-format
@@ -363,7 +406,7 @@ msgstr ""
 
 #: announcer/templates/fullblog_plaintext.txt:34
 msgid "Content:"
-msgstr ""
+msgstr "Inhalt:"
 
 #: announcer/templates/fullblog_plaintext.txt:37
 #, python-format
@@ -371,6 +414,7 @@ msgid "{% end %}"
 msgstr ""
 
 #: announcer/templates/prefs_announcer.html:14
+#: announcer/templates/prefs_announcer_manage_subscriptions.html:14
 msgid ""
 "Announcements serve as a method for Trac to communicate events to you; \n"
 "      the creation of a ticket, the change of a Wiki page, and so on. "
@@ -379,14 +423,14 @@ msgid ""
 "those\n"
 "      topics that you subscribe to."
 msgstr ""
-"Benachrichtigungen dienen in Trac dazu, Ihnen Ereignisse mitzuteilen: "
-"das Erstellen eines Tickets, die Änderung einer Wiki-Seite und anderes. "
+"Benachrichtigungen dienen in Trac dazu, Ihnen Ereignisse mitzuteilen: das"
+" Erstellen eines Tickets, die Änderung einer Wiki-Seite und anderes. "
 "Durch das Benachrichtigungssystem erhalten Sie nur Nachrichten zu den "
 "Bereichen, die Sie anfordern."
 
 #: announcer/templates/prefs_announcer_acct_mgr_subscription.html:5
 msgid "Subscribe to user account announcements."
-msgstr "Abonnement für Nutzer-Konten-Benachrichtigungen"
+msgstr "Abonnieren Sie Nutzer-Konten-bezogene Benachrichtigungen."
 
 #: announcer/templates/prefs_announcer_acct_mgr_subscription.html:9
 msgid "Send me announcements when new users are created."
@@ -424,34 +468,23 @@ msgstr ""
 msgid "Subscribe me to build completed announcements."
 msgstr ""
 
-#: announcer/templates/prefs_announcer_blog.html:8
-msgid "Notify me of any changes to my blog posts."
-msgstr ""
-
-#: announcer/templates/prefs_announcer_blog.html:11
-msgid "Notify me of any new blog posts."
-msgstr ""
-
-#: announcer/templates/prefs_announcer_blog.html:14
-msgid "Notify me of any blog changes."
-msgstr ""
-
-#: announcer/templates/prefs_announcer_blog.html:17
-msgid "Comma seperated list of blog authors to follow:"
+#: announcer/templates/prefs_announcer_distributor.html:3
+msgid "I prefer to recieve announcements via"
 msgstr ""
 
 #: announcer/templates/prefs_announcer_email.html:5
+#: announcer/templates/prefs_announcer_xmpp.html:3
 msgid ""
 "By default, the Announcer will deliver all notices to you in a plaintext "
 "format. You\n"
 "  may override this for each realm that may generate announcements."
 msgstr ""
-"Das Benachrichtigungssystem wird Ihnen alle Nachrichten normalerweise "
-"als reiner Text formatiert zusenden. Sie können für jeden Bereich, "
-"der Benachrichtigungen erzeugen kann, eine abweichende Einstellung "
-"vornehmen."
+"Das Benachrichtigungssystem wird Ihnen alle Nachrichten normalerweise als"
+" reiner Text formatiert zusenden. Sie können für jeden Bereich, der "
+"Benachrichtigungen erzeugen kann, eine abweichende Einstellung vornehmen."
 
 #: announcer/templates/prefs_announcer_email.html:9
+#: announcer/templates/prefs_announcer_xmpp.html:7
 msgid "announcements:"
 msgstr "Benachrichtigungen:"
 
@@ -514,6 +547,70 @@ msgstr ""
 msgid "Notify me when I update a ticket."
 msgstr "Benachrichtige mich, wenn ich selbst ein Ticket aktualisiere."
 
+#: announcer/templates/prefs_announcer_manage_subscriptions.html:23
+msgid "rules"
+msgstr "Regeln"
+
+#: announcer/templates/prefs_announcer_manage_subscriptions.html:25
+msgid "Custom Rules:"
+msgstr "Benutzereigene Regeln:"
+
+#: announcer/templates/prefs_announcer_manage_subscriptions.html:28
+msgid "Format:"
+msgstr "Format:"
+
+#: announcer/templates/prefs_announcer_manage_subscriptions.html:32
+msgid "Save"
+msgstr "Speichern"
+
+#: announcer/templates/prefs_announcer_manage_subscriptions.html:37
+msgid "Delete"
+msgstr "Löschen"
+
+#: announcer/templates/prefs_announcer_manage_subscriptions.html:37
+msgid "down"
+msgstr "tiefer"
+
+#: announcer/templates/prefs_announcer_manage_subscriptions.html:37
+msgid "up"
+msgstr "höher"
+
+#: announcer/templates/prefs_announcer_manage_subscriptions.html:48
+msgid "Add"
+msgstr "Hinzufügen"
+
+#: announcer/templates/prefs_announcer_manage_subscriptions.html:53
+msgid "Default Rules:"
+msgstr "Standardregeln:"
+
+#: announcer/templates/prefs_announcer_manage_subscriptions.html:55
+msgid ""
+"The following rules have been configured by the system admistrator as the"
+" default rules.  Any rules defined by you will take higher priority then "
+"these rules.  This can be confusing if you don't understand how the "
+"system works.  Only the first matching rule is applied when system events"
+" occur.  For example, if you have a rule like \"always notify me of any "
+"ticket changes\" in your custom rules, and there is a default rule "
+"\"never notify me when I update a ticket\", then the always rule will "
+"take precedent and you will still recieve announcements on ticket "
+"changes, even when you are the updater.  In the preceding case, you would"
+" need to add your own \"never notify me..\" rule above the \"always "
+"notify me..\" to get the proper behavior."
+msgstr ""
+"Die folgenden Regeln sind von System-Administratoren als Standardregeln "
+"eingerichet worden.  Jede Ihrer eigenen Regeln wird eine höhere "
+"Wichtigkeit als diese Regeln erhalten.  Bei einem Ereignis wird nur die "
+"erste zutreffende Regel angewendet.  Wenn Sie beispielsweise eine Regel "
+"wie \"immer Benachrichtigung an mich bei allen Ticketänderungen\" in "
+"Ihren benutzeigenen Regeln haben, und wenn es eine Standardregel "
+"\"niemals Benachrichtigung an mich, wenn ich selbst ein Ticket "
+"aktualisiere\" gibt, dann wird die immer-Regel Vorrang erhalten, und Sie "
+"werden auch dann Benachrichtigungen über Ticketänderungen erhalten, wenn "
+"Sie diese selbst ausgeführt haben.  Folglich müssten Sie Ihre eigene "
+"\"niemals Benachrichtigung an mich ...\"-Regel über dem \"immer "
+"Benachrichtigung an mich ...\" hinzufügen, um das richige Verhalten zu "
+"erreichen."
+
 #: announcer/templates/prefs_announcer_rules.html:6
 msgid ""
 "The rule-based subscription module is for advanced users, and allows you "
@@ -532,13 +629,21 @@ msgstr ""
 "Jede Regel hat die folgende Form: [1:[2:realm], [3:category]: [4:query "
 "rule]]"
 
+#: announcer/templates/prefs_announcer_ticket_all.html:8
+msgid "Notify me when any ticket changes."
+msgstr "Benachrichtige mich bei allen Ticketänderungen."
+
 #: announcer/templates/prefs_announcer_unsubscribe_all.html:5
 msgid "Opt-out of all announcements."
-msgstr "Aller Benachrichtigungen werden ablehnt."
+msgstr "Alle Benachrichtigungen werden ablehnt."
 
 #: announcer/templates/prefs_announcer_unsubscribe_all.html:8
 msgid "Never notify me of any changes."
 msgstr "Benachrichte mich niemals über Änderungen."
+
+#: announcer/templates/prefs_announcer_watch_bloggers.html:8
+msgid "Comma seperated list of blog authors to follow:"
+msgstr ""
 
 #: announcer/templates/prefs_announcer_watch_users.html:5
 msgid ""
@@ -583,6 +688,16 @@ msgid ""
 msgstr ""
 "Um Benachrichtigungen über alle Wiki-Seiten-Änderungen zu erhalten, geben"
 " Sie bitte nur [1:*] ein."
+
+#: announcer/templates/prefs_announcer_xmppaddress.html:3
+msgid ""
+"Specify your XMPP(jabber) address where you would like jabber "
+"announcements delivered."
+msgstr ""
+
+#: announcer/templates/prefs_announcer_xmppaddress.html:6
+msgid "XMPP address:"
+msgstr "XMPP-Adresse:"
 
 #: announcer/templates/ticket_email_mimic.html:114
 msgid "Ticket #"
@@ -742,7 +857,6 @@ msgid ""
 msgstr ""
 
 #: announcer/templates/ticket_email_plaintext.txt:43
-#: announcer/templates/wiki_email_plaintext.txt:11
 msgid "<URL:"
 msgstr ""
 
@@ -809,7 +923,11 @@ msgid ""
 "' has been deleted. {% end %}\\\n"
 "{% end %}\\\n"
 "--\n"
-"Page URL: <URL:"
+"Page URL: <"
+msgstr ""
+
+#: announcer/templates/wiki_email_plaintext.txt:11
+msgid "URL: <"
 msgstr ""
 
 #: announcer/util/mail_crypto.py:57
