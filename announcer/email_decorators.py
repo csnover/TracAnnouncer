@@ -98,6 +98,8 @@ class StaticEmailDecorator(Component):
     or reset password features of the accountmanager plugin.
     """
 
+    # FIXME: mark that emails as 'private' in AcctMgr and eval that mark here
+
     implements(IAnnouncementEmailDecorator)
 
     always_cc = Option("announcer", "email_always_cc", None,
@@ -118,7 +120,7 @@ class StaticEmailDecorator(Component):
                 self.log.debug("StaticEmailDecorator added '%s' "
                         "because of rule: email_always_%s"%(v, k.lower())),
                 if message[k] and len(str(message[k]).split(',')) > 0:
-                    recips = ", ".join(str(message[k]), v)
+                    recips = ", ".join([str(message[k]), v])
                 else:
                     recips = v
                 set_header(message, k, recips)
