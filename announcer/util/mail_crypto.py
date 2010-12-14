@@ -89,10 +89,9 @@ class CryptoTxt:
     def get_pubkey_ids(self, addr):
         """Find public key with UID matching address to encrypt to."""
 
-        if len(self.pubkeys) > 0 and self.pubkeys[-1].has_key('fingerprint') \
-            and self.pubkeys[-1].has_key('uids'):
-
-            pubkey_ids = []
+        pubkey_ids = []
+        if len(self.pubkeys) > 0 and self.pubkeys[-1].has_key('uids') and \
+                self.pubkeys[-1].has_key('fingerprint'):
             # compile pattern before use for better performance
             RCPT_RE = re.compile(addr)
             for k in self.pubkeys:
