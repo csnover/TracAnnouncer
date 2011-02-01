@@ -36,7 +36,7 @@ import re
 
 from trac.core import *
 from trac.config import ListOption
-from trac.perm import PermissionSystem
+from trac.perm import PermissionCache
 
 from announcer.api import IAnnouncementSubscriptionFilter
 from announcer.api import _
@@ -58,13 +58,14 @@ class DefaultPermissionFilter(Component):
             """)
 
     def filter_subscriptions(self, event, subscriptions):
-        permsys = PermissionSystem(self.env)
         action = '%s_VIEW'%event.realm.upper()
         for subscription in subscriptions:
             sid, auth = subscription[1:3]
-            if not sid or not auth:
+            # PermissionCache already takes care of sid = None
+            if not auth:
                 sid = 'anonymous'
-            if permsys.check_permission(action, sid):
+            perm = PermissionCache(self.env, sid)
+            if perm.has_permission(action):
                 yield subscription
             else:
                 self.log.debug(
