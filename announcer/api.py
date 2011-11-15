@@ -59,12 +59,13 @@ import time
 
 from operator import itemgetter
 
-from trac.core import *
 from trac.config import ExtensionOption
+from trac.core import *
 from trac.db import Table, Column, Index
 from trac.db import DatabaseManager
 from trac.env import IEnvironmentSetupParticipant
 from trac.util.compat import set
+
 
 class IAnnouncementProducer(Interface):
     """Producer converts Trac events from different subsystems, into
@@ -560,3 +561,4 @@ class AnnouncementSystem(Component):
                                 evt)
         except:
             self.log.error("AnnouncementSystem failed.", exc_info=True)
+

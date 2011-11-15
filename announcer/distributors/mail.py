@@ -34,6 +34,7 @@
 # TODO: pick format based on subscription.  For now users will use the same
 #       format for all announcements, but in the future we can make this more
 #       flexible, since it's in the subscription table.
+
 import Queue
 import random
 import re
@@ -42,25 +43,23 @@ import sys
 import threading
 import time
 
-from subprocess import Popen, PIPE
-
+from email.Charset import Charset, QP, BASE64
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEText import MIMEText
 from email.Utils import formatdate, formataddr
-from email.Charset import Charset, QP, BASE64
 try:
     from email.header import Header
 except:
     from email.Header import Header
+from subprocess import Popen, PIPE
 
+from trac.config import BoolOption, ExtensionOption, IntOption, Option, \
+                        OrderedExtensionsOption, ChoiceOption
 from trac.core import *
-from trac.util.compat import set, sorted
-from trac.config import Option, BoolOption, IntOption, \
-    OrderedExtensionsOption, ChoiceOption
-from trac.config import ExtensionOption
 from trac.util import get_pkginfo, md5
+from trac.util.compat import set, sorted
 from trac.util.datefmt import to_timestamp
-from trac.util.text import to_unicode, CRLF
+from trac.util.text import CRLF, to_unicode
 
 from announcer.api import AnnouncementSystem
 from announcer.api import IAnnouncementAddressResolver
