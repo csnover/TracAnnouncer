@@ -2,7 +2,7 @@
 #
 # Copyright (c) 2008, Stephen Hansen
 # Copyright (c) 2009, Robert Corsaro
-# Copyright (c) 2010, Steffen Hoffmann
+# Copyright (c) 2010,2011 Steffen Hoffmann
 #
 # All rights reserved.
 #
@@ -387,19 +387,19 @@ def istrue(value, otherwise=False):
     return True and (value in _TRUE_VALUES) or otherwise
 
 
+# Import i18n methods.  Fallback modules maintain compatibility to Trac 0.11
+# by keeping Babel optional here.
 try:
     from trac.util.translation import domain_functions
-
-    _, tag_, N_, add_domain = \
-        domain_functions('announcer', ('_', 'tag_', 'N_', 'add_domain'))
-
+    add_domain, _, N_ , tag_= \
+        domain_functions('announcer', ('add_domain', '_', 'N_', 'tag_'))
 except ImportError:
-    # fall back to 0.11 behavior, i18n functions are no-ops then
-    def add_domain():
+    from  genshi.builder         import  tag as tag_
+    from  trac.util.translation  import  gettext
+    _ = gettext
+    N_ = lambda text: text
+    def add_domain(a, b, c=None):
         pass
-
-    _ = N_ = tag_ = _noop = lambda string: string
-    pass
 
 
 class AnnouncementSystem(Component):

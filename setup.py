@@ -2,7 +2,7 @@
 #
 # Copyright (c) 2008, Stephen Hansen
 # Copyright (c) 2009, Robert Corsaro
-# Copyright (c) 2010, Steffen Hoffmann
+# Copyright (c) 2010,2011 Steffen Hoffmann
 # 
 # All rights reserved.
 # 
@@ -38,24 +38,22 @@ from setuptools import find_packages, setup
 extra = {}
 
 try:
-    import babel
-
-    extractors = [
-        ('**.py',                'python', None),
-        ('**/templates/**.html', 'genshi', None),
-        ('**/templates/**.txt',  'genshi', {
-            'template_class': 'genshi.template:TextTemplate'
-        }),
-    ]
-    extra['message_extractors'] = {
-        'announcer': extractors,
-    }
-
-    from trac.util.dist import get_l10n_cmdclass
-    extra['cmdclass'] = get_l10n_cmdclass()
-
-except ImportError, e:
+    from trac.util.dist  import  get_l10n_cmdclass
+    cmdclass = get_l10n_cmdclass()
+    if cmdclass:
+        extra['cmdclass'] = cmdclass
+        extractors = [
+            ('**.py',                'python', None),
+            ('**/templates/**.html', 'genshi', None),
+            ('**/templates/**.txt',  'genshi', {
+                'template_class': 'genshi.template:TextTemplate'
+            }),
+        ]
+        extra['message_extractors'] = {'announcer': extractors}
+# i18n is implemented to be optional here.
+except ImportError:
     pass
+
 
 setup(
     name = 'TracAnnouncer',
@@ -68,21 +66,22 @@ setup(
     Copyright (c) 2009, Robert Corsaro.
     All rights reserved. Released under the 3-clause BSD license.
     """,
-    url = "http://www.trac-hacks.org/wiki/AnnouncerPlugin",
+    url = 'http://www.trac-hacks.org/wiki/AnnouncerPlugin',
     packages = find_packages(exclude=['*.tests*']),
     package_data = {
         'announcer': [
-            'templates/*.html',
-            'templates/*.txt',
             'htdocs/*.*',
             'htdocs/css/*.*',
             'locale/*/LC_MESSAGES/*.mo',
+            'locale/.placeholder',
+            'templates/*.html',
+            'templates/*.txt'
         ]
     },
-    install_requires = [
-        'trac>=0.12dev',
-    ],
+    install_requires = ['Genshi >= 0.5', 'Trac >= 0.11'],
     extras_require={
+        'Babel': 'Babel>= 0.9.5',
+        'Trac': 'Trac >= 0.12',
         'acct_mgr': 'TracAccountManager',
         'bitten': 'Bitten',
         'fullblog': 'TracFullBlogPlugin',
