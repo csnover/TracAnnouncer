@@ -40,7 +40,7 @@ from trac.core import *
 from trac.mimeview import Context
 from trac.test import Mock, MockPerm
 from trac.ticket.api import TicketSystem
-from trac.util.text import wrap, to_unicode, exception_to_unicode
+from trac.util.text import wrap, to_unicode
 from trac.versioncontrol.diff import diff_blocks, unified_diff
 from trac.web.chrome import Chrome
 from trac.web.href import Href
@@ -48,6 +48,7 @@ from trac.wiki.formatter import HtmlFormatter
 from trac.wiki.model import WikiPage
 
 from announcer.api import IAnnouncementFormatter
+from announcer.util.mail import exception_to_unicode
 
 
 def diff_cleanup(gen):
