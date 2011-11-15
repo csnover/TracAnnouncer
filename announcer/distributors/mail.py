@@ -54,7 +54,7 @@ except:
 from subprocess import Popen, PIPE
 
 from trac.config import BoolOption, ExtensionOption, IntOption, Option, \
-                        OrderedExtensionsOption, ChoiceOption
+                        OrderedExtensionsOption
 from trac.core import *
 from trac.util import get_pkginfo, md5
 from trac.util.compat import set, sorted
@@ -124,8 +124,7 @@ class EmailDistributor(Component):
     replyto = Option('announcer', 'email_replyto', 'trac@localhost',
         """Reply-To address to use in notification emails.""")
 
-    mime_encoding = ChoiceOption('announcer', 'mime_encoding',
-        ['base64', 'qp', 'none'],
+    mime_encoding = Option('announcer', 'mime_encoding', 'base64',
         """Specifies the MIME encoding scheme for emails.
 
         Valid options are 'base64' for Base64 encoding, 'qp' for
