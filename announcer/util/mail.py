@@ -64,9 +64,9 @@ def set_header(message, key, value, charset=None):
 def uid_encode(projurl, realm, target):
     """
     Unique identifier used to track resources in relation to emails.
-    projurl included to avoid Message-ID collisions.  Returns a base64 encode 
-    UID string.
 
+    Returns a base64 encode UID string.  projurl included to avoid
+    Message-ID collisions.  Returns a base64 encode UID string.
     Set project_url in trac.ini for proper results.
     """
     if hasattr(target, 'id'):

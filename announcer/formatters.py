@@ -32,6 +32,9 @@
 
 import difflib
 
+from genshi import HTML
+from genshi.template import NewTextTemplate, MarkupTemplate, TemplateLoader
+
 from trac.config import Option, IntOption, ListOption, BoolOption
 from trac.core import *
 from trac.mimeview import Context
@@ -44,10 +47,8 @@ from trac.web.href import Href
 from trac.wiki.formatter import HtmlFormatter
 from trac.wiki.model import WikiPage
 
-from genshi import HTML
-from genshi.template import NewTextTemplate, MarkupTemplate, TemplateLoader
-
 from announcer.api import IAnnouncementFormatter
+
 
 def diff_cleanup(gen):
     for value in gen:
