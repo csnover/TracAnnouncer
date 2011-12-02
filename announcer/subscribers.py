@@ -855,7 +855,7 @@ class WatchSubscriber(Component):
         elif hasattr(target, 'name'):
             tid = target.name
         else:
-            id = str(target)
+            tid = str(target)
         return tid
 
 class GeneralWikiSubscriber(Component):
