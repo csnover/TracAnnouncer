@@ -340,7 +340,7 @@ class SubscriptionResolver(Component):
         subscriptions = []
         for sp in self.subscribers:
             subscriptions.extend(
-                [x for x in sp.matches(event) if x]
+                [x for x in sp.matches(event) if x and len(x) > 6]
             )
 
         """
