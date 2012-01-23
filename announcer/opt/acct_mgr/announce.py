@@ -79,18 +79,20 @@ class AccountManagerAnnouncement(Component):
         self._notify('verify', username, token=token)
 
     # IAnnouncementSubscriber interface
-    def subscriptions(self, event):
-        if event.realm == 'acct_mgr':
-            for subscriber in self._get_membership(event):
-                self.log.debug("AccountManagerAnnouncement added '%s " \
-                        "(%s)'", subscriber[1], subscriber[2])
-                yield subscriber
-
     def matches(self, event):
-        yield
+        if event.realm != 'acct_mgr':
+            return
+        
+        for subscriber in self._get_membership(event):
+            self.log.debug("AccountManagerAnnouncement added '%s " \
+                "(%s)'", subscriber[2], subscriber[3])
+            yield subscriber
 
     def description(self):
-        return 'notify me an account changes NOT IMPLEMENTED'
+        return
+
+    def requires_authentication(self):
+        return True
 
     # IAnnouncementFormatter interface
     def styles(self, transport, realm):
@@ -155,7 +157,7 @@ class AccountManagerAnnouncement(Component):
             for result in settings[event.category].get_subscriptions():
                 yield result
         elif event.category in ('verify', 'reset'):
-            yield ('email', event.username, True, None)
+            yield (self.__class__.__name__, 'email', event.username, True, None, 'text/plain', 1, 'always')
 
     def _format_plaintext(self, event):
         acct_templates = {
