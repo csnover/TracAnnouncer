@@ -518,14 +518,16 @@ class EmailDistributor(Component):
 
         self.log.debug("Content of recip_adds: %s" %(recip_adds))
         package = (from_header, recip_adds, rootMessage.as_string())
-        start = time.time()
-        if self.use_threaded_delivery:
-            self.get_delivery_queue().put(package)
-        else:
-            self.send(*package)
-        stop = time.time()
-        self.log.debug("EmailDistributor took %s seconds to send."\
-                %(round(stop-start,2)))
+
+        if len(recip_adds) > 0:
+            start = time.time()
+            if self.use_threaded_delivery:
+                self.get_delivery_queue().put(package)
+            else:
+                self.send(*package)
+            stop = time.time()
+            self.log.debug("EmailDistributor took %s seconds to send."\
+                    %(round(stop-start,2)))
 
     def send(self, from_addr, recipients, message):
         """Send message to recipients via e-mail."""
