@@ -65,7 +65,7 @@ class DefaultPermissionFilter(Component):
             if not auth:
                 sid = 'anonymous'
             perm = PermissionCache(self.env, sid)
-            if perm.has_permission(action):
+            if event.realm in self.exception_realms or perm.has_permission(action):
                 yield subscription
             else:
                 self.log.debug(
