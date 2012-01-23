@@ -69,6 +69,6 @@ class DefaultPermissionFilter(Component):
                 yield subscription
             else:
                 self.log.debug(
-                    "Filtering %s because of rule: DefaultPermissionFilter"\
-                    %sid
+                    "Filtering %s with realm %s because of rule: DefaultPermissionFilter"\
+                    % (sid, event.realm)
                 )
